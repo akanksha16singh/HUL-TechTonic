@@ -1,8 +1,0 @@
-{
-  "name": "NEXT — Cultural War Room",
-  "description": "Cultural Decision Infrastructure for Hindustan Unilever featuring the Command Centre, War Room Cockpit, 7-Agent Specialist Mesh with Devil's Advocate, Governance Decision Rights Matrix, Cryptographic SHA-256 Outcome Ledger, and SQLite persistence.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}
