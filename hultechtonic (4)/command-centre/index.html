@@ -1,0 +1,2510 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="/shared/nav.css">
+<script src="./support.js"></script>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#1F44D6">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#1F44D6"/>
+    <rect x="360" y="240" width="480" height="320" rx="48" fill="#FFFFFF"/>
+    <rect x="430" y="330" width="200" height="28" rx="14" fill="#C7D6FF"/>
+    <rect x="430" y="386" width="340" height="28" rx="14" fill="#EAF0FF"/>
+    <rect x="430" y="442" width="150" height="48" rx="24" fill="#0E9F6E"/>
+  </svg>
+</template>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#F5F7FB;color:#0E1B33;font-family:'Plus Jakarta Sans',system-ui,sans-serif;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+*{box-sizing:border-box}
+a{color:#1F44D6;text-decoration:none}
+a:hover{color:#163398}
+::-webkit-scrollbar{width:10px;height:10px}
+::-webkit-scrollbar-thumb{background:#DCE3F0;border-radius:6px}
+@keyframes pulse{0%{transform:scale(1);opacity:.9}50%{transform:scale(1.9);opacity:0}100%{transform:scale(1.9);opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.94);opacity:0}60%{transform:scale(1.02)}100%{transform:scale(1);opacity:1}}
+@keyframes sweep{from{background-position:0 0}to{background-position:220px 0}}
+@keyframes grow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes scanLaser{
+  0%{top:0%;opacity:0.85;}
+  50%{top:95%;opacity:1;box-shadow:0 0 16px rgba(31,68,214,0.8);}
+  100%{top:0%;opacity:0.85;}
+}
+@keyframes scrollTicker{
+  0%{transform:translateY(0);}
+  100%{transform:translateY(-50%);}
+}
+@keyframes agentBlink{
+  0%, 100%{opacity:1;transform:scale(1);}
+  50%{opacity:0.4;transform:scale(0.92);}
+}
+@keyframes selectCelebration{
+  0%{box-shadow:0 0 0 rgba(14,159,110,0);border-color:#0E9F6E;}
+  50%{box-shadow:0 0 24px rgba(14,159,110,0.45);border-color:#0E9F6E;transform:scale(1.015);}
+  100%{box-shadow:0 0 10px rgba(14,159,110,0.2);border-color:#0E9F6E;transform:scale(1);}
+}
+</style>
+</helmet>
+<div style="min-width:1380px;min-height:100vh;background:#F5F7FB;display:flex;flex-direction:column">
+
+  <header style="height:62px;flex:0 0 62px;background:#FFFFFF;border-bottom:1px solid #E3E8F2;display:flex;align-items:center;gap:18px;padding:0 22px">
+    <div style="display:flex;align-items:center;gap:10px">
+      <a href="/" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid #DCE3F0;border-radius:8px;background:#F8FAFF;color:#1F44D6;font:700 11px/1 'Plus Jakarta Sans';text-decoration:none;transition:all .18s ease" style-hover="background:#EEF3FF;border-color:#1F44D6">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Home
+      </a>
+      <a href="/war-room/" style="display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px solid #DCE3F0;border-radius:8px;background:#FFFFFF;color:#5A6884;font:700 11px/1 'Plus Jakarta Sans';text-decoration:none;transition:all .18s ease" style-hover="background:#F8FAFF;color:#0E1B33">
+        War Room →
+      </a>
+    </div>
+    <div style="width:1px;height:24px;background:#E3E8F2"></div>
+    <div style="display:flex;align-items:center;gap:11px">
+      <div style="width:30px;height:30px;border-radius:9px;background:#1F44D6;display:flex;align-items:center;justify-content:center;color:#fff;font:800 14px/1 'Plus Jakarta Sans'">N</div>
+      <div>
+        <div style="font:800 15px/1.1 'Plus Jakarta Sans';letter-spacing:-.01em">NEXT</div>
+        <div style="font:500 10px/1.2 'Plus Jakarta Sans';color:#5A6884;letter-spacing:.06em;text-transform:uppercase">Decision command centre</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;height:32px;padding:0 12px;border:1px solid #E3E8F2;border-radius:9px;background:#F8FAFF">
+      <span style="position:relative;width:7px;height:7px;border-radius:50%;background:#0E9F6E">
+        <span style="position:absolute;inset:0;border-radius:50%;background:#0E9F6E;animation:pulse 2.4s infinite"></span>
+      </span>
+      <span style="font:700 11px/1 'Plus Jakarta Sans';color:#0E1B33">{{ modeLabel }}</span>
+      <span style="font:500 11px/1 'Plus Jakarta Sans';color:#5A6884">{{ modeNote }}</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;width:190px;min-width:190px;max-width:190px;height:32px;padding:0 10px;border:1px solid #C7D6FF;border-radius:9px;background:#F0F5FF;flex-shrink:0;box-sizing:border-box">
+      <span style="font:700 11px/1 'IBM Plex Mono',monospace;color:#1F44D6;font-variant-numeric:tabular-nums;letter-spacing:0;white-space:nowrap">⚡ SCAN: {{ autoScanCountdown }}</span>
+      <button onClick="{{ onScanNow }}" style="font:700 10px/1 'Plus Jakarta Sans',sans-serif;background:#1F44D6;color:#FFFFFF;border:0;border-radius:6px;padding:4px 8px;cursor:pointer;white-space:nowrap;transition:all .18s ease" style-hover="background:#163398">Scan Now</button>
+    </div>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <button onClick="{{ onStartWalkthrough }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid #C7D6FF;border-radius:8px;background:#EEF4FF;color:#1F44D6;font:700 11px/1 'Plus Jakarta Sans';cursor:pointer;transition:all .18s ease" style-hover="background:#DCE8FF">
+        <span style="font-size:13px">💡</span> Guided Walkthrough
+      </button>
+      <div style="width:1px;height:30px;background:#E3E8F2"></div>
+      <div style="text-align:right">
+        <div style="font:600 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Decisions waiting on you</div>
+        <div style="font:800 15px/1.3 'Plus Jakarta Sans';color:#B8770A">{{ waitingCount }}</div>
+      </div>
+      <div style="width:1px;height:30px;background:#E3E8F2"></div>
+      <div style="text-align:right">
+        <div style="font:600 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Average time to action</div>
+        <div style="font:800 15px/1.3 'Plus Jakarta Sans';color:#0E9F6E">{{ avgTta }}</div>
+      </div>
+      <div style="width:1px;height:30px;background:#E3E8F2"></div>
+      <div style="text-align:right">
+        <div style="font:600 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">This moment, live</div>
+        <div style="font:800 15px/1.3 'Plus Jakarta Sans';color:{{ liveClockColor }}">{{ liveClock }}</div>
+      </div>
+      <button onClick="{{ onRun }}" style="font:700 11px/1 'Plus Jakarta Sans';color:#FFFFFF;background:#1F44D6;border:0;border-radius:9px;padding:12px 16px;cursor:pointer;transition:all .18s ease" style-hover="background:#163398">{{ runLabel }}</button>
+      <div style="width:1px;height:30px;background:#E3E8F2"></div>
+      <div onClick="{{ onOpenRoleModal }}" style="display:flex;align-items:center;gap:10px;padding:4px 10px;border-radius:8px;border:1px solid #DCE3F0;background:#FFFFFF;cursor:pointer;transition:all .18s ease" title="Click to switch executive role" style-hover="border-color:#1F44D6;background:#F8FAFF">
+        <div style="width:32px;height:32px;border-radius:50%;background:{{ role.tint }};color:{{ role.color }};display:flex;align-items:center;justify-content:center;font:800 12px/1 'Plus Jakarta Sans'">{{ role.initials }}</div>
+        <div>
+          <div style="font:700 12px/1.2 'Plus Jakarta Sans';display:flex;align-items:center;gap:4px">
+            {{ role.who }}
+            <span style="font-size:10px;color:#1F44D6">▾</span>
+          </div>
+          <div style="font:500 10px/1.2 'Plus Jakarta Sans';color:#5A6884">{{ role.name }}</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div style="display:flex;flex:1;min-height:0">
+
+    <aside style="width:272px;flex:0 0 272px;background:#FFFFFF;border-right:1px solid #E3E8F2;overflow-y:auto;padding:18px 0">
+      <div style="padding:0 18px 12px;font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Your categories</div>
+      <sc-for list="{{ domainList }}" as="d" hint-placeholder-count="5">
+        <div onClick="{{ d.onClick }}" style="margin:0 12px 8px;padding:12px 13px;border:1px solid {{ d.bd }};background:{{ d.bg }};border-radius:12px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#C3CFEA">
+          <div style="display:flex;align-items:center;gap:9px;margin-bottom:6px">
+            <span style="width:8px;height:8px;border-radius:3px;background:{{ d.dot }}"></span>
+            <span style="font:700 13px/1.2 'Plus Jakarta Sans';color:#0E1B33;flex:1">{{ d.name }}</span>
+            <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ d.liveColor }};background:{{ d.liveBg }};border-radius:20px;padding:4px 8px">{{ d.live }}</span>
+          </div>
+          <div style="font:500 11px/1.45 'Plus Jakarta Sans';color:#5A6884;margin-bottom:9px">{{ d.brands }}</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:5px">
+            <span style="font:600 9px/1.3 'Plus Jakarta Sans';color:#8492AC;max-width:150px">{{ d.metric }}</span>
+            <span style="font:800 13px/1 'Plus Jakarta Sans';color:#0E1B33">{{ d.headline }}</span>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:3px;height:26px">
+            <sc-for list="{{ d.spark }}" as="b" hint-placeholder-count="10">
+              <div style="flex:1;height:{{ b.h }}px;background:{{ b.color }};border-radius:2px;transform-origin:bottom;animation:grow .5s ease-out"></div>
+            </sc-for>
+          </div>
+          <div style="font:600 10px/1.4 'Plus Jakarta Sans';color:{{ d.trendColor }};margin-top:6px">{{ d.trend }}</div>
+        </div>
+      </sc-for>
+
+      <div style="margin:16px 12px 0;padding:14px;border:1px solid #E3E8F2;border-radius:12px;background:#F8FAFF">
+        <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin-bottom:11px">{{ pulseTitle }}</div>
+        <sc-for list="{{ pulse }}" as="p" hint-placeholder-count="4">
+          <div style="margin-bottom:11px">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px">
+              <span style="font:600 11px/1.2 'Plus Jakarta Sans';color:#0E1B33">{{ p.k }}</span>
+              <span style="font:700 11px/1.2 'Plus Jakarta Sans';color:{{ p.color }}">{{ p.v }}</span>
+            </div>
+            <div style="height:5px;border-radius:3px;background:#E7EDF9;overflow:hidden">
+              <div style="height:5px;width:{{ p.pct }};background:{{ p.color }};border-radius:3px;transition:width .6s ease"></div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin:12px 12px 0;padding:14px;border:1px solid #DCE6FF;border-radius:12px;background:#EAF0FF">
+        <div style="font:700 11px/1.3 'Plus Jakarta Sans';color:#1F44D6;margin-bottom:6px">What this layer does</div>
+        <div style="font:500 11px/1.55 'Plus Jakarta Sans';color:#31456F">Every live signal in your category arrives here already read, argued over by six specialist agents and priced. You only make the call that needs a human.</div>
+      </div>
+    </aside>
+
+    <main style="flex:1;min-width:0;overflow-y:auto;padding:18px 20px 60px">
+
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px">
+        <div>
+          <div style="font:800 21px/1.25 'Plus Jakarta Sans';letter-spacing:-.01em">{{ domainHead }}</div>
+          <div style="font:500 13px/1.5 'Plus Jakarta Sans';color:#5A6884;max-width:760px;text-wrap:pretty">{{ domainSub }}</div>
+        </div>
+        <div style="font:600 11px/1.4 'Plus Jakarta Sans';color:#5A6884;text-align:right;max-width:230px">{{ domainScope }}</div>
+      </div>
+
+      <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin-bottom:9px">{{ queueLabel }}</div>
+      <div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+        <sc-for list="{{ queue }}" as="q" hint-placeholder-count="3">
+          <div onClick="{{ q.onClick }}" style="width:246px;background:#FFFFFF;border:1px solid {{ q.bd }};border-top:3px solid {{ q.top }};border-radius:12px;padding:12px 13px;cursor:pointer;transition:all .18s ease;box-shadow:{{ q.shadow }}" style-hover="border-color:#C3CFEA">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+              <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ q.vColor }};background:{{ q.vBg }};border-radius:20px;padding:4px 8px">{{ q.verdict }}</span>
+              <span style="font:600 10px/1 'Plus Jakarta Sans';color:#5A6884">{{ q.clock }}</span>
+            </div>
+            <div style="font:700 12px/1.4 'Plus Jakarta Sans';color:#0E1B33;margin-bottom:5px">{{ q.title }}</div>
+            <div style="font:500 11px/1.4 'Plus Jakarta Sans';color:#5A6884">{{ q.brand }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #E3E8F2;border-radius:16px;overflow:hidden">
+        <div style="padding:18px 20px 0;display:flex;align-items:flex-start;gap:18px">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+              <span style="font:700 10px/1 'Plus Jakarta Sans';color:#1F44D6;background:#EAF0FF;border-radius:20px;padding:5px 9px">{{ m.brand }}</span>
+              <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ m.vColor }};background:{{ m.vBg }};border-radius:20px;padding:5px 9px">{{ m.verdict }}</span>
+              <span style="font:600 10px/1 'Plus Jakarta Sans';color:#5A6884">{{ m.sourceLine }}</span>
+            </div>
+            <div style="font:800 19px/1.35 'Plus Jakarta Sans';letter-spacing:-.01em;max-width:820px;text-wrap:pretty">{{ m.title }}</div>
+            <div style="font:500 13px/1.6 'Plus Jakarta Sans';color:#5A6884;margin-top:7px;max-width:820px;text-wrap:pretty">{{ m.summary }}</div>
+          </div>
+          <div style="width:230px;flex:0 0 230px;border:1px solid #E3E8F2;border-radius:12px;padding:12px 14px;background:#F8FAFF">
+            <div style="font:600 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin-bottom:9px">Window and clock</div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+              <span style="font:500 11px/1.3 'Plus Jakarta Sans';color:#5A6884">Signal seen</span>
+              <span style="font:700 11px/1.3 'Plus Jakarta Sans'">{{ m.seen }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:7px">
+              <span style="font:500 11px/1.3 'Plus Jakarta Sans';color:#5A6884">Ready for you in</span>
+              <span style="font:700 11px/1.3 'Plus Jakarta Sans';color:#0E9F6E">{{ m.ready }}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="font:500 11px/1.3 'Plus Jakarta Sans';color:#5A6884">Window closes</span>
+              <span style="font:700 11px/1.3 'Plus Jakarta Sans';color:#B8770A">{{ m.window }}</span>
+            </div>
+            <div style="height:6px;border-radius:3px;background:#E7EDF9;margin-top:11px;overflow:hidden">
+              <div style="height:6px;width:{{ m.windowPct }};border-radius:3px;background:linear-gradient(90deg,#0E9F6E,#B8770A)"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin:18px 20px 0;border:1px solid {{ decision.bd }};background:{{ decision.headBg }};border-radius:14px;padding:16px 18px;display:flex;gap:20px;align-items:flex-start">
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <span style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Your call</span>
+              <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ decision.stateColor }};background:{{ decision.stateBg }};border-radius:20px;padding:5px 9px">{{ decision.state }}</span>
+              <span style="font:700 10px/1 'Plus Jakarta Sans';color:#1F44D6;background:#EAF0FF;border-radius:20px;padding:5px 9px">{{ decision.level }}</span>
+            </div>
+            <div style="font:800 18px/1.3 'Plus Jakarta Sans';color:#0E1B33;margin-bottom:6px">{{ decision.ask }}</div>
+            <div style="font:500 12px/1.6 'Plus Jakarta Sans';color:#5A6884;max-width:640px;text-wrap:pretty">{{ decision.note }}</div>
+            <div style="font:500 10px/1.5 'Plus Jakarta Sans';color:#8492AC;margin-top:2px">{{ decision.levelNote }}</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:13px">
+              <sc-for list="{{ decision.bullets }}" as="b" hint-placeholder-count="3">
+                <div style="display: flex; gap: 9px; padding: 10px 12px; background: #FFFFFF; border: 1px solid #E7EDF9; border-radius: 10px; width: 204px; height: 134px">
+                  <span style="width:18px;height:18px;border-radius:6px;background:{{ b.bg }};color:{{ b.color }};display:flex;align-items:center;justify-content:center;font:800 9px/1 'Plus Jakarta Sans';flex:0 0 18px">{{ b.mark }}</span>
+                  <span style="font: 500 11px/1.5 'Plus Jakarta Sans'; color: #31456F; width: 146px; height: 56px">{{ b.text }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="width:252px;flex:0 0 252px">
+            <sc-if value="{{ decision.open }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <button onClick="{{ onApprove }}" style="width:100%;font:700 12px/1 'Plus Jakarta Sans';color:#FFFFFF;background:#0E9F6E;border:0;border-radius:10px;padding:14px;cursor:pointer;transition:all .18s ease" style-hover="background:#0B8659">{{ decision.primary }}</button>
+                <div style="display:flex;gap:8px">
+                  <button onClick="{{ onEdit }}" style="flex:1;font:700 11px/1 'Plus Jakarta Sans';color:#1F44D6;background:#FFFFFF;border:1px solid #D3DFFF;border-radius:10px;padding:12px 8px;cursor:pointer;transition:all .18s ease" style-hover="background:#EAF0FF">Change a detail</button>
+                  <button onClick="{{ onDecline }}" style="flex:1;font:700 11px/1 'Plus Jakarta Sans';color:#C13A4C;background:#FFFFFF;border:1px solid #F6DDE1;border-radius:10px;padding:12px 8px;cursor:pointer;transition:all .18s ease" style-hover="background:#FDF2F4">Decline</button>
+                </div>
+                
+              </div>
+            </sc-if>
+            <sc-if value="{{ decision.done }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:13px 14px;border:1px solid {{ decision.doneBd }};background:#FFFFFF;border-radius:11px;animation:pop .3s ease-out">
+                <div style="display:flex;align-items:center;gap:9px;margin-bottom:7px">
+                  <span style="width:20px;height:20px;border-radius:50%;background:{{ decision.doneColor }};color:#FFFFFF;display:flex;align-items:center;justify-content:center;font:800 11px/1 'Plus Jakarta Sans'">{{ decision.doneMark }}</span>
+                  <span style="font:700 12px/1 'Plus Jakarta Sans';color:{{ decision.doneColor }}">{{ decision.doneTitle }}</span>
+                </div>
+                <div style="font:500 11px/1.55 'Plus Jakarta Sans';color:#5A6884">{{ decision.doneNote }}</div>
+                <button onClick="{{ onUndo }}" style="margin-top:11px;width:100%;font:700 11px/1 'Plus Jakarta Sans';color:#C13A4C;background:#FFFFFF;border:1px solid #F6DDE1;border-radius:9px;padding:11px;cursor:pointer" style-hover="background:#FDF2F4">{{ decision.undoLabel }}</button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:4px;padding:16px 20px 0;border-bottom:1px solid #E3E8F2;flex-wrap:wrap">
+          <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="6">
+            <div onClick="{{ t.onClick }}" style="padding:10px 14px 12px;border-bottom:2px solid {{ t.bd }};cursor:pointer;transition:all .18s ease;display:flex;align-items:center;gap:7px">
+              <span style="font:700 12px/1 'Plus Jakarta Sans';color:{{ t.color }}">{{ t.name }}</span>
+              <span style="font:700 9px/1 'Plus Jakarta Sans';color:{{ t.cColor }};background:{{ t.cBg }};border-radius:20px;padding:3px 6px">{{ t.count }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="padding:18px 20px 22px">
+
+          <sc-if value="{{ tabOverview }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:18px">
+                <sc-for list="{{ m.stats }}" as="s" hint-placeholder-count="6">
+                  <div style="border:1px solid #E3E8F2;border-radius:11px;padding:11px 12px;background:#FBFCFF">
+                    <div style="font:600 9px/1.2 'Plus Jakarta Sans';letter-spacing:.07em;color:#5A6884;text-transform:uppercase;margin-bottom:7px">{{ s.k }}</div>
+                    <div style="font:800 16px/1 'Plus Jakarta Sans';color:{{ s.c }}">{{ s.v }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:11px">
+                <div style="display:flex;align-items:baseline;gap:12px">
+                  <span style="font:700 13px/1 'Plus Jakarta Sans'">How this reached you</span>
+                  <span style="font:800 13px/1 'Plus Jakarta Sans';color:{{ liveClockColor }}">{{ liveClock }}</span>
+                  <span style="font:500 11px/1 'Plus Jakarta Sans';color:#8492AC">{{ liveClockNote }}</span>
+                </div>
+                <button onClick="{{ onPlay }}" style="font:700 11px/1 'Plus Jakarta Sans';color:#FFFFFF;background:#1F44D6;border:0;border-radius:9px;padding:10px 15px;cursor:pointer;transition:all .18s ease" style-hover="background:#163398">{{ playLabel }}</button>
+              </div>
+              <div style="display:flex;gap:8px;margin-bottom:20px">
+                <sc-for list="{{ phases }}" as="p" hint-placeholder-count="8">
+                  <div style="flex:1;border:1px solid {{ p.bd }};background:{{ p.bg }};border-radius:11px;padding:11px 10px;transition:all .3s ease">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+                      <span style="width:16px;height:16px;border-radius:50%;background:{{ p.dotBg }};color:{{ p.dotColor }};display:flex;align-items:center;justify-content:center;font:800 9px/1 'Plus Jakarta Sans'">{{ p.mark }}</span>
+                      <span style="font:700 10px/1.2 'Plus Jakarta Sans';color:{{ p.color }}">{{ p.name }}</span>
+                    </div>
+                    <div style="font:600 10px/1.3 'Plus Jakarta Sans';color:#5A6884">{{ p.time }}</div>
+                    <div style="font:500 10px/1.4 'Plus Jakarta Sans';color:#8492AC;margin-top:4px">{{ p.who }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div style="border:1px solid #DCEFE6;background:#F3FBF7;border-radius:12px;padding:15px 16px">
+                  <div style="font:700 11px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#0E9F6E;text-transform:uppercase;margin-bottom:11px">Why we should move</div>
+                  <sc-for list="{{ m.caseFor }}" as="f" hint-placeholder-count="3">
+                    <div style="display:flex;gap:9px;padding:5px 0">
+                      <span style="color:#0E9F6E;font:800 12px/1.6 'Plus Jakarta Sans'">+</span>
+                      <span style="font:500 12px/1.6 'Plus Jakarta Sans';color:#25476B">{{ f }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="border:1px solid #F6DDE1;background:#FDF6F7;border-radius:12px;padding:15px 16px">
+                  <div style="font:700 11px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#C13A4C;text-transform:uppercase;margin-bottom:11px">Why we might not</div>
+                  <sc-for list="{{ m.caseAgainst }}" as="f" hint-placeholder-count="3">
+                    <div style="display:flex;gap:9px;padding:5px 0">
+                      <span style="color:#C13A4C;font:800 12px/1.6 'Plus Jakarta Sans'">!</span>
+                      <span style="font:500 12px/1.6 'Plus Jakarta Sans';color:#5B3138">{{ f }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="margin-top:14px;border:1px solid #E3E8F2;border-radius:12px;padding:15px 16px;background:#FBFCFF">
+                <div style="font:700 11px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#5A6884;text-transform:uppercase;margin-bottom:8px">If we do nothing</div>
+                <div style="font:500 13px/1.65 'Plus Jakarta Sans';color:#31456F;text-wrap:pretty">{{ m.doNothing }}</div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabLive }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <!-- AI Scanner HUD Header -->
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding:14px 18px;border-radius:12px;background:{{ liveModeBg }};border:1px solid {{ liveModeColor }};box-shadow:0 4px 16px rgba(31,68,214,0.06);flex-wrap:wrap;gap:10px">
+                <div style="display:flex;align-items:center;gap:12px">
+                  <span style="font:700 11px/1 'IBM Plex Mono';letter-spacing:.08em;padding:6px 10px;border-radius:6px;color:#FFFFFF;background:{{ liveModeColor }};display:flex;align-items:center;gap:6px">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#FFFFFF;animation:pulse 1.8s infinite"></span>
+                    {{ liveMode }}
+                  </span>
+                  <div>
+                    <div style="font:700 13px/1.3 'Plus Jakarta Sans';color:#0E1B33">{{ scannerStatusTitle }}</div>
+                    <div style="font:500 11px/1.3 'Plus Jakarta Sans';color:#5A6884">{{ scannerStatusSub }}</div>
+                  </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px">
+                  <div style="text-align:right">
+                    <div style="font:600 9px/1 'IBM Plex Mono';color:#8492AC;text-transform:uppercase">Next Auto-Crawl</div>
+                    <div style="font:700 13px/1.2 'IBM Plex Mono';color:#1F44D6">{{ autoScanCountdown }}</div>
+                  </div>
+                  <button onClick="{{ onScanNow }}" style="font:700 11px/1 'Plus Jakarta Sans';background:#1F44D6;color:#FFFFFF;border:0;border-radius:8px;padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .18s ease" style-hover="background:#163398">
+                    <span>⚡ Run AI Scanner</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Multi-Agent Live Mesh Status Bar -->
+              <div style="margin-bottom:16px;border:1px solid #E3E8F2;border-radius:12px;padding:12px 16px;background:#FFFFFF">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                  <span style="font:700 11px/1 'IBM Plex Mono';color:#5A6884;text-transform:uppercase;letter-spacing:.08em">Autonomous Agent Mesh Processing</span>
+                  <span style="font:600 11px/1 'IBM Plex Mono';color:{{ agentMeshColor }}">{{ agentMeshState }}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">
+                  <sc-for list="{{ activeAgentChips }}" as="ac">
+                    <div style="border:1px solid {{ ac.bd }};border-radius:8px;padding:8px 10px;background:{{ ac.bg }};display:flex;flex-direction:column;gap:3px;transition:all .2s ease">
+                      <div style="display:flex;align-items:center;justify-content:space-between">
+                        <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ ac.color }}">{{ ac.name }}</span>
+                        <span style="width:6px;height:6px;border-radius:50%;background:{{ ac.dotColor }};animation:{{ ac.anim }}"></span>
+                      </div>
+                      <span style="font:600 9px/1 'IBM Plex Mono';color:#8492AC">{{ ac.status }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-bottom:16px">
+                <!-- Grounded News Stream with Laser Scanner -->
+                <div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                    <div style="font:700 11px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#5A6884;text-transform:uppercase">Grounded News Stream (India &amp; Global FMCG)</div>
+                    <span style="font:600 10px/1 'IBM Plex Mono';color:#8492AC">{{ liveCountLabel }}</span>
+                  </div>
+
+                  <div style="position:relative;max-height:560px;overflow-y:auto;padding-right:4px;display:flex;flex-direction:column;gap:10px;border-radius:10px">
+                    <!-- Scanner Laser Overlay when Active -->
+                    <sc-if value="{{ isScanningActive }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#1F44D6,#0E9F6E,transparent);box-shadow:0 0 12px #1F44D6;z-index:10;pointer-events:none;animation:scanLaser 2.2s infinite ease-in-out"></div>
+                    </sc-if>
+
+                    <sc-if value="{{ hasLiveNews }}" hint-placeholder-val="{{ true }}">
+                      <sc-for list="{{ liveFeed }}" as="n">
+                        <div onClick="{{ n.onClick }}" style="position:relative;border:1px solid {{ n.bd }};border-radius:10px;padding:12px 14px;background:{{ n.bg }};cursor:pointer;transition:all .2s ease;box-shadow:{{ n.shadow }};animation:{{ n.cardAnim }}">
+                          <sc-if value="{{ n.isInspecting }}" hint-placeholder-val="{{ false }}">
+                            <div style="position:absolute;top:6px;right:8px;font:700 9px/1 'IBM Plex Mono';color:#1F44D6;background:#EAF0FF;padding:3px 7px;border-radius:4px;animation:pulse 1.2s infinite">AI INSPECTING</div>
+                          </sc-if>
+                          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+                            <div style="display:flex;align-items:center;gap:6px">
+                              <span style="font:700 10px/1 'IBM Plex Mono';padding:3px 7px;border-radius:4px;color:{{ n.stanceColor }};background:{{ n.stanceBg }}">{{ n.stance }}</span>
+                              <span style="font:700 11px/1 'Plus Jakarta Sans';color:#1F44D6">{{ n.brand }}</span>
+                              <span style="font:500 10px/1 'Plus Jakarta Sans';color:#8492AC">· {{ n.category }}</span>
+                            </div>
+                            <span style="font:700 11px/1 'IBM Plex Mono';color:{{ n.stanceColor }}">{{ n.score }} / 100</span>
+                          </div>
+                          <div style="font:700 13px/1.35 'Plus Jakarta Sans';color:#0E1B33;margin-bottom:5px">{{ n.headline }}</div>
+                          <div style="font:500 11px/1.45 'Plus Jakarta Sans';color:#5A6884;margin-bottom:6px">{{ n.summary }}</div>
+                          <div style="display:flex;align-items:center;justify-content:space-between;font:500 10px/1 'IBM Plex Mono';color:#8492AC">
+                            <span>{{ n.meta }}</span>
+                            <span style="color:#5A6884;font-weight:600">{{ n.window }}</span>
+                          </div>
+                        </div>
+                      </sc-for>
+                    </sc-if>
+                    <sc-if value="{{ noLiveNews }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:32px 20px;text-align:center;color:#8492AC;font:500 13px 'Plus Jakarta Sans';background:#FFFFFF;border:1px dashed #DCE3F0;border-radius:10px">
+                        <div>📡 Scanning real-time HUL and FMCG intelligence stream...</div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </div>
+
+                <!-- Agent Read & Selection Rationale -->
+                <div>
+                  <div style="font:700 11px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#5A6884;text-transform:uppercase;margin-bottom:10px">Agent Read &amp; Rationale</div>
+                  <sc-if value="{{ hasLiveSelection }}" hint-placeholder-val="{{ true }}">
+                    <div style="border:1px solid #E3E8F2;border-radius:12px;padding:16px;background:#FFFFFF;box-shadow:0 4px 18px rgba(14,27,51,0.04)">
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                        <span style="font:700 11px/1 'IBM Plex Mono';padding:4px 8px;border-radius:4px;color:{{ liveSel.stanceColor }};background:{{ liveSel.stanceBg }}">{{ liveSel.stance }} · {{ liveSel.window }}</span>
+                        <span style="font:700 12px/1 'Plus Jakarta Sans';color:#1F44D6">{{ liveSel.brand }}</span>
+                      </div>
+                      <h3 style="font:700 15px/1.35 'Plus Jakarta Sans';color:#0E1B33;margin:0 0 8px">{{ liveSel.headline }}</h3>
+                      <div style="font:500 12px/1.55 'Plus Jakarta Sans';color:#31456F;margin-bottom:12px;padding:10px 12px;border-radius:8px;background:#F5F8FF;border-left:3px solid #1F44D6">
+                        <strong style="color:#0E1B33">AI Rationale: </strong>{{ liveSel.rationale }}
+                      </div>
+                      <div style="font:700 11px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#5A6884;text-transform:uppercase;margin-bottom:8px">Specialist Panel Reads</div>
+                      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+                        <sc-for list="{{ liveAgents }}" as="la">
+                          <div style="border:1px solid #EAEFF8;border-radius:8px;padding:9px 11px;background:#FBFCFF">
+                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+                              <span style="font:700 11px/1 'Plus Jakarta Sans';color:#0E1B33">{{ la.name }}</span>
+                              <div style="display:flex;align-items:center;gap:6px">
+                                <span style="font:700 9px/1 'IBM Plex Mono';color:{{ la.color }};background:{{ la.bg }};border-radius:4px;padding:2px 6px">{{ la.verdict }}</span>
+                                <span style="font:700 10px/1 'IBM Plex Mono';color:{{ la.color }}">{{ la.score }}</span>
+                              </div>
+                            </div>
+                            <div style="font:500 11px/1.4 'Plus Jakarta Sans';color:#5A6884">{{ la.line }}</div>
+                          </div>
+                        </sc-for>
+                      </div>
+
+                      <sc-if value="{{ hasCitations }}" hint-placeholder-val="{{ true }}">
+                        <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#8492AC;text-transform:uppercase;margin-bottom:6px">Grounding Sources</div>
+                        <div style="display:flex;flex-wrap:wrap;gap:6px">
+                          <sc-for list="{{ liveCitations }}" as="c">
+                            <a href="{{ c.uri }}" target="_blank" rel="noopener noreferrer" style="font:500 10px/1 'IBM Plex Mono';color:#1F44D6;background:#EAF0FF;padding:4px 8px;border-radius:4px;text-decoration:none;display:inline-flex;align-items:center;gap:4px">
+                              🔗 {{ c.title }}
+                            </a>
+                          </sc-for>
+                        </div>
+                      </sc-if>
+                    </div>
+                  </sc-if>
+                </div>
+              </div>
+
+              <div style="border:1px solid #E3E8F2;border-radius:12px;padding:14px 16px;background:#FBFCFF">
+                <div style="font:700 11px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#5A6884;text-transform:uppercase;margin-bottom:8px">Live Indian Market Desk Context</div>
+                <div style="font:500 12px/1.6 'Plus Jakarta Sans';color:#31456F;margin-bottom:10px">{{ liveContextSummary }}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px">
+                  <sc-for list="{{ liveKeywords }}" as="kw">
+                    <span style="font:600 10px/1 'IBM Plex Mono';color:#1F44D6;background:#EAF0FF;padding:4px 9px;border-radius:12px"># {{ kw.k }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabDebate }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font:700 13px/1 'Plus Jakarta Sans'">Six specialists, six independent views</span>
+                <span style="font:500 11px/1 'Plus Jakarta Sans';color:#5A6884">{{ debateNote }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:16px">
+                <sc-for list="{{ m.agents }}" as="a" hint-placeholder-count="6">
+                  <div style="border:1px solid #E3E8F2;border-left:3px solid {{ a.color }};border-radius:11px;padding:13px 14px;background:#FFFFFF;animation:rise .35s ease-out">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                      <span style="font:700 12px/1 'Plus Jakarta Sans'">{{ a.name }}</span>
+                      <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ a.color }};background:{{ a.bg }};border-radius:20px;padding:4px 9px">{{ a.verdict }}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+                      <div style="flex:1;height:5px;border-radius:3px;background:#EEF2FA;overflow:hidden">
+                        <div style="height:5px;width:{{ a.pct }};background:{{ a.color }};border-radius:3px;transition:width .5s ease"></div>
+                      </div>
+                      <span style="font:800 12px/1 'Plus Jakarta Sans';color:{{ a.color }}">{{ a.score }}</span>
+                    </div>
+                    <div style="font:500 12px/1.55 'Plus Jakarta Sans';color:#4A5B7A;text-wrap:pretty">{{ a.line }}</div>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="border:1px solid {{ m.arbBd }};background:{{ m.arbBg }};border-radius:14px;padding:0;display:flex">
+                <div style="width:210px;flex:0 0 210px;padding:18px;border-right:1px solid {{ m.arbBd }};text-align:center">
+                  <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin-bottom:12px">Chair agent ruling</div>
+                  <div style="position:relative;width:118px;height:118px;margin:0 auto 10px">
+                    <svg viewBox="0 0 120 120" style="width:118px;height:118px;transform:rotate(270deg)">
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="#E7EDF9" stroke-width="11"></circle>
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="{{ m.vColor }}" stroke-width="11" stroke-linecap="round" stroke-dasharray="{{ m.ring }}"></circle>
+                    </svg>
+                    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                      <span style="font:800 30px/1 'Plus Jakarta Sans';color:{{ m.vColor }}">{{ m.score }}</span>
+                      <span style="font:600 9px/1 'Plus Jakarta Sans';color:#5A6884;letter-spacing:.06em;text-transform:uppercase;margin-top:4px">Opportunity</span>
+                    </div>
+                  </div>
+                  <div style="font:800 15px/1.2 'Plus Jakarta Sans';color:{{ m.vColor }}">{{ m.verdict }}</div>
+                </div>
+                <div style="flex:1;padding:18px 20px">
+                  <div style="font:500 13px/1.7 'Plus Jakarta Sans';color:#31456F;text-wrap:pretty">{{ m.rationale }}</div>
+                  <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin:15px 0 9px">Recorded disagreement</div>
+                  <sc-for list="{{ m.dissent }}" as="d" hint-placeholder-count="2">
+                    <div style="display:flex;gap:11px;padding:10px 13px;background:#FFFFFF;border:1px solid #E3E8F2;border-radius:10px;margin-bottom:7px">
+                      <span style="font:700 11px/1.5 'Plus Jakarta Sans';color:#B8770A;min-width:84px">{{ d.who }}</span>
+                      <span style="font:500 12px/1.5 'Plus Jakarta Sans';color:#4A5B7A">{{ d.what }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabCreative }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font:700 13px/1 'Plus Jakarta Sans'">{{ m.createLabel }}</span>
+                <span style="font:500 11px/1 'Plus Jakarta Sans';color:#5A6884">Each route checked against the brand book before you see it</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+                <sc-for list="{{ m.concepts }}" as="c" hint-placeholder-count="3">
+                  <div style="border:1px solid #E3E8F2;border-radius:13px;overflow:hidden;background:#FFFFFF;animation:pop .35s ease-out">
+                    <div style="height:150px;background:repeating-linear-gradient(135deg,#F2F5FC 0 10px,#E9EEF9 10px 20px);display:flex;align-items:center;justify-content:center;border-bottom:1px solid #E3E8F2">
+                      <span style="font:600 10px/1.5 'Plus Jakarta Sans';color:#7A88A3;text-align:center;padding:0 16px">{{ c.slot }}</span>
+                    </div>
+                    <div style="padding:13px 14px">
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+                        <span style="font:700 12px/1 'Plus Jakarta Sans'">{{ c.name }}</span>
+                        <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ c.color }};background:{{ c.bg }};border-radius:20px;padding:4px 8px">{{ c.state }}</span>
+                      </div>
+                      <div style="font:700 14px/1.4 'Plus Jakarta Sans';color:#0E1B33;margin-bottom:7px">{{ c.copy }}</div>
+                      <div style="font:500 11px/1.5 'Plus Jakarta Sans';color:#5A6884">{{ c.note }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ hasLocal }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:18px">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+                    <span style="font:700 13px/1 'Plus Jakarta Sans'">Market versions compiled from the approved route</span>
+                    <span style="font:600 11px/1 'Plus Jakarta Sans';color:#0E9F6E">{{ localNote }}</span>
+                  </div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+                    <sc-for list="{{ localCells }}" as="l" hint-placeholder-count="9">
+                      <div style="border:1px solid #E3E8F2;border-radius:11px;padding:12px 13px;background:#FBFCFF">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px">
+                          <span style="font:700 11px/1 'Plus Jakarta Sans';color:#31456F">{{ l.market }}</span>
+                          <span style="font:700 9px/1 'Plus Jakarta Sans';color:{{ l.color }};background:{{ l.bg }};border-radius:20px;padding:4px 8px">{{ l.check }}</span>
+                        </div>
+                        <div style="font:700 13px/1.45 'Plus Jakarta Sans';color:#0E1B33;margin-bottom:6px">{{ l.copy }}</div>
+                        <div style="font:500 10px/1.5 'Plus Jakarta Sans';color:#5A6884">{{ l.note }}</div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabRisk }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:grid;grid-template-columns:1.2fr 1fr;gap:14px">
+                <div>
+                  <div style="font:700 13px/1 'Plus Jakarta Sans';margin-bottom:11px">Risk register for this decision</div>
+                  <sc-for list="{{ m.risks }}" as="r" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #E3E8F2;border-radius:11px;background:#FFFFFF;margin-bottom:8px">
+                      <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ r.color }};background:{{ r.bg }};border-radius:20px;padding:5px 10px;min-width:62px;text-align:center">{{ r.sev }}</span>
+                      <span style="flex:1;font:500 12px/1.5 'Plus Jakarta Sans';color:#31456F">{{ r.text }}</span>
+                      <span style="font:600 11px/1.3 'Plus Jakarta Sans';color:#5A6884">{{ r.owner }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+                <div>
+                  <div style="font:700 13px/1 'Plus Jakarta Sans';margin-bottom:11px">Brand book lines checked</div>
+                  <sc-for list="{{ m.brandLines }}" as="b" hint-placeholder-count="4">
+                    <div style="padding:12px 14px;border:1px solid {{ b.bd }};background:{{ b.bg }};border-radius:11px;margin-bottom:8px">
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+                        <span style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.06em;color:#5A6884;text-transform:uppercase">{{ b.k }}</span>
+                        <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ b.color }}">{{ b.state }}</span>
+                      </div>
+                      <div style="font:500 12px/1.5 'Plus Jakarta Sans';color:#31456F">{{ b.v }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabGovernance }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px">
+                <div>
+                  <div style="font:700 13px/1 'Plus Jakarta Sans';margin-bottom:5px">Who is allowed to decide what</div>
+                  <div style="font:500 12px/1.5 'Plus Jakarta Sans';color:#5A6884">Change a level and the queue obeys it on the next run. This is a setting, not a rebuild.</div>
+                </div>
+                <span style="font:700 11px/1 'Plus Jakarta Sans';color:#1F44D6;background:#EAF0FF;border-radius:20px;padding:7px 11px">{{ policyNote }}</span>
+              </div>
+              <div style="border:1px solid #E3E8F2;border-radius:13px;overflow:hidden">
+                <div style="display:grid;grid-template-columns:1.6fr 260px 150px;gap:14px;padding:11px 16px;background:#F8FAFF;border-bottom:1px solid #E3E8F2">
+                  <span style="font:700 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Decision type</span>
+                  <span style="font:700 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Autonomy level</span>
+                  <span style="font:700 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;text-align:right">Result</span>
+                </div>
+                <sc-for list="{{ policyRows }}" as="r" hint-placeholder-count="5">
+                  <div style="display:grid;grid-template-columns:1.6fr 260px 150px;gap:14px;padding:13px 16px;border-bottom:1px solid #EEF2FA;background:{{ r.rowBg }};align-items:center">
+                    <div>
+                      <div style="font:600 12px/1.4 'Plus Jakarta Sans';color:{{ r.textColor }}">{{ r.cls }}</div>
+                      <div style="font:500 10px/1.4 'Plus Jakarta Sans';color:#8492AC">{{ r.meta }}</div>
+                    </div>
+                    <div style="display:flex;gap:4px">
+                      <sc-for list="{{ r.levels }}" as="lv" hint-placeholder-count="6">
+                        <span onClick="{{ lv.onClick }}" style="font:700 10px/1 'Plus Jakarta Sans';color:{{ lv.color }};background:{{ lv.bg }};border:1px solid {{ lv.bd }};border-radius:7px;padding:7px 8px;cursor:{{ lv.cursor }};transition:all .15s ease" style-hover="border-color:#1F44D6">{{ lv.label }}</span>
+                      </sc-for>
+                    </div>
+                    <span style="font:700 11px/1.3 'Plus Jakarta Sans';color:{{ r.gateColor }};text-align:right">{{ r.gate }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div style="border:1px solid #DCEFE6;background:#F3FBF7;border-radius:12px;padding:14px 15px">
+                  <div style="font:700 11px/1 'Plus Jakarta Sans';color:#0E9F6E;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">Undo before autonomy</div>
+                  <div style="font:500 12px/1.6 'Plus Jakarta Sans';color:#25476B">{{ m.undo }}</div>
+                </div>
+                <div style="border:1px solid #E3E8F2;background:#FBFCFF;border-radius:12px;padding:14px 15px">
+                  <div style="font:700 11px/1 'Plus Jakarta Sans';color:#5A6884;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">Levels in plain words</div>
+                  <div style="font:500 12px/1.6 'Plus Jakarta Sans';color:#31456F">L0 tells you. L1 suggests. L2 suggests and waits for you. L3 acts inside rules you already signed. L4 acts and tells you after. L5 is switched off on purpose.</div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabChannels }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <span style="font:700 13px/1 'Plus Jakarta Sans'">{{ channelLabel }}</span>
+                <span style="font:600 11px/1 'Plus Jakarta Sans';color:#5A6884">{{ channelNote }}</span>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <sc-for list="{{ channels }}" as="ch" hint-placeholder-count="4">
+                  <div style="border:1px solid #E3E8F2;border-radius:13px;overflow:hidden;background:#FFFFFF;animation:pop .3s ease-out">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 13px;border-bottom:1px solid #EEF2FA">
+                      <span style="font:700 12px/1 'Plus Jakarta Sans'">{{ ch.name }}</span>
+                      <span style="font:700 9px/1 'Plus Jakarta Sans';color:{{ ch.color }};background:{{ ch.bg }};border-radius:20px;padding:4px 8px">{{ ch.status }}</span>
+                    </div>
+                    <div style="height:112px;background:repeating-linear-gradient(135deg,#F2F5FC 0 10px,#E9EEF9 10px 20px);display:flex;align-items:center;justify-content:center">
+                      <span style="font:600 10px/1.4 'Plus Jakarta Sans';color:#7A88A3;text-align:center;padding:0 12px">{{ ch.slot }}</span>
+                    </div>
+                    <div style="padding:12px 13px">
+                      <div style="font:600 12px/1.45 'Plus Jakarta Sans';color:#31456F">{{ ch.caption }}</div>
+                      <div style="font:500 10px/1.45 'Plus Jakarta Sans';color:#8492AC;margin-top:6px">{{ ch.meta }}</div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabImpact }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+                <sc-for list="{{ m.impact }}" as="i" hint-placeholder-count="3">
+                  <div style="border:1px solid #E3E8F2;border-radius:13px;padding:16px;background:linear-gradient(180deg,#FFFFFF,#F8FAFF)">
+                    <div style="font:600 10px/1 'Plus Jakarta Sans';letter-spacing:.08em;color:#5A6884;text-transform:uppercase;margin-bottom:10px">{{ i.label }}</div>
+                    <div style="font:800 27px/1 'Plus Jakarta Sans';color:#1F44D6;letter-spacing:-.02em">{{ i.value }}</div>
+                    <div style="font:500 11px/1.5 'Plus Jakarta Sans';color:#5A6884;margin-top:8px">{{ i.note }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="border:1px solid #E3E8F2;border-radius:13px;padding:16px 18px;background:#FFFFFF">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px">
+                  <span style="font:700 13px/1 'Plus Jakarta Sans'">Value of the same idea as the day goes on</span>
+                  <span style="font:500 11px/1 'Plus Jakarta Sans';color:#5A6884">Every hour of delay is money left on the table</span>
+                </div>
+                <div style="display:flex;align-items:flex-end;gap:10px;height:120px">
+                  <sc-for list="{{ decay }}" as="d" hint-placeholder-count="8">
+                    <div style="flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:120px">
+                      <span style="font:700 10px/1.4 'Plus Jakarta Sans';color:#5A6884;text-align:center">{{ d.v }}</span>
+                      <div style="height:{{ d.h }}px;background:{{ d.color }};border-radius:5px 5px 0 0;transform-origin:bottom;animation:grow .5s ease-out"></div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display:flex;gap:10px;margin-top:8px">
+                  <sc-for list="{{ decay }}" as="d" hint-placeholder-count="8">
+                    <span style="flex:1;font:600 10px/1 'Plus Jakarta Sans';color:#8492AC;text-align:center">{{ d.t }}</span>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabLedger }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px">
+                <div>
+                  <div style="font:700 13px/1 'Plus Jakarta Sans';margin-bottom:5px">Memory of every call we have made</div>
+                  <div style="font:500 12px/1.5 'Plus Jakarta Sans';color:#5A6884">Models can be bought by anyone. This record cannot.</div>
+                </div>
+                <span style="font:700 11px/1 'Plus Jakarta Sans';color:#6A4CE0;background:#F0EBFF;border-radius:20px;padding:7px 11px">{{ ledgerNote }}</span>
+              </div>
+              <div style="border:1px solid #E3E8F2;border-radius:13px;overflow:hidden">
+                <div style="display:grid;grid-template-columns:1.5fr 130px 90px 1.4fr;gap:12px;padding:11px 16px;background:#F8FAFF;border-bottom:1px solid #E3E8F2">
+                  <span style="font:700 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Moment</span>
+                  <span style="font:700 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Call</span>
+                  <span style="font:700 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Score</span>
+                  <span style="font:700 9px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">What happened next</span>
+                </div>
+                <sc-for list="{{ ledger }}" as="e" hint-placeholder-count="4">
+                  <div style="display:grid;grid-template-columns:1.5fr 130px 90px 1.4fr;gap:12px;padding:13px 16px;border-bottom:1px solid #EEF2FA;background:{{ e.rowBg }};align-items:center">
+                    <div>
+                      <div style="font:600 12px/1.4 'Plus Jakarta Sans';color:#0E1B33">{{ e.sig }}</div>
+                      <div style="font:500 10px/1.4 'Plus Jakarta Sans';color:#8492AC">{{ e.id }}</div>
+                    </div>
+                    <span style="font:700 11px/1.3 'Plus Jakarta Sans';color:{{ e.color }}">{{ e.verdict }}</span>
+                    <span style="font:600 11px/1.3 'Plus Jakarta Sans';color:#31456F">{{ e.score }}</span>
+                    <span style="font:500 11px/1.5 'Plus Jakarta Sans';color:#5A6884">{{ e.outcome }}</span>
+                  </div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ hasReplay }}" hint-placeholder-val="{{ true }}">
+                <div style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div style="border:1px solid #E3E8F2;border-radius:12px;padding:15px 16px;background:#FBFCFF">
+                    <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#8492AC;text-transform:uppercase;margin-bottom:8px">{{ m.replay.thenDate }}</div>
+                    <div style="font:700 13px/1.45 'Plus Jakarta Sans';color:#31456F;margin-bottom:8px">{{ m.replay.thenTitle }}</div>
+                    <div style="font:500 12px/1.6 'Plus Jakarta Sans';color:#5A6884">{{ m.replay.thenOutcome }}</div>
+                  </div>
+                  <div style="border:1px solid #DCEFE6;border-radius:12px;padding:15px 16px;background:#F3FBF7">
+                    <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#0E9F6E;text-transform:uppercase;margin-bottom:8px">Today, taught by that outcome</div>
+                    <div style="font:700 13px/1.45 'Plus Jakarta Sans';color:#25476B;margin-bottom:8px">{{ m.replay.nowTitle }}</div>
+                    <div style="font:500 12px/1.6 'Plus Jakarta Sans';color:#4A5B7A">{{ m.replay.nowOutcome }}</div>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabBoard }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
+                <sc-for list="{{ board.value }}" as="v" hint-placeholder-count="3">
+                  <div style="border:1px solid #E3E8F2;border-radius:13px;padding:17px;background:linear-gradient(180deg,#FFFFFF,#F5F8FF)">
+                    <div style="font:600 10px/1.3 'Plus Jakarta Sans';letter-spacing:.08em;color:#5A6884;text-transform:uppercase;margin-bottom:10px">{{ v.label }}</div>
+                    <div style="font:800 28px/1 'Plus Jakarta Sans';color:#1F44D6;letter-spacing:-.02em">{{ v.value }}</div>
+                    <div style="font:500 11px/1.5 'Plus Jakarta Sans';color:#5A6884;margin-top:8px">{{ v.note }}</div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                <div>
+                  <div style="font:700 13px/1 'Plus Jakarta Sans';margin-bottom:11px">Are the guardrails holding</div>
+                  <sc-for list="{{ boardPosture }}" as="p" hint-placeholder-count="4">
+                    <div style="border:1px solid #E3E8F2;border-radius:11px;padding:13px 14px;background:#FFFFFF;margin-bottom:8px">
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+                        <span style="font:700 11px/1.3 'Plus Jakarta Sans';color:#31456F">{{ p.k }}</span>
+                        <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ p.color }};background:{{ p.bg }};border-radius:20px;padding:4px 9px">{{ p.state }}</span>
+                      </div>
+                      <div style="font:500 12px/1.5 'Plus Jakarta Sans';color:#5A6884">{{ p.v }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div>
+                  <div style="font:700 13px/1 'Plus Jakarta Sans';margin-bottom:11px">Where this goes next, and what it costs</div>
+                  <sc-for list="{{ board.rollout }}" as="r" hint-placeholder-count="3">
+                    <div style="border:1px solid #E3E8F2;border-left:3px solid {{ r.color }};border-radius:11px;padding:13px 14px;background:#FFFFFF;margin-bottom:8px">
+                      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+                        <span style="font:700 12px/1.3 'Plus Jakarta Sans';color:#0E1B33">{{ r.phase }}</span>
+                        <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ r.color }}">{{ r.state }}</span>
+                      </div>
+                      <div style="font:500 12px/1.5 'Plus Jakarta Sans';color:#5A6884">{{ r.scope }}</div>
+                      <div style="font:700 12px/1.4 'Plus Jakarta Sans';color:#31456F;margin-top:6px">{{ r.cost }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ tabPortfolio }}" hint-placeholder-val="{{ true }}">
+            <div style="animation:rise .3s ease-out">
+              <div style="font:700 13px/1 'Plus Jakarta Sans';margin-bottom:12px">Every live call across the business right now</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+                <sc-for list="{{ portfolio }}" as="p" hint-placeholder-count="6">
+                  <div onClick="{{ p.onClick }}" style="border:1px solid #E3E8F2;border-top:3px solid {{ p.top }};border-radius:12px;padding:14px 15px;background:#FFFFFF;cursor:pointer;transition:all .18s ease" style-hover="border-color:#C3CFEA">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+                      <span style="font:700 10px/1 'Plus Jakarta Sans';color:#1F44D6;background:#EAF0FF;border-radius:20px;padding:4px 8px">{{ p.domain }}</span>
+                      <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ p.vColor }};background:{{ p.vBg }};border-radius:20px;padding:4px 8px">{{ p.verdict }}</span>
+                    </div>
+                    <div style="font:700 12px/1.45 'Plus Jakarta Sans';color:#0E1B33;margin-bottom:9px">{{ p.title }}</div>
+                    <div style="display:flex;align-items:center;gap:9px">
+                      <div style="flex:1;height:6px;border-radius:3px;background:#EEF2FA;overflow:hidden">
+                        <div style="height:6px;width:{{ p.pct }};background:{{ p.vColor }};border-radius:3px"></div>
+                      </div>
+                      <span style="font:800 12px/1 'Plus Jakarta Sans';color:{{ p.vColor }}">{{ p.score }}</span>
+                    </div>
+                    <div style="font:500 11px/1.45 'Plus Jakarta Sans';color:#5A6884;margin-top:9px">{{ p.owner }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </main>
+
+    <aside style="width:352px;flex:0 0 352px;background:#FFFFFF;border-left:1px solid #E3E8F2;display:flex;flex-direction:column;min-height:0">
+      <div style="padding:15px 16px;border-bottom:1px solid #E3E8F2;background:#F8FAFF">
+        <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin-bottom:10px">Whose desk are you at</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <sc-for list="{{ roleTabs }}" as="r" hint-placeholder-count="6">
+            <div onClick="{{ r.onClick }}" style="display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid {{ r.bd }};background:{{ r.bg }};border-radius:10px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#C3CFEA">
+              <span style="width:26px;height:26px;border-radius:50%;background:{{ r.avBg }};color:{{ r.avColor }};display:flex;align-items:center;justify-content:center;font:800 10px/1 'Plus Jakarta Sans';flex:0 0 26px">{{ r.initials }}</span>
+              <span style="flex:1;font:700 12px/1.2 'Plus Jakarta Sans';color:{{ r.color }}">{{ r.name }}</span>
+              <span style="font:700 10px/1 'Plus Jakarta Sans';color:{{ r.badgeColor }};background:{{ r.badgeBg }};border-radius:20px;padding:4px 8px">{{ r.badge }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:15px 18px;border-bottom:1px solid #E3E8F2">
+        <div style="font:800 14px/1.35 'Plus Jakarta Sans';color:#0E1B33;margin-bottom:5px">{{ role.greeting }}</div>
+        <div style="font:500 11px/1.6 'Plus Jakarta Sans';color:#5A6884;text-wrap:pretty">{{ role.brief }}</div>
+        <div style="font:600 10px/1.4 'Plus Jakarta Sans';color:#8492AC;margin-top:7px">{{ role.scope }}</div>
+      </div>
+
+      <div style="padding:14px 18px;border-bottom:1px solid #E3E8F2">
+        <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin-bottom:10px">How this desk is doing</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div style="border:1px solid #E7EDF9;border-radius:10px;padding:10px 11px;background:#FBFCFF;animation:pop .3s ease-out">
+              <div style="font:600 9px/1.3 'Plus Jakarta Sans';letter-spacing:.06em;color:#8492AC;text-transform:uppercase;margin-bottom:6px">{{ k.label }}</div>
+              <div style="font:800 17px/1 'Plus Jakarta Sans';color:{{ k.color }};letter-spacing:-.02em">{{ k.value }}</div>
+              <div style="font:500 10px/1.4 'Plus Jakarta Sans';color:#8492AC;margin-top:5px">{{ k.delta }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="padding:14px 18px;border-bottom:1px solid #E3E8F2">
+        <div style="font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase;margin-bottom:9px">{{ railTitle }}</div>
+        <sc-for list="{{ decision.bullets }}" as="b" hint-placeholder-count="3">
+          <div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #F2F5FC">
+            <span style="width:18px;height:18px;border-radius:6px;background:{{ b.bg }};color:{{ b.color }};display:flex;align-items:center;justify-content:center;font:800 9px/1 'Plus Jakarta Sans';flex:0 0 18px">{{ b.mark }}</span>
+            <span style="font:500 11px/1.5 'Plus Jakarta Sans';color:#31456F">{{ b.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="flex:1;min-height:0;display:flex;flex-direction:column">
+        <div style="padding:14px 18px 8px;font:700 10px/1 'Plus Jakarta Sans';letter-spacing:.1em;color:#5A6884;text-transform:uppercase">Activity</div>
+        <div style="flex:1;overflow-y:auto;padding:0 18px 16px">
+          <sc-for list="{{ feed }}" as="f" hint-placeholder-count="6">
+            <div style="display:flex;gap:10px;padding:8px 0;animation:rise .25s ease-out">
+              <span style="width:7px;height:7px;border-radius:50%;background:{{ f.color }};margin-top:6px;flex:0 0 7px"></span>
+              <div style="flex:1">
+                <div style="font:500 11px/1.5 'Plus Jakarta Sans';color:#31456F">{{ f.text }}</div>
+                <div style="font:600 10px/1.4 'Plus Jakarta Sans';color:#A3AEC4">{{ f.t }}</div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;mode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Demo mode&quot;,&quot;Live data&quot;],&quot;default&quot;:&quot;Demo mode&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Demo control&quot;}}">
+class Component extends DCLogic {
+  data = (() => {
+    const ag = (name, verdict, score, line) => ({ name, verdict, score, line });
+    const m1 = {
+      id: "m1", domain: "Personal Care", brand: "Rexona", queueLabel: "Live moments in your category",
+      title: "Our logo appeared under the fourth official's arm for three seconds and it is now the meme of the tournament",
+      summary: "Nobody planned this. A board side placement was caught during a sweat heavy substitution in the ninety second minute, and the crop pairs our logo with our own promise. It is spreading on two platforms at once and it costs us nothing to join.",
+      sourceLine: "Seen on X, TikTok, Reddit and our own listening tools",
+      seen: "18:42", ready: "6 min 20 sec", window: "in 6 to 14 hours", windowPct: "34%",
+      verdict: "Go now", vColor: "#0E9F6E", vBg: "#E6F7F0", arbBd: "#DCEFE6", arbBg: "#F3FBF7",
+      score: 87, decisionClass: "concept_launch", tta: "41 min",
+      stats: [
+        { k: "Speed of spread", v: "Very high", c: "#0E9F6E" },
+        { k: "Posts in 3 hours", v: "412K", c: "#0E1B33" },
+        { k: "How people feel", v: "Warm", c: "#0E9F6E" },
+        { k: "Brand fit", v: "Exact", c: "#0E9F6E" },
+        { k: "Money needed", v: "Zero", c: "#0E1B33" },
+        { k: "Time we have", v: "6 to 14 hrs", c: "#B8770A" }
+      ],
+      agents: [
+        ag("Culture", "Go", 92, "Still climbing at eighteen percent an hour. Because it started with fans, joining reads as playing along rather than muscling in."),
+        ag("Brand", "Go", 88, "Our promise is literally in the picture. No stretch, no explaining, nothing in the brand book is bent."),
+        ag("Creative", "Go", 90, "Three routes ready. The strongest is almost wordless: a recreated frame and four words."),
+        ag("Risk", "Hold", 61, "One hard rule. The broadcast clip belongs to the broadcaster, so we recreate the shot and we never name the official."),
+        ag("Commercial", "Go", 84, "Eighteen to twenty four million people reached for no media money. Cheapest reach we will see this quarter."),
+        ag("Media", "Go", 86, "X first because that is where the joke lives. Instagram forty minutes later. TikTok once the sound peaks.")
+      ],
+      rationale: "Five of the six specialists say go. Risk does not argue against acting, it argues about the asset, so its objection is kept as a hard gate rather than averaged away: recreate the shot, never identify the official. The only real enemy here is the clock.",
+      dissent: [
+        { who: "Risk", what: "Stays on hold at sixty one. Its condition blocks publishing until the recreated asset is signed off." },
+        { who: "Media", what: "Wanted TikTok first. Overruled because the joke was born on X." }
+      ],
+      caseFor: [
+        "Our promise and the picture say the same thing, so the idea needs no explaining.",
+        "It started with fans, so joining in costs nothing and feels welcome.",
+        "The same play in 2023 lifted brand favourability by 1.4 points."
+      ],
+      caseAgainst: [
+        "The broadcast footage is not ours, so any shortcut here is a legal problem.",
+        "A rival category sponsor is visible in the same frame.",
+        "If the asset takes too long, we arrive at a party that has ended."
+      ],
+      doNothing: "The conversation collapses inside fourteen hours. Two competitors are already drafting. We lose eighteen to twenty four million people of free attention and the chance to bank the play for next time.",
+      createLabel: "Three routes, ready now",
+      concepts: [
+        { name: "Understudy", state: "Clear", color: "#0E9F6E", bg: "#E6F7F0", copy: "Held the line. Both of us.", note: "Recreated in studio with a plain kit and no face. Pack visible, nothing borrowed.", slot: "Studio recreation. Sleeve crop with pack in frame." },
+        { name: "Four words", state: "Fastest", color: "#1F44D6", bg: "#EAF0FF", copy: "It did not let go.", note: "Type only over our brand block. Nothing to clear, ships in twenty minutes.", slot: "Type only asset on brand block." },
+        { name: "Ninety second", state: "Too slow", color: "#B8770A", bg: "#FEF4E4", copy: "Ninety two minutes. Still holding.", note: "Six second vertical cut. Needs forty minutes of edit and misses the window.", slot: "Six second vertical film, owned footage." }
+      ],
+      hasLocal: true, localNote: "Three markets ready, one held for review",
+      localCells: [
+        { market: "India, Hinglish", copy: "Poore match tak saath diya.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "Local advertising code checked. No claim made." },
+        { market: "United Kingdom, English", copy: "Ninety two minutes. Still holding.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "Nobody named, no broadcaster material used." },
+        { market: "Brazil, Portuguese", copy: "Aguentou o jogo inteiro.", check: "Held", color: "#B8770A", bg: "#FEF4E4", note: "Local code avoids referee references during a live tournament." }
+      ],
+      risks: [
+        { sev: "High", text: "Reusing the broadcast clip would be a rights breach", owner: "Legal, gated", color: "#C13A4C", bg: "#FCECEE" },
+        { sev: "Medium", text: "The official could be recognised and object", owner: "Legal, gated", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Low", text: "Read as riding on tournament sponsorship", owner: "Brand", color: "#5A6884", bg: "#F2F5FC" },
+        { sev: "Low", text: "Sweat humour misread in a few markets", owner: "Brand", color: "#5A6884", bg: "#F2F5FC" }
+      ],
+      brandLines: [
+        { k: "Our promise", v: "It will not ever let you down.", state: "Matched", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Never do", v: "No laughing at a person. No shaming anyone for sweating.", state: "Respected", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Rights rule", v: "Broadcast material is never reused. Recreate instead.", state: "Gate on", color: "#B8770A", bd: "#F7E7C8", bg: "#FEF9EF" },
+        { k: "Closest past play", v: "Referee's whistle, 2023. Two million views, favourability up 1.4 points.", state: "Useful", color: "#1F44D6", bd: "#DCE6FF", bg: "#F5F8FF" }
+      ],
+      decay: [82, 96, 91, 74, 55, 38, 24, 11],
+      impact: [
+        { label: "Free attention on the table", value: "18 to 24M", note: "People reached with no media money at all." },
+        { label: "Time from signal to live", value: "41 minutes", note: "The same job used to take eleven days through the old route." },
+        { label: "Cost per thousand reached", value: "Near zero", note: "Compared with two hundred and forty rupees on paid social." }
+      ],
+      channelLabel: "Where it goes and in what order",
+      channelNote: "Simulated for this demo. Real connectors plug into the same slots.",
+      channels: [
+        { name: "X", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Recreated square asset", caption: "It did not let go.", meta: "Goes first. Undo is a delete, eight seconds." },
+        { name: "Instagram Reels", status: "Queued", color: "#1F44D6", bg: "#EAF0FF", slot: "Four by five story render", caption: "Story and grid, no stickers", meta: "Forty minutes later, organic only." },
+        { name: "Moj / ShareChat", status: "Waiting", color: "#B8770A", bg: "#FEF4E4", slot: "Nine by sixteen stitch", caption: "Stitch to the original clip", meta: "Two hours later, once the sound peaks." },
+        { name: "Outdoor, Mumbai", status: "Held", color: "#5A6884", bg: "#F2F5FC", slot: "Six sheet digital render", caption: "Held because it cannot be pulled fast", meta: "Rules keep this one with a human." }
+      ],
+      undo: "Every channel here can be pulled back. A post is deleted in eight seconds and one switch halts the whole queue. Outdoor cannot be pulled quickly, so it stays with a human by rule.",
+      ledgerEntry: { sig: "Fourth official sightline", verdict: "Go now", score: "87" }
+    };
+    const m2 = {
+      id: "m2", domain: "Personal Care", brand: "Rexona", queueLabel: "Live moments in your category",
+      title: "The fastest trend of the week is an office prank chain and three competitors have already joined it",
+      summary: "Colleagues ambush their managers with ice water. It touches sweat, recovery and confidence, so on the surface it looks made for us. Read the brand book and it is the opposite of what we stand for.",
+      sourceLine: "Seen on Instagram Reels, YouTube Shorts, Moj and competitor watch",
+      seen: "09:12", ready: "4 min 05 sec", window: "in 2 to 3 days", windowPct: "18%",
+      verdict: "Do nothing", vColor: "#C13A4C", vBg: "#FCECEE", arbBd: "#F6DDE1", arbBg: "#FDF6F7",
+      score: 31, decisionClass: "concept_launch", tta: "12 min",
+      stats: [
+        { k: "Speed of spread", v: "Highest", c: "#0E9F6E" },
+        { k: "Posts in 12 hours", v: "1.9M", c: "#0E1B33" },
+        { k: "How people feel", v: "Mixed", c: "#B8770A" },
+        { k: "Brand fit", v: "Poor", c: "#C13A4C" },
+        { k: "Rivals already in", v: "3", c: "#C13A4C" },
+        { k: "Time we have", v: "2 to 3 days", c: "#0E9F6E" }
+      ],
+      agents: [
+        ag("Culture", "Go", 96, "Fastest thing moving this week and we have two clear days. The category link is real."),
+        ag("Brand", "Stop", 22, "The joke needs a victim. Our brand book says confidence is never built at someone else's expense."),
+        ag("Creative", "Hold", 44, "The only safe version has the manager soak themselves, which is a weaker idea that will not travel."),
+        ag("Risk", "Stop", 18, "The sound is licensed and not cleared for brands. Two of the top fifty videos show injuries."),
+        ag("Commercial", "Hold", 57, "Big reach but shallow. Trends of this shape have moved favourability by less than a fifth of a point."),
+        ag("Media", "Go", 71, "Cheap reach if we are in within a day. Reels first if it is approved.")
+      ],
+      rationale: "Speed is the loudest number in the room and it is deliberately not the deciding one. Brand and Risk both point at written rules, and the only idea that clears them is a weaker idea. So we pass, and we write down why, so that in ninety days we can check whether passing was right.",
+      dissent: [
+        { who: "Culture", what: "Stays on go at ninety six. Argues that passing hands the week to our rivals." },
+        { who: "Media", what: "Stays on go at seventy one on reach economics alone." }
+      ],
+      caseFor: [
+        "It is the fastest moving conversation of the week.",
+        "Sweat and recovery sit squarely in our category.",
+        "Three competitors are already in it and getting reach."
+      ],
+      caseAgainst: [
+        "The joke needs someone to be humiliated, which we have promised never to do.",
+        "The trending sound is licensed and not cleared for brand use.",
+        "Two of the top videos involve injuries, and we would sit next to them."
+      ],
+      doNothing: "We lose a week of cheap reach and a rival gets the attention. In 2022 the brand that entered a near identical trend carried four weeks of negative sentiment afterwards, which is exactly what we are choosing to avoid.",
+      risks: [
+        { sev: "High", text: "Sound is licensed and not cleared for brand use", owner: "Legal, blocking", color: "#C13A4C", bg: "#FCECEE" },
+        { sev: "High", text: "Sitting beside injury videos in the same feed", owner: "Brand, blocking", color: "#C13A4C", bg: "#FCECEE" },
+        { sev: "Medium", text: "Workplace safety sensitivities in three markets", owner: "Legal", color: "#B8770A", bg: "#FEF4E4" }
+      ],
+      brandLines: [
+        { k: "Never do", v: "Confidence is never built at someone else's expense.", state: "Broken", color: "#C13A4C", bd: "#F6DDE1", bg: "#FDF6F7" },
+        { k: "Never do", v: "No content showing workplace humiliation.", state: "Broken", color: "#C13A4C", bd: "#F6DDE1", bg: "#FDF6F7" },
+        { k: "Sound rule", v: "Only cleared commercial music. Trending audio needs clearance.", state: "Not cleared", color: "#C13A4C", bd: "#F6DDE1", bg: "#FDF6F7" },
+        { k: "Closest past play", v: "Cold plunge trend, 2022. We passed. The rival who entered took four weeks of backlash.", state: "Supports pass", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" }
+      ],
+      decay: [40, 44, 38, 30, 24, 18, 12, 8],
+      impact: [
+        { label: "Reach we are turning down", value: "9 to 12M", note: "Real, and deliberately declined." },
+        { label: "Backlash risk avoided", value: "4 weeks", note: "Based on what happened to a rival in 2022." },
+        { label: "Cost of this decision", value: "Zero", note: "Nothing produced, nothing cleared, nothing spent." }
+      ],
+      channelLabel: "Nothing goes anywhere",
+      channelNote: "No creative was produced because the call was to pass",
+      channels: [
+        { name: "X", status: "Not used", color: "#5A6884", bg: "#F2F5FC", slot: "No asset produced", caption: "Passed", meta: "Reason stored with the decision." },
+        { name: "Instagram", status: "Not used", color: "#5A6884", bg: "#F2F5FC", slot: "No asset produced", caption: "Passed", meta: "Reason stored with the decision." },
+        { name: "Moj / ShareChat", status: "Not used", color: "#5A6884", bg: "#F2F5FC", slot: "No asset produced", caption: "Passed", meta: "Reason stored with the decision." },
+        { name: "Review", status: "Open", color: "#6A4CE0", bg: "#F0EBFF", slot: "Ninety day check booked", caption: "Was passing right?", meta: "We will grade our own call." }
+      ],
+      undo: "Nothing was published, so there is nothing to pull back. The choice itself is written down, with the two specialists who disagreed, so it can be argued with later.",
+      ledgerEntry: { sig: "Office prank chain", verdict: "Do nothing", score: "31" }
+    };
+    const m3 = {
+      id: "m3", domain: "Personal Care", brand: "Rexona India", queueLabel: "Live moments in your category",
+      title: "Mumbai monsoon commute jokes are spiking and the specialists genuinely disagree about this one",
+      summary: "Soaked shirt humour on local handles. It is funny, it is the most relevant season we have, and it sits one news cycle away from a real weather emergency. Three say go, three say hold.",
+      sourceLine: "Seen on regional handles, Mumbai pages and the weather bulletin feed",
+      seen: "07:20", ready: "5 min 40 sec", window: "in 18 to 30 hours", windowPct: "48%",
+      verdict: "Go with conditions", vColor: "#B8770A", vBg: "#FEF4E4", arbBd: "#F7E7C8", arbBg: "#FEF9EF",
+      score: 66, decisionClass: "concept_launch", tta: "37 min",
+      stats: [
+        { k: "Speed of spread", v: "Medium", c: "#B8770A" },
+        { k: "Posts in 8 hours", v: "88K", c: "#0E1B33" },
+        { k: "How people feel", v: "Playful", c: "#0E9F6E" },
+        { k: "Brand fit", v: "Seasonal peak", c: "#0E9F6E" },
+        { k: "Weather alert", v: "Orange", c: "#B8770A" },
+        { k: "Time we have", v: "18 to 30 hrs", c: "#0E9F6E" }
+      ],
+      agents: [
+        ag("Culture", "Go", 74, "Genuinely local and self deprecating rather than mocking. It peaks with tomorrow morning's commute."),
+        ag("Brand", "Hold", 58, "Best category season of the year, but we are one headline away from being tone deaf."),
+        ag("Creative", "Go", 81, "There is a route that jokes only about the commuter's own shirt. No flooding, no crowds."),
+        ag("Risk", "Hold", 55, "The alert is orange today. If it turns red, anything we published becomes a liability within hours."),
+        ag("Commercial", "Go", 69, "Buying intent peaks now and regional spend works two and a third times harder than national."),
+        ag("Media", "Hold", 52, "Organic only. Paid cannot be pulled back fast enough if the weather turns.")
+      ],
+      rationale: "Three go, three hold, nobody blocking. The chair does not split the difference. It turns each objection into a condition we can check by machine: organic only, no paid, the joke stays on the commuter's own shirt, and everything is pulled automatically if the alert turns red. The decision can now be reversed without a meeting.",
+      dissent: [
+        { who: "Brand", what: "Stays on hold at fifty eight. Argues we publish nothing while any weather alert is live." },
+        { who: "Media", what: "Accepts the organic only condition and withdraws its paid plan." }
+      ],
+      caseFor: [
+        "This is the most relevant few weeks of the Indian year for our category.",
+        "A safe route exists that jokes only about the commuter's own shirt.",
+        "Organic only means we can be out of it in under a minute."
+      ],
+      caseAgainst: [
+        "An orange alert can turn red overnight and humour ages badly next to distress.",
+        "A similar post in 2024 drew a negative regional news cycle.",
+        "The brand specialist's objection is unresolved, not overruled."
+      ],
+      doNothing: "The cost is modest. The season runs for another eight weeks, so passing here is defensible. Either way the record will show whether the conditional route beat sitting it out.",
+      createLabel: "Only the routes that clear the conditions",
+      concepts: [
+        { name: "Own shirt", state: "Clear", color: "#0E9F6E", bg: "#E6F7F0", copy: "Twelve stops. One shirt. Held.", note: "No water, no crowds, no civic imagery. Passes every condition.", slot: "Studio shirt detail, dry beside damp." },
+        { name: "Platform four", state: "Blocked", color: "#C13A4C", bg: "#FCECEE", copy: "Monsoon one. You one.", note: "Shows a flooded station, so the condition set blocks it automatically.", slot: "Blocked by the conditions." },
+        { name: "Commute card", state: "Backup", color: "#1F44D6", bg: "#EAF0FF", copy: "Rain plan. Umbrella optional.", note: "Safe fallback if the alert escalates while we are live.", slot: "Type only asset on brand block." }
+      ],
+      hasLocal: false,
+      risks: [
+        { sev: "Medium", text: "Weather alert turns red while we are live", owner: "Auto pull armed", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Medium", text: "Regional press frames it as tone deaf", owner: "Brand India", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Low", text: "Paid cannot be recalled fast enough", owner: "Blocked by condition", color: "#5A6884", bg: "#F2F5FC" }
+      ],
+      brandLines: [
+        { k: "Market note", v: "Monsoon is the highest relevance season for this category in India.", state: "Supports", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Never do", v: "No humour anywhere near loss of life or civic distress.", state: "Condition", color: "#B8770A", bd: "#F7E7C8", bg: "#FEF9EF" },
+        { k: "Escalation rule", v: "A red alert in the target city pulls all reactive content automatically.", state: "Armed", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Closest past play", v: "Local train post, 2024. Strong engagement, one negative regional cycle.", state: "Caution", color: "#B8770A", bd: "#F7E7C8", bg: "#FEF9EF" }
+      ],
+      decay: [58, 66, 72, 78, 64, 45, 28, 14],
+      impact: [
+        { label: "Seasonal intent lift", value: "2.3 times", note: "Regional spend versus national in these weeks." },
+        { label: "Time to pull it back", value: "Under 1 min", note: "Organic only, so reversal is instant." },
+        { label: "People reached", value: "3 to 5M", note: "Four Mumbai districts, organic only." }
+      ],
+      channelLabel: "Where it goes, with the conditions attached",
+      channelNote: "Paid is blocked by the conditions, not by preference",
+      channels: [
+        { name: "X India", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Own shirt square asset", caption: "Twelve stops. One shirt. Held.", meta: "Organic only. Delete to undo." },
+        { name: "Instagram India", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Four by five grid render", caption: "Mumbai handles only", meta: "Fenced to four districts." },
+        { name: "Paid boost", status: "Blocked", color: "#C13A4C", bg: "#FCECEE", slot: "Blocked by condition", caption: "Cannot be pulled fast enough", meta: "Rule, not preference." },
+        { name: "Weather watch", status: "Armed", color: "#6A4CE0", bg: "#F0EBFF", slot: "Automatic pull monitor", caption: "Red alert removes everything", meta: "Checks every five minutes." }
+      ],
+      undo: "Organic posts delete in seconds and the weather watcher can pull everything without waiting for a person. Paid is blocked precisely because it cannot be undone in time.",
+      ledgerEntry: { sig: "Mumbai monsoon commute", verdict: "Go with conditions", score: "66" }
+    };
+    const m4 = {
+      id: "m4", domain: "Beauty and Wellbeing", brand: "Rexona and Dove", queueLabel: "Localisation jobs waiting on you",
+      title: "One approved idea, nine market versions, four minutes of work instead of nine days",
+      summary: "The approved route is locked as a master. Every market version is written against local advertising rules and local idiom, then compared with the master so nothing drifts. Only the versions that need judgement come to you.",
+      sourceLine: "Job started from the approved route in the fourth official moment",
+      seen: "19:24", ready: "4 min 12 sec", window: "in 5 hours", windowPct: "62%",
+      verdict: "Six ready, three to review", vColor: "#1F44D6", vBg: "#EAF0FF", arbBd: "#DCE6FF", arbBg: "#F5F8FF",
+      score: 74, decisionClass: "localised_variant", tta: "4 min",
+      stats: [
+        { k: "Versions made", v: "9", c: "#0E1B33" },
+        { k: "Cleared to ship", v: "6", c: "#0E9F6E" },
+        { k: "Need your eye", v: "2", c: "#B8770A" },
+        { k: "Blocked by law", v: "1", c: "#C13A4C" },
+        { k: "Time taken", v: "4 min 12 s", c: "#0E9F6E" },
+        { k: "Old way", v: "9 to 14 days", c: "#5A6884" }
+      ],
+      agents: [
+        ag("Language", "Go", 86, "Six versions read naturally. Two need a human ear for idiom, which the machine will not guess."),
+        ag("Brand", "Go", 84, "Every version sits within tone limits and none of them invents a claim."),
+        ag("Legal", "Hold", 52, "One market bars referee references during a live tournament, so that version is held automatically."),
+        ag("Creative", "Go", 79, "The master is locked, so every version can be compared with it line by line."),
+        ag("Commercial", "Go", 81, "Nine assets for the cost of about twenty minutes of review time."),
+        ag("Media", "Hold", 58, "The diaspora version needs a media plan sign off, not a copy change.")
+      ],
+      rationale: "Six versions clear every rule pack and can ship under permissions you already signed. Two need human judgement on idiom and one is blocked by local law with no override path. That split is the whole point: machines take the volume, people take the judgement.",
+      dissent: [
+        { who: "Legal", what: "Holds one market outright. There is no route to override a regulator." },
+        { who: "Media", what: "Flags that diaspora targeting is a plan decision, not a copy decision." }
+      ],
+      caseFor: [
+        "Six of nine versions clear every rule and can ship now.",
+        "Four minutes against a nine to fourteen day agency baseline.",
+        "Every version is compared with the locked master, so drift is visible."
+      ],
+      caseAgainst: [
+        "Two versions need a human ear for idiom.",
+        "One market is blocked by law and must not be pushed.",
+        "Diaspora targeting sits with media planning, not with this job."
+      ],
+      doNothing: "The old route costs nine to fourteen days and roughly twenty eight lakh rupees of agency time for the same nine assets, by which point the moment that started it is long gone.",
+      createLabel: "The locked master and how the versions are built",
+      concepts: [
+        { name: "Master", state: "Locked", color: "#1F44D6", bg: "#EAF0FF", copy: "It did not let go.", note: "Approved earlier today. Every version is built from this and compared with it.", slot: "Master type asset on brand block." },
+        { name: "Rule packs", state: "Applied", color: "#0E9F6E", bg: "#E6F7F0", copy: "Nine targets, three rule packs", note: "Tone, claims, local law and cultural checks run before anything renders.", slot: "Rule pack matrix by market." },
+        { name: "Your load", state: "Light", color: "#6A4CE0", bg: "#F0EBFF", copy: "Nine assets, two reviews", note: "Cleared versions ship on permissions you already gave.", slot: "Review queue with two items." }
+      ],
+      hasLocal: true, localNote: "Six clear, two for your ear, one held by law",
+      localCells: [
+        { market: "Mumbai, Hinglish", copy: "Poore match tak saath diya.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "Local code fine. Mix of languages sits inside our tone band." },
+        { market: "Mumbai, Marathi", copy: "पूर्ण सामना साथ दिली.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "Script renders correctly. No claim made." },
+        { market: "Mumbai, English", copy: "Ninety two minutes. Still holding.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "Baseline version with no local exception." },
+        { market: "Chennai, Tamil", copy: "முழு ஆட்டமும் தாங்கியது.", check: "Your ear", color: "#B8770A", bg: "#FEF4E4", note: "Reads like a sports commentary cliché. Sent to you for a better line." },
+        { market: "Chennai, Hinglish", copy: "Poore match tak saath diya.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "Twenty two percent of the audience here. Kept." },
+        { market: "Chennai, English", copy: "Ninety two minutes. Still holding.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "No local exception." },
+        { market: "London, English", copy: "Ninety two minutes. Still holding.", check: "Clear", color: "#0E9F6E", bg: "#E6F7F0", note: "No performance claim made, so it clears." },
+        { market: "London, Hindi", copy: "पूरे मैच तक साथ दिया.", check: "Your ear", color: "#B8770A", bg: "#FEF4E4", note: "Targeting question for media, not a copy change." },
+        { market: "São Paulo, Portuguese", copy: "Aguentou o jogo inteiro.", check: "Held by law", color: "#C13A4C", bg: "#FCECEE", note: "Referee references barred during a live tournament. Held with no override." }
+      ],
+      risks: [
+        { sev: "High", text: "Pushing the blocked market would breach local law", owner: "Held, no override", color: "#C13A4C", bg: "#FCECEE" },
+        { sev: "Medium", text: "Tamil line reads as cliché and drifts from tone", owner: "With you", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Low", text: "Script rendering in the asset library", owner: "Verified", color: "#5A6884", bg: "#F2F5FC" }
+      ],
+      brandLines: [
+        { k: "Tone band", v: "Playful, never boastful. Local voice over translated voice.", state: "Held", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Claims rule", v: "No performance claim in reactive work.", state: "Respected", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Local law", v: "One market bars referee references during a live tournament.", state: "Blocking", color: "#C13A4C", bd: "#F6DDE1", bg: "#FDF6F7" },
+        { k: "Master rule", v: "The approved master is locked and every version is diffed against it.", state: "On", color: "#1F44D6", bd: "#DCE6FF", bg: "#F5F8FF" }
+      ],
+      decay: [70, 74, 70, 62, 50, 38, 26, 15],
+      impact: [
+        { label: "Cost of the same nine assets", value: "About 4%", note: "Of the agency route, and it lands the same day." },
+        { label: "Human time needed", value: "20 minutes", note: "Two reviews instead of nine briefs." },
+        { label: "Markets live today", value: "6 of 9", note: "The rest are held for good reasons." }
+      ],
+      channelLabel: "Where the finished versions go",
+      channelNote: "Cleared versions ship on permissions already given",
+      channels: [
+        { name: "Asset library", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Six cleared versions", caption: "Versioned and searchable", meta: "Undo removes a version." },
+        { name: "Review queue", status: "With you", color: "#B8770A", bg: "#FEF4E4", slot: "Two versions for your ear", caption: "Market copy leads notified", meta: "Answer expected in forty five minutes." },
+        { name: "São Paulo", status: "Held", color: "#C13A4C", bg: "#FCECEE", slot: "Held by local law", caption: "No override path exists", meta: "Regulator rule, not a preference." },
+        { name: "Media plan", status: "Waiting", color: "#5A6884", bg: "#F2F5FC", slot: "Diaspora plan pending", caption: "Needs a planning sign off", meta: "Sits with media, not copy." }
+      ],
+      undo: "Any shipped version can be removed on its own without touching the others, and the master stays locked and unchanged throughout.",
+      ledgerEntry: { sig: "Nine market versions", verdict: "Six shipped", score: "74" }
+    };
+    const m5 = {
+      id: "m5", domain: "Personal Care", brand: "Rexona", queueLabel: "Moments we have seen before",
+      title: "We have seen this exact shape of moment before, and last time it did not work",
+      summary: "A runner collapses near the line and a rival helps them over. Warm, fast, and a very good fit for our promise. We acted on a near identical moment in 2024 and the record says it underperformed badly.",
+      sourceLine: "Seen on Instagram Reels, YouTube Shorts, Moj, matched to one past decision",
+      seen: "14:05", ready: "5 min 10 sec", window: "in 10 to 20 hours", windowPct: "40%",
+      verdict: "Go smaller", vColor: "#B8770A", vBg: "#FEF4E4", arbBd: "#F7E7C8", arbBg: "#FEF9EF",
+      score: 58, decisionClass: "concept_launch", tta: "29 min",
+      stats: [
+        { k: "Speed of spread", v: "High", c: "#0E9F6E" },
+        { k: "Posts in 5 hours", v: "230K", c: "#0E1B33" },
+        { k: "Match to a past call", v: "Very close", c: "#B8770A" },
+        { k: "Score before memory", v: "74", c: "#5A6884" },
+        { k: "Score after memory", v: "58", c: "#B8770A" },
+        { k: "Money we will spend", v: "Zero", c: "#0E9F6E" }
+      ],
+      agents: [
+        ag("Culture", "Go", 77, "Real momentum, but this is a repeat shape and audiences notice repeats too."),
+        ag("Brand", "Hold", 54, "The fit is genuine, and so is the failure mode we recorded last time."),
+        ag("Creative", "Go", 72, "Repost with a caption. The record says produced film does not earn its cost here."),
+        ag("Risk", "Hold", 49, "The athlete is recognisable and has not agreed. Sharing the creator's own post is the clean route."),
+        ag("Commercial", "Hold", 51, "Adjusted for what happened last time, paid spend fails its own hurdle."),
+        ag("Media", "Hold", 47, "Organic only, one platform, no boost. That is the opposite of what it advised in 2024.")
+      ],
+      rationale: "Without memory this scores seventy four, almost exactly what we gave the 2024 moment before it disappointed. Four recorded outcomes of the same shape pull it down to fifty eight, which is below the bar for paid money and above the bar for doing nothing. So we act small, spend nothing and stay able to reverse. Same models, better call.",
+      dissent: [
+        { who: "Culture", what: "Stays on go at seventy seven. Argues four past cases is a thin basis for the penalty." },
+        { who: "Media", what: "Notes it advised the opposite in 2024. That reversal is recorded against it." }
+      ],
+      caseFor: [
+        "The fit with our promise is real and the moment is warm.",
+        "Sharing the creator's own post costs nothing and takes minutes.",
+        "Staying small keeps the option open if it grows."
+      ],
+      caseAgainst: [
+        "The last four moments of this shape underperformed by about half.",
+        "The athlete is recognisable and has not agreed to anything.",
+        "Produced film here has already been shown not to pay for itself."
+      ],
+      doNothing: "Very little is lost. The point of this moment is not the reach, it is the proof that the system now prices its own past mistakes without anyone rewriting it.",
+      replay: {
+        thenDate: "April 2024, past decision",
+        thenTitle: "We went big. Score seventy one, hero film and paid support in four markets.",
+        thenOutcome: "Engagement came in at four tenths of forecast. Favourability did not move. One negative press mention on tone. Twenty-five lakh rupees (₹25,00,000) of media spent quietly for nothing.",
+        nowTitle: "We go small. Score fifty eight, a shared post and nothing else.",
+        nowOutcome: "Nothing about the technology changed. Four recorded outcomes changed the price of this idea. Zero spend, a small expected lift, and we are out of it in eight seconds if it turns."
+      },
+      risks: [
+        { sev: "Medium", text: "Athlete is recognisable and has not agreed", owner: "Share creator post only", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Medium", text: "Humour near distress underperforms", owner: "Priced in", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Low", text: "Repeat shape reads as unoriginal", owner: "Brand", color: "#5A6884", bg: "#F2F5FC" }
+      ],
+      brandLines: [
+        { k: "Our promise", v: "It will not ever let you down.", state: "Matched", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Learned rule", v: "Humour close to physical distress lands about half of forecast.", state: "Applied", color: "#B8770A", bd: "#F7E7C8", bg: "#FEF9EF" },
+        { k: "Consent rule", v: "No identifiable person without agreement.", state: "Route changed", color: "#B8770A", bd: "#F7E7C8", bg: "#FEF9EF" },
+        { k: "Past call", v: "April 2024. We went big and it did not work.", state: "In memory", color: "#6A4CE0", bd: "#E4DBFF", bg: "#F8F5FF" }
+      ],
+      decay: [64, 68, 60, 50, 40, 30, 20, 12],
+      impact: [
+        { label: "Money not wasted", value: "₹25 Lakh", note: "What the same idea cost us in 2024." },
+        { label: "Score corrected by memory", value: "74 to 58", note: "Nobody rewrote a rule. The record did it." },
+        { label: "Time to reverse", value: "8 seconds", note: "A shared post can simply be removed." }
+      ],
+      channelLabel: "Deliberately small",
+      channelNote: "One platform, no money, easy to undo",
+      channels: [
+        { name: "X", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Shared creator post", caption: "Caption only, nothing produced", meta: "Undo is a delete." },
+        { name: "Instagram", status: "Not used", color: "#5A6884", bg: "#F2F5FC", slot: "Nothing produced", caption: "Skipped on purpose", meta: "The record says it will not pay." },
+        { name: "Paid support", status: "Below bar", color: "#C13A4C", bg: "#FCECEE", slot: "Fails its own hurdle", caption: "No money moves", meta: "Adjusted forecast decides this." },
+        { name: "Ninety day check", status: "Booked", color: "#6A4CE0", bg: "#F0EBFF", slot: "Outcome check scheduled", caption: "Was going small right?", meta: "Feeds the next call of this shape." }
+      ],
+      undo: "One shared post, removed in eight seconds, with no production or media commitments behind it.",
+      ledgerEntry: { sig: "Marathon finish, repeat shape", verdict: "Go smaller", score: "58" }
+    };
+    const m6 = {
+      id: "m6", domain: "Supply Chain", brand: "Dove sachets, Tamil Nadu", queueLabel: "Live calls in your region",
+      title: "Sachet demand has jumped thirty one percent in four districts while a competitor is out of stock",
+      summary: "The festival calendar moved eleven days earlier and a rival cannot supply. This is the same system that handled the Rexona meme this morning: same signals, same chair agent, same rulebook, same memory. Only the specialists changed.",
+      sourceLine: "Seen in distributor sales feeds, availability checks and the festival calendar",
+      seen: "06:15", ready: "3 min 30 sec", window: "in 9 days", windowPct: "72%",
+      verdict: "Acting inside your rules", vColor: "#0E9F6E", vBg: "#E6F7F0", arbBd: "#DCEFE6", arbBg: "#F3FBF7",
+      score: 82, decisionClass: "supply_move", tta: "18 min",
+      stats: [
+        { k: "Demand change", v: "Up 31%", c: "#0E9F6E" },
+        { k: "Districts", v: "4", c: "#0E1B33" },
+        { k: "Rival out of stock", v: "41% stores", c: "#0E9F6E" },
+        { k: "Stock to move", v: "1.6% of line", c: "#0E1B33" },
+        { k: "Inside signed rules", v: "Yes", c: "#0E9F6E" },
+        { k: "Time we have", v: "9 days", c: "#0E9F6E" }
+      ],
+      agents: [
+        ag("Demand", "Go", 88, "Sales pull is up thirty one percent across four districts and the festival moved eleven days earlier."),
+        ag("Supply", "Go", 81, "One point six percent can move from the Coimbatore depot without breaking any service floor."),
+        ag("Logistics", "Hold", 63, "The Madurai lane is two days tight. It needs a second carrier to make the window."),
+        ag("Finance", "Go", 79, "Two point one crore of extra margin. Freight premium eats eight percent of it."),
+        ag("Trade", "Go", 84, "Winning shelf back later costs more than the freight premium costs now."),
+        ag("Risk", "Go", 76, "Inside the pre approved band and reversible by a return leg. No donor district drops below floor.")
+      ],
+      rationale: "Everyone says go with one operational caution. The move is one point six percent of the line, inside the two percent band you signed last year, and it can be sent back for six days. So the rulebook lets it run and simply tells you, while this morning's brand decision had to wait for a person. Same rulebook, different answer, because the rules say so.",
+      dissent: [
+        { who: "Logistics", what: "Holds at sixty three on the Madurai lane. A second carrier must be confirmed before anything ships." }
+      ],
+      caseFor: [
+        "A rival is out of stock in forty one percent of tracked stores for about nine days.",
+        "The move is inside rules you already signed and can be sent back for six days.",
+        "The same play at Onam last year captured sixty two percent of a rival's lost volume."
+      ],
+      caseAgainst: [
+        "The Madurai lane could arrive after the festival peak.",
+        "Freight premium eats eight percent of the extra margin.",
+        "Donor districts carry less buffer if rains disrupt refills."
+      ],
+      doNothing: "The rival restocks in about nine days. We give up two point one crore of extra margin and then pay roughly seventy lakh to win the shelf space back later.",
+      createLabel: "The move being recommended",
+      concepts: [
+        { name: "Stock move", state: "Inside rules", color: "#0E9F6E", bg: "#E6F7F0", copy: "Coimbatore depot to four districts", note: "One point six percent of the line. Return leg available for six days.", slot: "Allocation plan across four districts." },
+        { name: "Second carrier", state: "Gate", color: "#B8770A", bg: "#FEF4E4", copy: "Madurai lane, two days tight", note: "Nothing ships until the second carrier is confirmed.", slot: "Lane plan for the Madurai route." },
+        { name: "Upside", state: "Checked", color: "#1F44D6", bg: "#EAF0FF", copy: "Two point one crore", note: "After the freight premium, and measured against the cost of losing shelf.", slot: "Margin summary by district." }
+      ],
+      hasLocal: false,
+      risks: [
+        { sev: "Medium", text: "Madurai lane arrives after the festival peak", owner: "Carrier gate", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Low", text: "Donor districts hold less buffer", owner: "Inside floor", color: "#5A6884", bg: "#F2F5FC" },
+        { sev: "Low", text: "Pressure for priority allocation", owner: "Rules block it", color: "#5A6884", bg: "#F2F5FC" }
+      ],
+      brandLines: [
+        { k: "Service floor", v: "Availability never drops below ninety four percent in festival weeks.", state: "Held", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Signed rule", v: "Moves under two percent of a line between districts are pre approved.", state: "Applies", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Fairness rule", v: "No channel gets priority through informal pressure.", state: "Enforced", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Closest past play", v: "Onam 2025. Moved one point four percent, captured sixty two percent of lost volume.", state: "Supports", color: "#1F44D6", bd: "#DCE6FF", bg: "#F5F8FF" }
+      ],
+      decay: [64, 72, 80, 86, 82, 70, 52, 30],
+      impact: [
+        { label: "Extra margin in reach", value: "2.1 crore", note: "Net of the freight premium." },
+        { label: "Shelf recovery avoided", value: "70 lakh", note: "What it would cost to win the facings back later." },
+        { label: "Decision time", value: "18 minutes", note: "The same play took nine days of meetings last year." }
+      ],
+      channelLabel: "How the move is carried out",
+      channelNote: "Running inside rules you signed, with you notified rather than asked",
+      channels: [
+        { name: "Stock orders", status: "Running", color: "#0E9F6E", bg: "#E6F7F0", slot: "Transfer orders raised", caption: "One point six percent of the line", meta: "Return leg open for six days." },
+        { name: "Carrier", status: "Confirmed", color: "#0E9F6E", bg: "#E6F7F0", slot: "Second carrier booked", caption: "Madurai lane secured", meta: "Gate cleared before dispatch." },
+        { name: "Distributors", status: "Notified", color: "#1F44D6", bg: "#EAF0FF", slot: "Allocation notice", caption: "Four districts informed", meta: "No priority overrides." },
+        { name: "Finance", status: "Posted", color: "#1F44D6", bg: "#EAF0FF", slot: "Margin impact posted", caption: "Two point one crore flagged", meta: "Full trail attached." }
+      ],
+      undo: "Undispatched orders can be cancelled instantly and dispatched stock can come back on a return leg for six days. That reversibility is exactly why this is allowed to run without asking you first.",
+      ledgerEntry: { sig: "Tamil Nadu sachet demand", verdict: "Ran inside rules", score: "82" }
+    };
+
+    const m7 = {
+      id: "m7", domain: "Home Care", brand: "Surf Excel", queueLabel: "Live moments in home care",
+      title: "Parents are copying a stain fix from one mother and calling it the night before miracle",
+      summary: "A mother filmed a two minute grass stain fix the night before school photographs. Thousands of parents have copied it and many are tagging us. It is warm, useful and sits on the oldest idea we own.",
+      sourceLine: "Seen on Reels, forwarded messages and parenting forums",
+      seen: "21:10", ready: "5 min 55 sec", window: "in 2 days", windowPct: "55%",
+      verdict: "Go now", vColor: "#0E9F6E", vBg: "#E6F7F0", arbBd: "#DCEFE6", arbBg: "#F3FBF7",
+      score: 79, decisionClass: "concept_launch", tta: "34 min",
+      stats: [
+        { k: "Speed of spread", v: "Steady", c: "#B8770A" },
+        { k: "Posts in 6 hours", v: "61K", c: "#0E1B33" },
+        { k: "How people feel", v: "Grateful", c: "#0E9F6E" },
+        { k: "Brand fit", v: "Strong", c: "#0E9F6E" },
+        { k: "Money needed", v: "Small", c: "#0E1B33" },
+        { k: "Time we have", v: "2 days", c: "#0E9F6E" }
+      ],
+      agents: [
+        ag("Culture", "Go", 82, "Useful beats funny in this community. Parents are already doing the work for us."),
+        ag("Brand", "Go", 86, "Play gets dirty is the oldest idea we own. This is that idea told by a real mother."),
+        ag("Creative", "Go", 78, "Best route simply thanks her and shows the method. We add nothing clever."),
+        ag("Risk", "Hold", 64, "We must not promise a result we have not tested. Credit and permission from her first."),
+        ag("Commercial", "Go", 74, "Sits right before the school season, when households buy the largest packs."),
+        ag("Media", "Go", 71, "Reels first with a saveable version. Regional language edits by tomorrow morning.")
+      ],
+      rationale: "Everyone agrees the moment is ours. Risk is not arguing against acting, it is protecting two things we would regret losing: her permission, and the rule that we never claim a result we have not tested. Both become gates before anything publishes.",
+      dissent: [
+        { who: "Risk", what: "Holds at sixty four until she has agreed in writing and the claim wording is checked." },
+        { who: "Media", what: "Wanted a paid push behind it. Held back until the first day of organic results." }
+      ],
+      caseFor: [
+        "A real mother said our idea better than our advertising does.",
+        "It lands days before the school season, when the biggest packs sell.",
+        "Thanking someone costs nothing and the community is already watching."
+      ],
+      caseAgainst: [
+        "We do not have her permission yet, and taking it would be worse than missing it.",
+        "The method has not been tested on our own bench, so we cannot promise it works.",
+        "Parenting communities react badly to a brand walking into their conversation."
+      ],
+      doNothing: "The moment fades in about two days and a rival thanks her instead. We lose an authentic proof of the oldest thing we stand for, right before the season where it sells most.",
+      createLabel: "Three routes, permission first",
+      concepts: [
+        { name: "Thank her", state: "Clear", color: "#0E9F6E", bg: "#E6F7F0", copy: "You said it better than we ever did.", note: "Her clip, her credit, her name on it. Needs her written agreement first.", slot: "Creator clip with credit card at the end." },
+        { name: "The method", state: "Needs test", color: "#B8770A", bg: "#FEF4E4", copy: "The night before, in two minutes.", note: "Step by step version. Cannot publish until our own bench confirms it.", slot: "Overhead step sequence on a uniform." },
+        { name: "School season", state: "Backup", color: "#1F44D6", bg: "#EAF0FF", copy: "Dirt happens the night before.", note: "Seasonal route that does not depend on her at all.", slot: "Type only asset on brand block." }
+      ],
+      hasLocal: false,
+      risks: [
+        { sev: "High", text: "Using her clip without written permission", owner: "Gate, blocking", color: "#C13A4C", bg: "#FCECEE" },
+        { sev: "Medium", text: "Repeating a stain result we have not tested", owner: "Bench test first", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Low", text: "Read as a brand crashing a parents conversation", owner: "Brand", color: "#5A6884", bg: "#F2F5FC" }
+      ],
+      brandLines: [
+        { k: "Our idea", v: "Getting dirty is part of growing up.", state: "Matched", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Claims rule", v: "No stain result is shown unless our own bench has repeated it.", state: "Gate on", color: "#B8770A", bd: "#F7E7C8", bg: "#FEF9EF" },
+        { k: "Creator rule", v: "Written permission and visible credit, every time.", state: "Gate on", color: "#B8770A", bd: "#F7E7C8", bg: "#FEF9EF" },
+        { k: "Closest past play", v: "Uniform week, 2023. Creator led work outperformed studio work by a third.", state: "Supports", color: "#1F44D6", bd: "#DCE6FF", bg: "#F5F8FF" }
+      ],
+      decay: [66, 74, 78, 72, 60, 46, 32, 18],
+      impact: [
+        { label: "Households reached", value: "7 to 9M", note: "Parents of school age children, four states." },
+        { label: "Cost of the work", value: "Under 2 lakh", note: "Credit and edit only. No shoot." },
+        { label: "Season timing", value: "9 days early", note: "Ahead of the biggest pack buying week." }
+      ],
+      channelLabel: "Where it goes once permission lands",
+      channelNote: "Nothing publishes until the two gates clear",
+      channels: [
+        { name: "Instagram", status: "Gate open", color: "#B8770A", bg: "#FEF4E4", slot: "Creator clip with credit", caption: "You said it better than we ever did.", meta: "Waits for her written agreement." },
+        { name: "WhatsApp", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Saveable step card", caption: "Built to be forwarded", meta: "Regional languages by morning." },
+        { name: "Paid push", status: "Held", color: "#5A6884", bg: "#F2F5FC", slot: "Held until day one results", caption: "Organic proves it first", meta: "Media agreed to wait." },
+        { name: "Bench test", status: "Running", color: "#1F44D6", bg: "#EAF0FF", slot: "Method being repeated", caption: "No claim until it passes", meta: "Result expected in forty minutes." }
+      ],
+      undo: "Both live pieces are organic and delete in seconds, and her clip comes down at a word from her without any argument.",
+      ledgerEntry: { sig: "Uniform stain fix by a parent", verdict: "Go now", score: "79" }
+    };
+    const m8 = {
+      id: "m8", domain: "Foods and Refreshment", brand: "Knorr and Kissan", queueLabel: "Live moments in foods",
+      title: "The festival calendar moved eleven days forward and recipe searches have arrived early with it",
+      summary: "Search and recipe saves for festival cooking have jumped three weeks ahead of last year because the calendar shifted. Marketing, trade and supply are all looking at the same signal at the same time, which is the point.",
+      sourceLine: "Seen in search trends, recipe saves, retailer orders and the festival calendar",
+      seen: "05:40", ready: "3 min 45 sec", window: "in 11 days", windowPct: "68%",
+      verdict: "Go now", vColor: "#0E9F6E", vBg: "#E6F7F0", arbBd: "#DCEFE6", arbBg: "#F3FBF7",
+      score: 84, decisionClass: "concept_launch", tta: "23 min",
+      stats: [
+        { k: "Search change", v: "Up 42%", c: "#0E9F6E" },
+        { k: "Recipe saves", v: "318K", c: "#0E1B33" },
+        { k: "How people feel", v: "Excited", c: "#0E9F6E" },
+        { k: "Brand fit", v: "Direct", c: "#0E9F6E" },
+        { k: "Stock ready", v: "Yes", c: "#0E9F6E" },
+        { k: "Time we have", v: "11 days", c: "#0E9F6E" }
+      ],
+      agents: [
+        ag("Culture", "Go", 85, "Households are planning earlier than usual and asking each other what to cook."),
+        ag("Brand", "Go", 88, "This is our season and our aisle. Nothing needs inventing, only publishing sooner."),
+        ag("Creative", "Go", 80, "Twelve recipe cards already exist from last year and only need dates and prices changed."),
+        ag("Risk", "Go", 77, "No claims, no borrowed material, nothing sensitive. Cleanest case this week."),
+        ag("Commercial", "Go", 86, "Eleven days of extra selling if the shelf and the content move together."),
+        ag("Media", "Hold", 62, "Recommends holding half the budget until we see which recipes actually get saved.")
+      ],
+      rationale: "The rare unanimous case. The only argument is about money, not about whether to move, so half the budget is held back until the first two days of saves tell us which recipes are working. Supply has already been told through the same system, which is why the shelf and the content will arrive together.",
+      dissent: [
+        { who: "Media", what: "Holds at sixty two on spending everything at once. Half the budget waits for real save data." }
+      ],
+      caseFor: [
+        "Eleven extra days of selling if content and shelf move together.",
+        "Twelve recipe assets already exist and only need dates changed.",
+        "Supply saw the same signal, so stock is already moving."
+      ],
+      caseAgainst: [
+        "Spending the full budget before we know which recipes get saved is wasteful.",
+        "Retail may not reset shelves as early as the calendar moved.",
+        "Early cooking content can be forgotten by the actual festival week."
+      ],
+      doNothing: "We publish on last year's dates, arrive eleven days late and lose the first and best week of the season while a rival owns the recipe searches.",
+      createLabel: "Twelve cards that already exist",
+      concepts: [
+        { name: "Recipe cards", state: "Clear", color: "#0E9F6E", bg: "#E6F7F0", copy: "Festival cooking starts early this year.", note: "Twelve existing cards refreshed with new dates and prices.", slot: "Recipe card set, twelve variants." },
+        { name: "Shop list", state: "Clear", color: "#0E9F6E", bg: "#E6F7F0", copy: "One list, six dishes.", note: "Saveable shopping list that links straight to the aisle.", slot: "Shopping list card for saving." },
+        { name: "Big film", state: "Not now", color: "#5A6884", bg: "#F2F5FC", copy: "The table that waited.", note: "Beautiful and slow. Keep it for the festival week itself.", slot: "Thirty second film, festival week." }
+      ],
+      hasLocal: false,
+      risks: [
+        { sev: "Medium", text: "Retail shelves reset later than the calendar moved", owner: "Trade", color: "#B8770A", bg: "#FEF4E4" },
+        { sev: "Low", text: "Full budget spent before save data arrives", owner: "Half held", color: "#5A6884", bg: "#F2F5FC" },
+        { sev: "Low", text: "Early content forgotten by festival week", owner: "Second wave planned", color: "#5A6884", bg: "#F2F5FC" }
+      ],
+      brandLines: [
+        { k: "Our territory", v: "Everyday cooking made easier, especially at festivals.", state: "Matched", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Claims rule", v: "No nutrition claim in seasonal recipe work.", state: "Respected", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Price rule", v: "Prices shown must match live retailer feeds.", state: "Checked", color: "#0E9F6E", bd: "#DCEFE6", bg: "#F3FBF7" },
+        { k: "Closest past play", v: "Onam 2025. Content and stock moved together and the week doubled.", state: "Supports", color: "#1F44D6", bd: "#DCE6FF", bg: "#F5F8FF" }
+      ],
+      decay: [80, 86, 88, 84, 76, 64, 48, 30],
+      impact: [
+        { label: "Extra selling days", value: "11 days", note: "Because we read the calendar shift, not last year's plan." },
+        { label: "Assets reused", value: "12 of 14", note: "Almost nothing had to be made from scratch." },
+        { label: "Budget held back", value: "50%", note: "Released only once saves show what works." }
+      ],
+      channelLabel: "Content and shelf moving together",
+      channelNote: "Supply was told by the same system this morning",
+      channels: [
+        { name: "Search and video", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Twelve recipe cards", caption: "Festival cooking starts early", meta: "Half the budget only." },
+        { name: "Retailer apps", status: "Ready", color: "#0E9F6E", bg: "#E6F7F0", slot: "Shop list linked to aisle", caption: "One list, six dishes", meta: "Prices from live feeds." },
+        { name: "Trade", status: "Notified", color: "#1F44D6", bg: "#EAF0FF", slot: "Shelf reset request", caption: "Eleven days earlier", meta: "Same signal, same morning." },
+        { name: "Second wave", status: "Planned", color: "#5A6884", bg: "#F2F5FC", slot: "Held for festival week", caption: "Big film waits", meta: "Released after save data." }
+      ],
+      undo: "Every piece is organic or paused in minutes, and the held budget means half the money is still ours to redirect at any point.",
+      ledgerEntry: { sig: "Festival calendar moved forward", verdict: "Go now", score: "84" }
+    };
+
+    const board = {
+      value: [
+        { label: "Decision latency across the business", value: "41 minutes", note: "From eleven days. Median of ninety four recorded calls." },
+        { label: "Value influenced this quarter", value: "2.8 crore", note: "Margin captured plus media not wasted." },
+        { label: "Localisation cost per asset", value: "Down 94%", note: "Four minutes of compute against nine days of agency time." }
+      ],
+      posture: [
+        { k: "Calls the machine may run alone", v: "Only reversible ones, inside bands you signed", state: "Holding" },
+        { k: "Irreversible calls", v: "Cannot leave level zero. People only.", state: "Locked" },
+        { k: "Human disagreement rate", v: "Twenty four percent, and we want it visible", state: "Healthy" },
+        { k: "Rules broken to move faster", v: "None in twelve months", state: "Clean" }
+      ],
+      rollout: [
+        { phase: "Now", scope: "One brand, one market, brand decisions", cost: "Four to six crore", state: "Running", color: "#0E9F6E" },
+        { phase: "Next four quarters", scope: "Five brands, three markets, plus supply", cost: "Fifteen to twenty crore", state: "Funded", color: "#1F44D6" },
+        { phase: "Beyond", scope: "Research, sales and finance on the same layer", cost: "Fifty to seventy crore", state: "Proposed", color: "#6A4CE0" }
+      ]
+    };
+
+    const roles = [
+      { id: "brand", name: "Brand", who: "Priya Nair", initials: "PN", badge: "3", color: "#0E1B33", tint: "#EAF0FF", accent: "#1F44D6",
+        greeting: "Good evening Priya. Your calls are ready.",
+        brief: "Everything below has already been read, argued over and priced. Your job is the judgement, not the homework.",
+        scope: "Deodorants and body care, India and global",
+        tabs: ["overview", "debate", "creative", "governance", "channels", "ledger"],
+        homeDomain: "personal", rail: "What tips this decision",
+        moments: ["m1", "m2", "m3", "m5"],
+        kpis: [
+          { label: "Time from signal to live", value: "41 min", delta: "was 11 days", color: "#0E9F6E", note: "Median for your brands this month." },
+          { label: "Moments joined", value: "37", delta: "+9", color: "#1F44D6", note: "Out of 1284 seen and read." },
+          { label: "Deliberately passed", value: "58%", delta: "on purpose", color: "#B8770A", note: "Saying no is a result, not a gap." },
+          { label: "Brand safety slips", value: "0", delta: "12 months", color: "#0E9F6E", note: "No rule was broken to move fast." }
+        ] },
+      { id: "creative", name: "Creative studio", who: "Arjun Rao", initials: "AR", badge: "2", color: "#0E1B33", tint: "#F0EBFF", accent: "#6A4CE0",
+        greeting: "Arjun, two briefs are already written for you.",
+        brief: "Routes come with the brand book already checked and the rights already flagged, so you only make things that can actually ship.",
+        scope: "Reactive studio, Mumbai and London",
+        tabs: ["overview", "creative", "channels"],
+        homeDomain: "beauty", rail: "What you need to make",
+        moments: ["m1", "m4", "m3", "m7"],
+        kpis: [
+          { label: "Briefs written for you", value: "12", delta: "this week", color: "#6A4CE0", note: "Each with rights and tone pre checked." },
+          { label: "Routes blocked early", value: "5", delta: "before work", color: "#C13A4C", note: "No wasted production." },
+          { label: "Versions compiled", value: "146", delta: "+38", color: "#1F44D6", note: "Markets and languages from locked masters." },
+          { label: "Time to first asset", value: "22 min", delta: "was 3 days", color: "#0E9F6E", note: "From decision to something publishable." }
+        ] },
+      { id: "legal", name: "Legal and risk", who: "Meera Iyer", initials: "MI", badge: "4", color: "#0E1B33", tint: "#FCECEE", accent: "#C13A4C",
+        greeting: "Meera, four gates are waiting on your view.",
+        brief: "You see the rules that were touched, who touched them and what is blocked. Nothing publishes past a gate you hold.",
+        scope: "India, United Kingdom and Brazil",
+        tabs: ["overview", "risk", "governance", "ledger"],
+        homeDomain: "personal", rail: "The gates you are holding",
+        moments: ["m1", "m2", "m4", "m7"],
+        kpis: [
+          { label: "Gates you hold open", value: "4", delta: "live now", color: "#C13A4C", note: "Publishing stops until you move." },
+          { label: "Rights issues caught", value: "23", delta: "this quarter", color: "#0E9F6E", note: "Before anything was made." },
+          { label: "Rules broken", value: "0", delta: "12 months", color: "#0E9F6E", note: "Speed did not cost compliance." },
+          { label: "Average review time", value: "9 min", delta: "was 2 days", color: "#1F44D6", note: "Because the case arrives complete." }
+        ] },
+      { id: "media", name: "Media", who: "Rohit Sen", initials: "RS", badge: "2", color: "#0E1B33", tint: "#EAF0FF", accent: "#1F44D6",
+        greeting: "Rohit, two plans are ready to release.",
+        brief: "Sequence, spend and reversibility in one view. Anything that cannot be pulled back quickly stays with a person by rule.",
+        scope: "Paid and organic, India first",
+        tabs: ["overview", "channels", "impact"],
+        homeDomain: "personal", rail: "The plan in one look",
+        moments: ["m1", "m3", "m5", "m8"],
+        kpis: [
+          { label: "Free reach earned", value: "64M", delta: "this quarter", color: "#0E9F6E", note: "No media money behind it." },
+          { label: "Money not spent", value: "₹25 Lakh", delta: "avoided", color: "#1F44D6", note: "Plans the record says would not pay." },
+          { label: "Plans pulled in time", value: "3", delta: "all reversed", color: "#B8770A", note: "Every one inside its undo window." },
+          { label: "Cost per thousand", value: "Down 41%", delta: "year on year", color: "#0E9F6E", note: "Organic first sequencing." }
+        ] },
+      { id: "supply", name: "Supply chain", who: "Kavya Menon", initials: "KM", badge: "1", color: "#0E1B33", tint: "#E6F7F0", accent: "#0E9F6E",
+        greeting: "Kavya, one move is running inside your rules.",
+        brief: "The same engine, pointed at demand and stock. You are told rather than asked, because the move is small and reversible.",
+        scope: "South India, general trade",
+        tabs: ["overview", "debate", "channels", "governance"],
+        homeDomain: "supply", rail: "What actually moves",
+        moments: ["m6", "m8"],
+        kpis: [
+          { label: "Extra margin in reach", value: "2.1 crore", delta: "9 day window", color: "#0E9F6E", note: "Tamil Nadu sachets." },
+          { label: "Availability held", value: "96.2%", delta: "floor 94%", color: "#0E9F6E", note: "No donor district dropped below floor." },
+          { label: "Moves run on rules", value: "14", delta: "this quarter", color: "#1F44D6", note: "All under two percent of a line." },
+          { label: "Decision time", value: "18 min", delta: "was 9 days", color: "#0E9F6E", note: "Same governance as brand decisions." }
+        ] },
+      { id: "leadership", name: "Leadership", who: "Ananya Desai", initials: "AD", badge: "6", color: "#0E1B33", tint: "#F0EBFF", accent: "#6A4CE0",
+        greeting: "Ananya, this is the business, not a brand.",
+        brief: "No single moment is your problem. What matters is how fast the whole company turns a signal into a decision, what that is worth, and whether the guardrails held while it happened.",
+        scope: "Five categories, two functions live",
+        tabs: ["portfolio", "board", "impact", "ledger"],
+        homeDomain: "personal", rail: "Where the business is exposed",
+        moments: ["m1", "m2", "m3", "m4", "m5", "m6", "m7", "m8"],
+        kpis: [
+          { label: "Signal to action, whole company", value: "41 min", delta: "was 11 days", color: "#0E9F6E", note: "Median of ninety four recorded calls." },
+          { label: "Value influenced this quarter", value: "2.8 crore", delta: "margin plus waste avoided", color: "#6A4CE0", note: "Traceable to individual calls." },
+          { label: "Functions on the layer", value: "2 of 5", delta: "brand and supply", color: "#1F44D6", note: "Research and sales are next." },
+          { label: "Guardrails broken", value: "0", delta: "12 months", color: "#0E9F6E", note: "Speed did not cost control." }
+        ] }
+    ];
+
+    const domains = [
+      { id: "personal", name: "Personal care", brands: "Rexona, Lifebuoy, Lux", moments: ["m1", "m2", "m3", "m5"], metric: "Conversation about our category, last ten hours", headline: "Up 34%", trend: "One moment is worth acting on today", trendUp: true, spark: [30, 42, 38, 55, 61, 48, 72, 88, 76, 94] },
+      { id: "beauty", name: "Beauty and wellbeing", brands: "Dove, Sunsilk, Pond's", moments: ["m4"], metric: "Market versions produced, last ten hours", headline: "9 built", trend: "Two versions need a human ear", trendUp: true, spark: [40, 38, 44, 50, 46, 58, 54, 62, 70, 66] },
+      { id: "home", name: "Home care", brands: "Surf Excel, Rin, Vim", moments: ["m7"], metric: "Parents copying the stain fix, last ten hours", headline: "61K posts", trend: "Waiting on permission from the creator", trendUp: true, spark: [22, 28, 34, 40, 52, 60, 68, 74, 80, 86] },
+      { id: "foods", name: "Foods and refreshment", brands: "Knorr, Kissan, Brooke Bond", moments: ["m8"], metric: "Festival recipe searches, last ten hours", headline: "Up 42%", trend: "Arrived eleven days earlier than last year", trendUp: true, spark: [35, 40, 46, 44, 52, 58, 55, 64, 68, 74] },
+      { id: "supply", name: "Supply chain", brands: "Depots, distributors, lanes", moments: ["m6"], metric: "Sales pull in four districts, last ten hours", headline: "Up 31%", trend: "A rival is out of stock in 41% of stores", trendUp: true, spark: [45, 50, 48, 56, 62, 70, 68, 78, 84, 90] }
+    ];
+
+    return { moments: { m1, m2, m3, m4, m5, m6, m7, m8 }, roles, domains, board };
+  })();
+
+  phaseDefs = [
+    { name: "Signal", time: "0 min", who: "Listening layer" },
+    { name: "Read", time: "6 min", who: "Brand memory" },
+    { name: "Argued", time: "12 min", who: "Six specialists" },
+    { name: "Ruled", time: "16 min", who: "Chair agent" },
+    { name: "Made", time: "29 min", who: "Creative engine" },
+    { name: "Your call", time: "41 min", who: "You" },
+    { name: "Live", time: "44 min", who: "Channels" },
+    { name: "Remembered", time: "46 min", who: "Record" }
+  ];
+
+  state = {
+    roleId: "brand", domainId: "personal", momentId: "m1", tab: "overview",
+    phase: 8, playing: false, decisions: {},
+    clock: 41, clockTarget: 41, avg: 43.6, runs: 94, lastRun: null,
+    policy: { concept_launch: 2, localised_variant: 3, paid_media: 2, brand_book_change: 0, supply_move: 3 },
+    newsInsights: null,
+    liveNews: [],
+    liveContext: null,
+    liveMode: 'demo',
+    liveSelectedId: null,
+    liveCount: 0,
+    autoScanSec: 600,
+    isScanningActive: false,
+    inspectingId: null,
+    selectedCelebrationId: null,
+    agentMeshState: "Mesh Standby · Polling stream",
+    agentMeshColor: "#1F44D6",
+    feed: [
+      { text: "Chair agent ruled on the fourth official moment. Score 87.", t: "6 minutes ago", color: "#0E9F6E" },
+      { text: "Legal opened a gate: recreated asset only, official not named.", t: "9 minutes ago", color: "#B8770A" },
+      { text: "Six specialists returned independent views. Two disagreed.", t: "14 minutes ago", color: "#1F44D6" },
+      { text: "412 thousand posts read and grouped into one moment.", t: "22 minutes ago", color: "#5A6884" },
+      { text: "Office prank trend passed. Reason and dissent recorded.", t: "1 hour ago", color: "#C13A4C" },
+      { text: "Tamil Nadu stock move ran inside signed rules. You were told.", t: "3 hours ago", color: "#0E9F6E" }
+    ],
+    ledger: [
+      { id: "record 00487", sig: "Festival audio trend, Sunsilk", verdict: "Do nothing", score: "34", outcome: "Passed. Ninety day check open.", color: "#C13A4C" },
+      { id: "record 00486", sig: "Dove refill pack posts", verdict: "Go now", score: "79", outcome: "Approved by a person. Favourability up 0.9 points.", color: "#0E9F6E" },
+      { id: "record 00485", sig: "Local train post, Mumbai", verdict: "Go with conditions", score: "63", outcome: "Ran organic only. One negative regional cycle.", color: "#B8770A" },
+      { id: "record 00412", sig: "Marathon finish, 2024", verdict: "Went big", score: "71", outcome: "Four tenths of forecast. This taught the system.", color: "#6A4CE0" }
+    ]
+  };
+
+  timers = [];
+  componentDidMount() {
+    this.fetchLedgerData();
+    this.fetchLiveInsights();
+    this.connectLiveStream();
+
+    this.scanInterval = setInterval(() => {
+      this.setState(s => {
+        if (s.autoScanSec <= 1) {
+          setTimeout(() => { if (!this.state.isScanningActive) this.onScanNow(); }, 10);
+          return { autoScanSec: 600 };
+        }
+        return { autoScanSec: s.autoScanSec - 1 };
+      });
+    }, 1000);
+
+    // Initial role check on mount
+    setTimeout(() => {
+      const savedRole = localStorage.getItem('next_operator_role');
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!savedRole || urlParams.get('selectRole') === 'true' || !sessionStorage.getItem('next_cc_role_picked')) {
+        window.openCcRoleModal && window.openCcRoleModal();
+      }
+    }, 400);
+
+    window.ccInstance = this;
+  }
+
+  fetchLedgerData() {
+    fetch('/api/ledger')
+      .then(res => res.json())
+      .then(entries => {
+        if (Array.isArray(entries) && entries.length > 0) {
+          const mapped = entries.map(e => ({
+            id: e.blockId || ('Block #' + (e.id || 1)),
+            sig: (e.brand || 'HUL Brand') + ' · ' + (e.signalHeadline || e.summary || 'Strategic decision'),
+            verdict: e.choice === 'STAND_DOWN' ? 'Stood down' : (e.choice === 'APPROVE_OVERRIDE' ? 'Overridden' : 'Approved'),
+            score: String(e.opportunityScore || 90),
+            outcome: e.notes || (e.choice === 'STAND_DOWN' ? 'Stood down on record' : 'Live on Meta Reels & Blinkit'),
+            color: e.choice === 'STAND_DOWN' ? '#C13A4C' : '#0E9F6E',
+            rowBg: '#FFFFFF'
+          }));
+          this.setState({ ledger: mapped, avg: 41.2 });
+        }
+      })
+      .catch(() => {});
+  }
+
+  connectLiveStream() {
+    if (typeof EventSource === 'undefined') {
+      this.startPolling();
+      return;
+    }
+    try {
+      const es = new EventSource('/api/news/stream');
+      this.es = es;
+      es.addEventListener('hello', e => this.onHello(JSON.parse(e.data)));
+      es.addEventListener('item', e => this.onLiveItem(JSON.parse(e.data)));
+      es.addEventListener('heartbeat', e => {
+        try {
+          const data = JSON.parse(e.data);
+          if (data.nextRefreshInSec !== undefined) {
+            this.setState({ autoScanSec: data.nextRefreshInSec });
+          }
+        } catch {}
+      });
+      es.addEventListener('agent_log', e => {
+        try {
+          const log = JSON.parse(e.data);
+          this.setState(s => ({
+            agentMeshState: (log.agent ? log.agent + ': ' : '') + log.message,
+            agentMeshColor: '#0E9F6E',
+            feed: [{ text: `🤖 ${log.agent || 'Agent'}: ${log.message}`, t: 'just now', color: '#1F44D6' }, ...s.feed].slice(0, 40)
+          }));
+        } catch {}
+      });
+      es.addEventListener('new_signal', () => {
+        this.fetchLiveInsights();
+      });
+      es.addEventListener('decision_executed', e => {
+        try {
+          const res = JSON.parse(e.data);
+          this.setState(s => ({
+            feed: [{ text: `⚡ EXECUTION DISPATCHED: ${res.headline || res.brand} (Adapters: Meta, Instagram Reels, Blinkit, Zepto)`, t: 'just now', color: '#0E9F6E' }, ...s.feed].slice(0, 40)
+          }));
+        } catch {}
+      });
+      es.addEventListener('context', e => {
+        try { this.setState({ liveContext: JSON.parse(e.data) }); } catch {}
+      });
+      es.addEventListener('status', e => {
+        try { this.setState({ liveMode: JSON.parse(e.data).mode }); } catch {}
+      });
+      es.onerror = () => {
+        if (this.es) { this.es.close(); this.es = null; }
+        this.startPolling();
+      };
+    } catch (err) {
+      this.startPolling();
+    }
+  }
+
+  onHello(data) {
+    if (data && data.mode) {
+      this.setState({ liveMode: data.mode });
+    }
+  }
+
+  onLiveItem(item) {
+    if (!item || !item.id) return;
+    this.setState(s => {
+      if (s.liveNews.some(n => n.id === item.id)) return null;
+      const updated = [item, ...s.liveNews].slice(0, 24);
+      const feedLine = {
+        text: '📡 ' + item.brand + ' · ' + item.headline,
+        t: 'just now · live agent',
+        color: item.stanceColor || '#1F44D6'
+      };
+      return {
+        liveNews: updated,
+        liveCount: s.liveCount + 1,
+        liveSelectedId: s.liveSelectedId || item.id,
+        feed: [feedLine, ...s.feed].slice(0, 40)
+      };
+    });
+  }
+
+  startPolling() {
+    this.setState({ liveMode: 'polling' });
+    if (this.pollTimer) clearInterval(this.pollTimer);
+    this.pollTimer = setInterval(() => this.fetchLiveInsights(), 30000);
+  }
+
+  fetchLiveInsights() {
+    fetch('/api/news/hul-insights')
+      .then(res => res.json())
+      .then(res => {
+        if (!res || !res.insights) return;
+        const insights = res.insights;
+        const india = Array.isArray(insights.indiaMarketNews) ? insights.indiaMarketNews : [];
+        const global = Array.isArray(insights.globalNews) ? insights.globalNews : [];
+        const combined = [...india, ...global];
+        
+        this.setState(s => {
+          const existingIds = new Set(s.liveNews.map(n => n.id));
+          const newItems = combined.filter(n => n && n.id && !existingIds.has(n.id));
+          const merged = [...newItems, ...s.liveNews].slice(0, 24);
+          const firstId = s.liveSelectedId || (merged[0] ? merged[0].id : null);
+          return {
+            newsInsights: insights,
+            liveNews: merged.length ? merged : s.liveNews,
+            liveContext: insights.marketContext || s.liveContext,
+            liveMode: res.mode || s.liveMode,
+            liveSelectedId: firstId,
+            liveCount: s.liveCount + newItems.length
+          };
+        });
+      })
+      .catch(err => {
+        console.warn("Live insights fetch error:", err);
+      });
+  }
+
+  onScanNow() {
+    if (this.state.isScanningActive) return;
+    this.setState({
+      isScanningActive: true,
+      agentMeshState: "Radar sweeping FMCG feeds & evaluating 6 agents...",
+      agentMeshColor: "#1F44D6"
+    });
+
+    // Fun animated cycling through news articles
+    const news = this.state.liveNews;
+    let idx = 0;
+    const cycleTimer = setInterval(() => {
+      if (news && news.length > 0) {
+        this.setState({ inspectingId: news[idx % news.length].id });
+        idx++;
+      }
+    }, 280);
+
+    fetch('/api/news/refresh-now', { method: 'POST' })
+      .then(res => res.json())
+      .then(() => {
+        setTimeout(() => {
+          clearInterval(cycleTimer);
+          this.fetchLiveInsights();
+          const targetId = (this.state.liveNews && this.state.liveNews[0]) ? this.state.liveNews[0].id : null;
+          this.setState({
+            isScanningActive: false,
+            inspectingId: null,
+            liveSelectedId: targetId,
+            selectedCelebrationId: targetId,
+            agentMeshState: "Scan complete. Top cultural opportunity synthesized.",
+            agentMeshColor: "#0E9F6E",
+            autoScanSec: 600
+          });
+          setTimeout(() => {
+            this.setState({ selectedCelebrationId: null });
+          }, 2400);
+        }, 1800);
+      })
+      .catch(() => {
+        clearInterval(cycleTimer);
+        this.setState({ isScanningActive: false, inspectingId: null });
+      });
+  }
+
+  componentWillUnmount() {
+    this.timers.forEach(clearTimeout);
+    clearInterval(this.ticker);
+    if (this.pollTimer) clearInterval(this.pollTimer);
+    if (this.scanInterval) clearInterval(this.scanInterval);
+    if (this.es) { this.es.close(); this.es = null; }
+  }
+
+  selectLiveItem(id) {
+    this.setState({ liveSelectedId: id });
+  }
+
+  get liveSelected() {
+    return this.state.liveNews.find(n => n.id === this.state.liveSelectedId) || this.state.liveNews[0] || null;
+  }
+
+  get role() { return this.data.roles.find(r => r.id === this.state.roleId); }
+  get m() { return this.data.moments[this.state.momentId]; }
+  get domain() { return this.data.domains.find(d => d.id === this.state.domainId); }
+  get tabsFor() {
+    const base = this.role.tabs.slice();
+    if (this.state.roleId === "leadership") return base;
+    if (this.state.roleId !== "legal" && base.indexOf("live") < 0) {
+      const ovIdx = base.indexOf("overview");
+      if (ovIdx >= 0) {
+        base.splice(ovIdx + 1, 0, "live");
+      } else {
+        base.unshift("live");
+      }
+    }
+    if (this.m.replay && base.indexOf("ledger") < 0) base.push("ledger");
+    if (this.m.concepts && base.indexOf("creative") < 0 && this.state.roleId !== "legal") base.push("creative");
+    return base;
+  }
+  get level() { return this.state.policy[this.m.decisionClass] ?? 2; }
+  get queueIds() {
+    const d = this.domain, role = this.role;
+    const mine = d.moments.filter(id => role.moments.indexOf(id) >= 0);
+    return mine.length ? mine : d.moments;
+  }
+
+  pickRole(id) {
+    const r = this.data.roles.find(x => x.id === id);
+    const d = this.data.domains.find(x => x.id === r.homeDomain);
+    const mine = d.moments.filter(mid => r.moments.indexOf(mid) >= 0);
+    this.setState({ roleId: id, domainId: r.homeDomain, momentId: (mine[0] || d.moments[0]), tab: r.tabs[0] });
+  }
+  pickDomain(id) {
+    const d = this.data.domains.find(x => x.id === id), role = this.role;
+    const mine = d.moments.filter(mid => role.moments.indexOf(mid) >= 0);
+    const mid = mine[0] || d.moments[0];
+    this.setState(s => ({ domainId: id, momentId: mid, tab: this.role.tabs.indexOf(s.tab) >= 0 ? s.tab : this.role.tabs[0] }));
+  }
+  pickMoment(id) {
+    const t = this.tabsFor;
+    this.setState(s => ({ momentId: id, tab: t.indexOf(s.tab) >= 0 ? s.tab : "overview" }));
+  }
+  play() {
+    this.timers.forEach(clearTimeout); this.timers = []; clearInterval(this.ticker);
+    const base = parseInt(this.m.tta, 10) || 40;
+    const target = Math.max(6, Math.round(base * 10) / 10);
+    this.setState({ phase: 0, playing: true, clock: 0, clockTarget: target });
+    const started = Date.now(), dur = 3600;
+    this.ticker = setInterval(() => {
+      const p = Math.min(1, (Date.now() - started) / dur);
+      this.setState({ clock: Math.round(target * p * 10) / 10 });
+      if (p >= 1) clearInterval(this.ticker);
+    }, 45);
+    for (let i = 1; i <= 8; i++) {
+      this.timers.push(setTimeout(() => this.setState({ phase: i, playing: i < 8 }), i * (dur / 8)));
+    }
+    this.timers.push(setTimeout(() => {
+      this.setState(s => ({
+        clock: target, lastRun: target, runs: s.runs + 1,
+        avg: Math.round(((s.avg * 4 + target) / 5) * 10) / 10,
+        feed: [{ text: "Loop run on the " + this.m.brand + " moment. Ready for a person in " + target.toFixed(1) + " minutes.", t: "just now", color: "#1F44D6" }].concat(s.feed)
+      }));
+    }, dur + 60));
+  }
+  decide(kind) {
+    const id = this.state.momentId;
+    const line = { approve: "You approved the " + this.m.brand + " call. It is going live now.", edit: "You changed a detail on the " + this.m.brand + " call, then approved it.", decline: "You declined the " + this.m.brand + " call. Your reason is on the record." }[kind];
+    
+    // Wire real decision execution to backend ledger
+    const choiceMap = { approve: 'APPROVE_AUTOMATE', edit: 'APPROVE_OVERRIDE', decline: 'STAND_DOWN' };
+    fetch('/api/decision/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        signalId: id,
+        brand: this.m.brand,
+        choice: choiceMap[kind] || 'APPROVE_AUTOMATE',
+        headline: this.m.title,
+        rationale: this.m.rationale || line
+      })
+    }).then(res => res.json()).then(data => {
+      this.fetchLedgerData();
+    }).catch(() => {});
+
+    this.setState(s => ({
+      decisions: { ...s.decisions, [id]: kind },
+      feed: [{ text: line, t: "just now", color: kind === "decline" ? "#C13A4C" : "#0E9F6E" }].concat(s.feed),
+      ledger: [{
+        id: "record 00" + (488 + s.ledger.length - 3),
+        sig: this.m.ledgerEntry.sig,
+        verdict: kind === "decline" ? "Declined by you" : this.m.ledgerEntry.verdict,
+        score: this.m.ledgerEntry.score,
+        outcome: kind === "decline" ? "You overruled the system. Reason stored." : kind === "edit" ? "You edited, then approved. Change stored." : "You approved. Activation running.",
+        color: kind === "decline" ? "#C13A4C" : "#0E9F6E", rowBg: "#F7FBF9"
+      }].concat(s.ledger)
+    }));
+  }
+  undo() {
+    const id = this.state.momentId;
+    this.setState(s => {
+      const d = { ...s.decisions }; delete d[id];
+      return { decisions: d, feed: [{ text: "You pulled the " + this.m.brand + " call back. Everything is down again.", t: "just now", color: "#C13A4C" }].concat(s.feed) };
+    });
+  }
+
+  renderVals() {
+    const st = this.state, role = this.role, m = this.m, tabs = this.tabsFor;
+    const vc = v => v === "Go" ? "#0E9F6E" : v === "Stop" ? "#C13A4C" : "#B8770A";
+    const vbg = v => v === "Go" ? "#E6F7F0" : v === "Stop" ? "#FCECEE" : "#FEF4E4";
+    const tabNames = { overview: "The moment", live: "Live intelligence", debate: "What the agents said", creative: "The work", risk: "Risk and rules", governance: "Permissions", channels: "Where it runs", impact: "The numbers", ledger: "Memory", portfolio: "All live calls", board: "Board view" };
+    const tabCounts = {
+      overview: "6", live: String(st.liveNews.length), debate: "6", creative: String((m.concepts || []).length), risk: String((m.risks || []).length),
+      governance: "5", channels: String((m.channels || []).length), impact: "3", ledger: String(st.ledger.length), portfolio: "8", board: "3"
+    };
+    const decided = st.decisions[st.momentId];
+    const autoRun = this.level >= 3;
+    const ring = Math.round(m.score / 100 * 327) + " 327";
+
+    const sel = this.liveSelected;
+
+    const roleMoments = this.queueIds.map(id => this.data.moments[id]);
+    const undecided = role.moments.filter(id => !st.decisions[id]).length;
+    const railBullets = {
+      brand: [
+        { mark: "1", text: m.caseFor[0], bg: "#E6F7F0", color: "#0E9F6E" },
+        { mark: "2", text: m.caseAgainst[0], bg: "#FCECEE", color: "#C13A4C" },
+        { mark: "3", text: "If we pass: " + m.doNothing.split(".")[0] + ".", bg: "#FEF4E4", color: "#B8770A" }
+      ],
+      creative: [
+        { mark: "A", text: "Make first: " + (m.concepts ? m.concepts[0].name + ". " + m.concepts[0].note : "nothing yet"), bg: "#F0EBFF", color: "#6A4CE0" },
+        { mark: "B", text: m.concepts && m.concepts[1] ? m.concepts[1].name + " is " + m.concepts[1].state.toLowerCase() + ". " + m.concepts[1].note : "", bg: "#FEF4E4", color: "#B8770A" },
+        { mark: "C", text: "Ships to: " + m.channelNote.toLowerCase(), bg: "#EAF0FF", color: "#1F44D6" }
+      ],
+      legal: [
+        { mark: "!", text: "Biggest exposure: " + m.risks[0].text + ". Owner: " + m.risks[0].owner + ".", bg: "#FCECEE", color: "#C13A4C" },
+        { mark: "§", text: m.brandLines[1].k + ". " + m.brandLines[1].v, bg: "#FEF4E4", color: "#B8770A" },
+        { mark: "↺", text: "Reversal path: " + m.undo.split(".")[0] + ".", bg: "#E6F7F0", color: "#0E9F6E" }
+      ],
+      media: [
+        { mark: "1", text: "Starts on " + m.channels[0].name + ". " + m.channels[0].meta, bg: "#EAF0FF", color: "#1F44D6" },
+        { mark: "2", text: m.impact[0].label + ": " + m.impact[0].value + ". " + m.impact[0].note, bg: "#E6F7F0", color: "#0E9F6E" },
+        { mark: "3", text: "Pull back in " + (m.impact[2] ? m.impact[2].value.toLowerCase() : "minutes") + " if it turns.", bg: "#FEF4E4", color: "#B8770A" }
+      ],
+      supply: [
+        { mark: "1", text: m.concepts ? m.concepts[0].copy + ". " + m.concepts[0].note : "", bg: "#E6F7F0", color: "#0E9F6E" },
+        { mark: "2", text: m.brandLines[1].v, bg: "#EAF0FF", color: "#1F44D6" },
+        { mark: "3", text: m.undo.split(".")[0] + ".", bg: "#FEF4E4", color: "#B8770A" }
+      ],
+      leadership: [
+        { mark: "1", text: undecided + " calls across the business are still waiting on a person right now.", bg: "#FEF4E4", color: "#B8770A" },
+        { mark: "2", text: "Largest single exposure open today: " + m.impact[0].label.toLowerCase() + " at " + m.impact[0].value + ".", bg: "#EAF0FF", color: "#1F44D6" },
+        { mark: "3", text: "Nothing irreversible can run without a person. That rule is locked.", bg: "#E6F7F0", color: "#0E9F6E" }
+      ]
+    }[st.roleId];
+
+    return {
+      modeLabel: this.props.mode === "Live data" ? "Live data" : "Demo mode",
+      modeNote: this.props.mode === "Live data" ? "Reading real feeds. Falls back to demo if a feed drops." : "Prepared moments. Runs the same way every time.",
+      waitingCount: undecided + " now",
+      avgTta: st.avg.toFixed(1) + " min",
+      liveClock: st.clock.toFixed(1) + " min",
+      liveClockColor: st.playing ? "#1F44D6" : "#0E9F6E",
+      liveClockNote: st.playing ? "Loop running now" : st.lastRun ? "Last run took " + st.lastRun.toFixed(1) + " min" : "Run the loop to watch it",
+      runLabel: st.playing ? "Running the loop" : "Run the loop",
+      onRun: () => this.play(),
+      onStartWalkthrough: () => window.startCcWalkthroughTour && window.startCcWalkthroughTour(),
+      onOpenRoleModal: () => window.openCcRoleModal && window.openCcRoleModal(),
+      runCount: st.runs + " loops run",
+      role: { ...role, initials: role.initials, color: role.accent },
+
+      autoScanCountdown: String(Math.floor(st.autoScanSec / 60)).padStart(2, '0') + ':' + String(st.autoScanSec % 60).padStart(2, '0'),
+      onScanNow: () => this.onScanNow(),
+      isScanningActive: st.isScanningActive,
+      scannerStatusTitle: st.isScanningActive ? '⚡ Multi-Agent Radar Scanning...' : 'Real-Time FMCG Grounded News Stream',
+      scannerStatusSub: st.isScanningActive ? 'Evaluating 7 specialist nodes against HUL brand constitutions' : 'Synchronized with live FMCG web wires & automated 10-minute crawl',
+      agentMeshState: st.agentMeshState,
+      agentMeshColor: st.agentMeshColor,
+      activeAgentChips: [
+        { name: "Cultural Signal", status: st.isScanningActive ? "Scanning Wires" : "Active", color: "#1F44D6", bg: "#F0F5FF", bd: "#C7D6FF", dotColor: "#1F44D6", anim: st.isScanningActive ? "agentBlink 0.6s infinite" : "none" },
+        { name: "Brand Voice", status: st.isScanningActive ? "Checking Align" : "Active", color: "#0E9F6E", bg: "#E6F7F0", bd: "#A3E0C8", dotColor: "#0E9F6E", anim: st.isScanningActive ? "agentBlink 0.8s infinite" : "none" },
+        { name: "Legal / ASCI", status: st.isScanningActive ? "Auditing Code" : "Active", color: "#B8770A", bg: "#FEF4E4", bd: "#F9DCB0", dotColor: "#B8770A", anim: st.isScanningActive ? "agentBlink 0.7s infinite" : "none" },
+        { name: "Commercial Media", status: st.isScanningActive ? "Modeling ROAS" : "Active", color: "#6A4CE0", bg: "#F0EBFF", bd: "#D5C8F8", dotColor: "#6A4CE0", anim: st.isScanningActive ? "agentBlink 0.9s infinite" : "none" },
+        { name: "Channel Fit", status: st.isScanningActive ? "Blinkit/Meta" : "Active", color: "#1F44D6", bg: "#F0F5FF", bd: "#C7D6FF", dotColor: "#1F44D6", anim: st.isScanningActive ? "agentBlink 0.65s infinite" : "none" },
+        { name: "PR Resilience", status: st.isScanningActive ? "Trolling Test" : "Active", color: "#C13A4C", bg: "#FCECEE", bd: "#F6BEC5", dotColor: "#C13A4C", anim: st.isScanningActive ? "agentBlink 0.75s infinite" : "none" },
+        { name: "Supply Chain", status: st.isScanningActive ? "Inventory Gate" : "Active", color: "#0E9F6E", bg: "#E6F7F0", bd: "#A3E0C8", dotColor: "#0E9F6E", anim: st.isScanningActive ? "agentBlink 0.85s infinite" : "none" }
+      ],
+
+      liveMode:      st.liveMode === 'live' ? 'LIVE' : st.liveMode === 'polling' ? 'POLLING' : 'DEMO',
+      liveModeColor: st.liveMode === 'live' ? '#0E9F6E' : st.liveMode === 'polling' ? '#1F44D6' : '#B8770A',
+      liveModeBg:    st.liveMode === 'live' ? '#E6F7F0' : st.liveMode === 'polling' ? '#EAF0FF' : '#FEF4E4',
+      liveModeNote:  st.liveMode === 'live' ? 'Streaming grounded news. Agent reads every item as it lands.'
+                   : st.liveMode === 'polling' ? 'Stream unavailable. Refreshing every 30 seconds.'
+                   : 'No live feed. Showing seeded intelligence.',
+      liveCountLabel: st.liveCount + ' items read this session',
+      hasLiveNews: st.liveNews.length > 0,
+      noLiveNews:  st.liveNews.length === 0,
+
+      liveFeed: st.liveNews.map(n => ({
+        id: n.id, headline: n.headline, summary: n.summary,
+        brand: n.brand, category: n.category,
+        meta: n.source + ' · ' + n.publishedAt + ' · ' + n.region,
+        stance: n.analysis.stance, stanceColor: n.stanceColor, stanceBg: n.stanceBg,
+        score: String(n.analysis.relevance),
+        pct: n.analysis.relevance + '%',
+        window: n.analysis.windowHours + 'h window',
+        bd: n.id === st.liveSelectedId ? '#1F44D6' : (n.id === st.inspectingId ? '#0E9F6E' : '#E7EDF9'),
+        bg: n.id === st.liveSelectedId ? '#F5F8FF' : (n.id === st.inspectingId ? '#E6F7F0' : '#FFFFFF'),
+        shadow: n.id === st.liveSelectedId ? '0 4px 14px rgba(31,68,214,0.12)' : 'none',
+        cardAnim: n.id === st.selectedCelebrationId ? 'selectCelebration 1.8s ease' : 'none',
+        isInspecting: n.id === st.inspectingId,
+        onClick: () => this.selectLiveItem(n.id)
+      })),
+
+      hasLiveSelection: !!sel,
+      liveSel: sel ? {
+        headline: sel.headline, summary: sel.summary, rationale: sel.analysis.rationale,
+        stance: sel.analysis.stance, stanceColor: sel.stanceColor, stanceBg: sel.stanceBg,
+        score: String(sel.analysis.relevance), ring: Math.round(sel.analysis.relevance / 100 * 327) + ' 327',
+        brand: sel.brand, category: sel.category, source: sel.source,
+        window: sel.analysis.windowHours + ' hours'
+      } : {},
+      liveAgents: sel ? sel.analysis.agentRead.map(a => ({
+        name: a.name, score: String(a.score), pct: a.score + '%',
+        verdict: a.verdict, color: a.color,
+        bg: a.verdict === 'Go' ? '#E6F7F0' : a.verdict === 'Stop' ? '#FCECEE' : '#FEF4E4',
+        line: a.line
+      })) : [],
+      liveCitations: sel ? (sel.citations || []).map(c => ({ title: c.title, uri: c.uri })) : [],
+      hasCitations: !!(sel && sel.citations && sel.citations.length),
+
+      liveContextSummary:  st.liveContext ? st.liveContext.summary : 'Waiting for the first grounded read.',
+      liveSentiment:       st.liveContext ? st.liveContext.consumerSentiment : '—',
+      liveKeywords:        st.liveContext ? (st.liveContext.trendingKeywords || []).map(k => ({ k })) : [],
+      liveKpis:            st.liveContext ? st.liveContext.kpis : [],
+
+      roleTabs: this.data.roles.map(r => {
+        const on = r.id === st.roleId;
+        return {
+          name: r.name, initials: r.initials,
+          badge: String(r.moments.filter(id => !st.decisions[id]).length),
+          onClick: () => this.pickRole(r.id),
+          bg: on ? "#FFFFFF" : "#F0F3FA", bd: on ? r.accent : "#E3E8F2",
+          shadow: on ? "0 2px 10px rgba(31,68,214,.12)" : "none",
+          color: on ? "#0E1B33" : "#5A6884",
+          avBg: on ? r.tint : "#E7EDF9", avColor: on ? r.accent : "#7A88A3",
+          badgeColor: on ? "#FFFFFF" : "#7A88A3", badgeBg: on ? r.accent : "#E7EDF9"
+        };
+      }),
+
+      domainList: this.data.domains.map(d => {
+        const on = d.id === st.domainId;
+        const open = d.moments.filter(id => !st.decisions[id]).length;
+        return {
+          name: d.name, brands: d.brands, trend: d.trend,
+          live: open === 0 ? "all settled" : open + (open === 1 ? " waiting" : " waiting"),
+          metric: d.metric, headline: d.headline,
+          bg: on ? "#F5F8FF" : "#FFFFFF", bd: on ? "#C7D6FF" : "#E7EDF9",
+          dot: on ? "#1F44D6" : "#C3CFEA",
+          liveColor: open === 0 ? "#7A88A3" : "#0E9F6E",
+          liveBg: open === 0 ? "#F2F5FC" : "#E6F7F0",
+          trendColor: d.trendUp ? "#0E9F6E" : "#7A88A3",
+          spark: d.spark.map(v => ({ h: Math.max(3, Math.round(v * 0.26)), color: on ? "#1F44D6" : "#D5DEF0" })),
+          onClick: () => this.pickDomain(d.id)
+        };
+      }),
+
+      domainHead: this.domain.name,
+      domainSub: (st.liveNews && st.liveNews[0]) 
+        ? st.liveNews[0].headline 
+        : (st.newsInsights && st.newsInsights.indiaMarketNews && st.newsInsights.indiaMarketNews[0])
+          ? st.newsInsights.indiaMarketNews[0].headline 
+          : this.domain.metric + ". " + this.domain.trend + ".",
+      domainScope: this.domain.brands + " · " + this.domain.moments.filter(id => !st.decisions[id]).length + " waiting on a person",
+      pulseTitle: this.domain.name + " (AI Live Intelligence)",
+      pulse: [
+        { k: (st.liveContext ? "AI Strategic Pulse" : this.domain.metric), v: (st.liveContext ? st.liveContext.consumerSentiment : this.domain.headline), pct: "84%", color: "#1F44D6" },
+        { k: "Moments read in this category", v: (st.liveContext && st.liveContext.trendingKeywords ? st.liveContext.trendingKeywords.slice(0, 3).join(", ") : "1284"), pct: "78%", color: "#6A4CE0" },
+        { k: "Waiting on a person here", v: String(this.domain.moments.filter(id => !st.decisions[id]).length), pct: "22%", color: "#B8770A" },
+        { k: "Rules broken here", v: "0", pct: "2%", color: "#0E9F6E" }
+      ],
+
+      kpis: role.kpis.map(k => ({ ...k, deltaColor: "#7A88A3" })),
+
+      queueLabel: m.queueLabel,
+      queue: roleMoments.map(q => {
+        const on = q.id === st.momentId;
+        return {
+          title: q.title.length > 78 ? q.title.slice(0, 78) + "…" : q.title,
+          brand: q.brand, verdict: q.verdict, clock: q.tta,
+          vColor: q.vColor, vBg: q.vBg,
+          top: on ? q.vColor : "#E7EDF9", bd: on ? "#C7D6FF" : "#E7EDF9",
+          shadow: on ? "0 3px 14px rgba(31,68,214,.10)" : "none",
+          onClick: () => this.pickMoment(q.id)
+        };
+      }),
+
+      m: {
+        ...m, ring,
+        agents: (m.agents || []).map(a => ({ ...a, color: vc(a.verdict), bg: vbg(a.verdict), pct: a.score + "%" }))
+      },
+
+      tabs: tabs.map(t => {
+        const on = t === st.tab;
+        return {
+          name: tabNames[t], count: tabCounts[t] || "",
+          bd: on ? "#1F44D6" : "transparent", color: on ? "#1F44D6" : "#5A6884",
+          cColor: on ? "#1F44D6" : "#8492AC", cBg: on ? "#EAF0FF" : "#F2F5FC",
+          onClick: () => this.setState({ tab: t })
+        };
+      }),
+      tabOverview: st.tab === "overview",
+      tabLive: st.tab === "live",
+      tabDebate: st.tab === "debate",
+      tabCreative: st.tab === "creative", tabRisk: st.tab === "risk",
+      tabGovernance: st.tab === "governance", tabChannels: st.tab === "channels",
+      tabImpact: st.tab === "impact", tabLedger: st.tab === "ledger",
+      tabPortfolio: st.tab === "portfolio", tabBoard: st.tab === "board",
+      board: this.data.board,
+      boardPosture: this.data.board.posture.map(p => ({ ...p, color: p.state === "Locked" ? "#C13A4C" : "#0E9F6E", bg: p.state === "Locked" ? "#FCECEE" : "#E6F7F0" })),
+
+      phases: this.phaseDefs.map((p, i) => {
+        const done = st.phase > i, active = st.phase === i;
+        return {
+          name: p.name, time: done || active ? p.time : "waiting", who: p.who,
+          bg: active ? "#EAF0FF" : done ? "#F7FBF9" : "#FBFCFF",
+          bd: active ? "#C7D6FF" : done ? "#DCEFE6" : "#EEF2FA",
+          color: active ? "#1F44D6" : done ? "#0E1B33" : "#A3AEC4",
+          dotBg: done ? "#0E9F6E" : active ? "#1F44D6" : "#E7EDF9",
+          dotColor: done || active ? "#FFFFFF" : "#A3AEC4",
+          mark: done ? "✓" : String(i + 1)
+        };
+      }),
+      playLabel: st.playing ? "Running the loop" : "Run the loop on this moment",
+      onPlay: () => this.play(),
+      railTitle: role.rail,
+
+      debateNote: "Each one answers on its own. They are allowed to disagree.",
+      hasLocal: !!m.hasLocal, localNote: m.localNote || "", localCells: m.localCells || [],
+      channelLabel: m.channelLabel, channelNote: m.channelNote, channels: m.channels || [],
+      decay: (m.decay || []).map((v, i) => ({
+        h: Math.max(4, Math.round(v * 1.05)), v: String(v),
+        t: ["now", "3h", "6h", "9h", "12h", "15h", "18h", "24h"][i],
+        color: v > 70 ? "#0E9F6E" : v > 40 ? "#B8770A" : "#D5DEF0"
+      })),
+
+      policyNote: "This call is set to level " + this.level,
+      policyRows: [
+        { key: "concept_launch", cls: "New idea going out for the first time", meta: "Undo is a delete, eight seconds", rev: true },
+        { key: "localised_variant", cls: "Market version of an idea already approved", meta: "Undo removes that version only", rev: true },
+        { key: "paid_media", cls: "Paid support under fifty thousand rupees (₹50,000)", meta: "Undo pauses the line, four minutes", rev: true },
+        { key: "supply_move", cls: "Stock move between districts under two percent", meta: "Undo is a return leg, six days", rev: true },
+        { key: "brand_book_change", cls: "Changing the brand book itself", meta: "Cannot be undone, so it stays with people", rev: false }
+      ].map(c => {
+        const cur = st.policy[c.key], isCur = c.key === m.decisionClass, max = c.rev ? 4 : 0;
+        return {
+          cls: c.cls, meta: c.meta, rowBg: isCur ? "#F5F8FF" : "#FFFFFF",
+          textColor: isCur ? "#0E1B33" : "#31456F",
+          gate: c.rev ? (cur >= 3 ? "Runs on its own" : "Waits for a person") : "Tells you only",
+          gateColor: c.rev ? (cur >= 3 ? "#0E9F6E" : "#B8770A") : "#5A6884",
+          levels: [0, 1, 2, 3, 4, 5].map(n => {
+            const on = n === cur, allowed = n <= max;
+            return {
+              label: "L" + n, cursor: allowed ? "pointer" : "not-allowed",
+              color: on ? "#FFFFFF" : allowed ? "#5A6884" : "#C3CFEA",
+              bg: on ? "#1F44D6" : "#FFFFFF", bd: on ? "#1F44D6" : "#E3E8F2",
+              onClick: () => { if (allowed) this.setState(s => ({ policy: { ...s.policy, [c.key]: n } })); }
+            };
+          })
+        };
+      }),
+
+      ledger: st.ledger.map(e => ({ ...e, rowBg: e.rowBg || "#FFFFFF" })),
+      ledgerNote: (st.ledger.length + 90) + " calls remembered",
+      hasReplay: !!m.replay,
+
+      portfolio: Object.keys(this.data.moments).map(k => {
+        const q = this.data.moments[k];
+        return {
+          domain: q.domain, title: q.title.length > 66 ? q.title.slice(0, 66) + "…" : q.title,
+          verdict: q.verdict, vColor: q.vColor, vBg: q.vBg, score: q.score, pct: q.score + "%",
+          top: q.vColor, owner: "Owner: " + q.brand + " · decided in " + q.tta,
+          onClick: () => this.pickMoment(q.id)
+        };
+      }),
+
+      decision: {
+        headBg: decided ? "#F7FBF9" : autoRun ? "#F5F8FF" : "#FEF9EF",
+        bd: decided ? "#DCEFE6" : autoRun ? "#DCE6FF" : "#F7E7C8",
+        state: decided ? "Done" : autoRun ? "Running on your rules" : "Waiting on you",
+        stateColor: decided ? "#0E9F6E" : autoRun ? "#1F44D6" : "#B8770A",
+        stateBg: decided ? "#E6F7F0" : autoRun ? "#EAF0FF" : "#FEF4E4",
+        ask: decided
+          ? (decided === "decline" ? "You said no, and that is on the record" : "Your call is recorded")
+          : autoRun ? "Nothing needed from you" : "Do we run this?",
+        note: decided
+          ? (decided === "decline"
+              ? "Nothing went out. The case, the six views and your reason stay together so this can be argued with later."
+              : "Live now on the channels listed under where it runs. You can still pull it back from here.")
+          : autoRun
+            ? "This type of call sits at level " + this.level + ", so it runs inside the rules you signed and simply tells you. You can stop it at any point."
+            : m.verdict + " at a score of " + m.score + ". You can approve, change one detail first, or say no.",
+        open: !decided,
+        primary: autoRun ? "Acknowledge and let it run" : "Approve and go live",
+        done: !!decided,
+        doneTitle: decided === "decline" ? "You said no" : decided === "edit" ? "Edited, then approved" : "Approved and live",
+        doneMark: decided === "decline" ? "✕" : "✓",
+        doneColor: decided === "decline" ? "#C13A4C" : "#0E9F6E",
+        doneBd: decided === "decline" ? "#F6DDE1" : "#DCEFE6",
+        doneNote: decided === "decline"
+          ? "Nothing went out. Your reason is stored with the case, so the system can be judged against you later."
+          : "Live on the channels in the running tab. " + m.undo,
+        undoLabel: decided === "decline" ? "Change your mind" : "Pull it back now",
+        bullets: railBullets,
+        level: "Level " + this.level,
+        levelNote: autoRun
+          ? "You already signed this off in the permissions tab, so it runs and reports. Move it to level two there if you want to be asked every time."
+          : "Level two means the system may recommend but never act on its own. Raise it in the permissions tab and calls like this stop waiting for you."
+      },
+      onApprove: () => this.decide("approve"),
+      onEdit: () => this.decide("edit"),
+      onDecline: () => this.decide("decline"),
+      onUndo: () => this.undo(),
+      feed: st.feed
+    };
+  }
+}
+</script>
+
+<!-- Command Centre Executive Role Gate Modal -->
+<div id="ccRoleModal" style="display:none;position:fixed;inset:0;background:rgba(7,11,20,0.85);z-index:99999;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(6px);font-family:'Plus Jakarta Sans',sans-serif">
+  <div style="background:#FFFFFF;border:1px solid #DCE3F0;border-radius:14px;max-width:720px;width:100%;box-shadow:0 24px 60px rgba(14,27,51,0.3);overflow:hidden;animation:modalEnter 0.25s ease-out">
+    <div style="padding:22px 24px;border-bottom:1px solid #E3E8F2;background:#F8FAFF;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;background:#1F44D6;color:#fff;font-weight:800;font-size:12px">N</span>
+          <b style="font-size:17px;color:#0E1B33">Select Executive Role to Enter Command Centre</b>
+        </div>
+        <div style="font-size:12px;color:#5A6884;margin-top:4px">Your role sets your decision threshold, spend limit, and approval authority under HUL Governance.</div>
+      </div>
+      <button onclick="window.closeCcRoleModal()" style="background:none;border:none;color:#8492AC;font-size:20px;cursor:pointer;padding:4px">✕</button>
+    </div>
+    
+    <div style="padding:20px 24px;max-height:68vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <!-- Brand Manager -->
+      <div onclick="window.setCcRole('Brand Manager', 'brand')" class="role-select-box" style="border:1px solid #C7D6FF;background:#F5F8FF;padding:14px;border-radius:10px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#1F44D6;transform:translateY(-1px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px;color:#1F44D6">Brand Manager</b>
+          <span style="font:700 10px/1 'IBM Plex Mono';background:#E0EBFF;color:#1F44D6;padding:3px 7px;border-radius:4px">₹5,00,000</span>
+        </div>
+        <div style="font-size:11.5px;color:#5A6884;line-height:1.4">Fast tactical execution, creator partnerships, and local vernacular adaptions.</div>
+      </div>
+
+      <!-- Brand Director -->
+      <div onclick="window.setCcRole('Brand Director', 'brand')" class="role-select-box" style="border:1px solid #A3E0C8;background:#F0FBF6;padding:14px;border-radius:10px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#0E9F6E;transform:translateY(-1px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px;color:#0E9F6E">Brand Director</b>
+          <span style="font:700 10px/1 'IBM Plex Mono';background:#D1FAE5;color:#065F46;padding:3px 7px;border-radius:4px">₹25,00,000</span>
+        </div>
+        <div style="font-size:11.5px;color:#5A6884;line-height:1.4">National reactive pushes, cross-category deployments, and quick-commerce scaling.</div>
+      </div>
+
+      <!-- Category Head -->
+      <div onclick="window.setCcRole('Category Head', 'leadership')" class="role-select-box" style="border:1px solid #D5C8F8;background:#F8F5FF;padding:14px;border-radius:10px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#6A4CE0;transform:translateY(-1px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px;color:#6A4CE0">Category Head / VP</b>
+          <span style="font:700 10px/1 'IBM Plex Mono';background:#EDE9FE;color:#5B21B6;padding:3px 7px;border-radius:4px">₹1,00,00,000</span>
+        </div>
+        <div style="font-size:11.5px;color:#5A6884;line-height:1.4">Multi-brand capital allocations, market invasion defense, and annual growth targets.</div>
+      </div>
+
+      <!-- Legal Counsel -->
+      <div onclick="window.setCcRole('Legal Counsel', 'legal')" class="role-select-box" style="border:1px solid #F9DCB0;background:#FFFBF5;padding:14px;border-radius:10px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#B8770A;transform:translateY(-1px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px;color:#B8770A">Legal Counsel</b>
+          <span style="font:700 10px/1 'IBM Plex Mono';background:#FEF3C7;color:#92400E;padding:3px 7px;border-radius:4px">Compliance Gate</span>
+        </div>
+        <div style="font-size:11.5px;color:#5A6884;line-height:1.4">ASCI code clearance, DPDP 2023 consent validation, and claim truth compliance.</div>
+      </div>
+
+      <!-- Social Lead -->
+      <div onclick="window.setCcRole('Social Lead', 'media')" class="role-select-box" style="border:1px solid #C7D6FF;background:#F5F8FF;padding:14px;border-radius:10px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#1F44D6;transform:translateY(-1px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px;color:#1F44D6">Social Lead</b>
+          <span style="font:700 10px/1 'IBM Plex Mono';background:#E0EBFF;color:#1F44D6;padding:3px 7px;border-radius:4px">₹50,000</span>
+        </div>
+        <div style="font-size:11.5px;color:#5A6884;line-height:1.4">Sub-30s organic engagement, creator replies, and audio trend amplification.</div>
+      </div>
+
+      <!-- Executive Committee -->
+      <div onclick="window.setCcRole('Executive Committee', 'leadership')" class="role-select-box" style="border:1px solid #E3E8F2;background:#FFFFFF;padding:14px;border-radius:10px;cursor:pointer;transition:all .18s ease" style-hover="border-color:#0E1B33;transform:translateY(-1px)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <b style="font-size:14px;color:#0E1B33">Executive Committee / MD</b>
+          <span style="font:700 10px/1 'IBM Plex Mono';background:#F1F5F9;color:#334155;padding:3px 7px;border-radius:4px">Unlimited</span>
+        </div>
+        <div style="font-size:11.5px;color:#5A6884;line-height:1.4">Full enterprise authority across all 5 HUL divisions and reputation crises.</div>
+      </div>
+    </div>
+
+    <div style="padding:14px 24px;background:#F8FAFF;border-top:1px solid #E3E8F2;display:flex;align-items:center;justify-content:space-between">
+      <button onclick="window.setCcRole('Viewing Only', 'leadership')" style="background:none;border:none;color:#5A6884;font-size:12px;font-weight:600;cursor:pointer;text-decoration:underline">
+        Continue as Observer (Read Only)
+      </button>
+      <span style="font-size:11px;color:#8492AC">You can switch personas anytime from the top bar.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Interactive Walkthrough Tour Spotlight Overlay -->
+<div id="ccTourOverlay" style="display:none;position:fixed;inset:0;z-index:999999;background:rgba(5,9,16,0.7);backdrop-filter:blur(3px)">
+  <div id="ccTourCard" style="position:absolute;background:#FFFFFF;border:2px solid #1F44D6;border-radius:12px;box-shadow:0 25px 60px rgba(0,0,0,0.45);max-width:460px;width:92%;padding:22px;color:#0E1B33;font-family:'Plus Jakarta Sans',sans-serif;transition:all 0.3s cubic-bezier(0.16, 1, 0.3, 1)">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span id="ccTourStepNum" style="background:#1F44D6;color:#fff;font:800 11px/1 'IBM Plex Mono';padding:4px 8px;border-radius:4px">STEP 1 OF 4</span>
+        <b id="ccTourStepTitle" style="font-size:14px;color:#1F44D6">Radar & Auto-Scan</b>
+      </div>
+      <button onclick="window.closeCcTour()" style="background:none;border:none;color:#8492AC;font-size:18px;cursor:pointer">✕</button>
+    </div>
+    <div id="ccTourStepBody" style="font-size:12.5px;line-height:1.55;color:#475569;margin-bottom:18px">
+      Explanation body goes here...
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <button id="ccTourPrevBtn" onclick="window.prevCcTourStep()" style="background:#F1F5F9;border:1px solid #CBD5E1;color:#475569;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">← Previous</button>
+      <div style="display:flex;align-items:center;gap:6px">
+        <button onclick="window.closeCcTour()" style="background:transparent;border:none;color:#64748B;font-size:11px;cursor:pointer;padding:6px 10px">Skip Tour</button>
+        <button id="ccTourNextBtn" onclick="window.nextCcTourStep()" style="background:#1F44D6;border:none;color:#FFFFFF;padding:6px 16px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer">Next Step →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+window.openCcRoleModal = function() {
+  const modal = document.getElementById('ccRoleModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeCcRoleModal = function() {
+  const modal = document.getElementById('ccRoleModal');
+  if (modal) modal.style.display = 'none';
+  sessionStorage.setItem('next_cc_role_picked', 'true');
+};
+
+window.setCcRole = function(roleName, internalRoleId) {
+  localStorage.setItem('next_operator_role', roleName);
+  sessionStorage.setItem('next_cc_role_picked', 'true');
+  window.closeCcRoleModal();
+
+  if (window.ccInstance) {
+    window.ccInstance.pickRole(internalRoleId || 'brand');
+  }
+
+  // Update status bar
+  if (window.nextUpdateStatusBar) {
+    window.nextUpdateStatusBar();
+  }
+};
+
+window.showRoleGateModal = window.openCcRoleModal;
+
+// Interactive Walkthrough Tour
+let ccTourCurrentStep = 0;
+const ccTourSteps = [
+  {
+    title: "⚡ Real-Time Radar & 10-Minute Auto Scan",
+    body: "NEXT automatically monitors 6 surveillance lanes (National News, Instagram Reels, Google Search, Quick-Commerce Blinkit dark stores, Vernacular wires, Weather). The steady countdown box shows when the next multi-agent scan will run.",
+    pos: { top: '80px', left: '260px' }
+  },
+  {
+    title: "📂 FMCG Category Radar & Live Feeds",
+    body: "Browse brand opportunities across Personal Care (Dove, Rexona, Lifebuoy), Beauty (Pond's, Sunsilk), Home Care (Surf Excel, Rin), and Supply Chain. Each category aggregates real-time signals with instant opportunity scores.",
+    pos: { top: '160px', left: '300px' }
+  },
+  {
+    title: "🤖 7 Specialist Models & Brand Twin",
+    body: "Click 'Run the loop' to watch the 7 AI specialist models deliberate in parallel (Culture, Brand Voice, Legal/ASCI, Commercial ROI, Creative DAM, PR, and Devil's Advocate). Dissent is welcomed so no blind spots are missed.",
+    pos: { top: '160px', right: '40px' }
+  },
+  {
+    title: "🔒 Governance Tiers & 1-Click Execution",
+    body: "Approvals enforce HUL's Decision Rights Matrix based on your role. Approved actions dispatch simulated digital receipts to Meta Ads and Blinkit rails with instant SHA-256 tamper-proof ledger recording.",
+    pos: { top: '320px', right: '40px' }
+  }
+];
+
+window.startCcWalkthroughTour = function() {
+  ccTourCurrentStep = 0;
+  document.getElementById('ccTourOverlay').style.display = 'block';
+  window.renderCcTourStep();
+};
+
+window.closeCcTour = function() {
+  document.getElementById('ccTourOverlay').style.display = 'none';
+};
+
+window.renderCcTourStep = function() {
+  const step = ccTourSteps[ccTourCurrentStep];
+  const card = document.getElementById('ccTourCard');
+  document.getElementById('ccTourStepNum').innerText = `STEP ${ccTourCurrentStep + 1} OF ${ccTourSteps.length}`;
+  document.getElementById('ccTourStepTitle').innerText = step.title;
+  document.getElementById('ccTourStepBody').innerText = step.body;
+  
+  document.getElementById('ccTourPrevBtn').style.display = ccTourCurrentStep === 0 ? 'none' : 'block';
+  document.getElementById('ccTourNextBtn').innerText = ccTourCurrentStep === ccTourSteps.length - 1 ? 'Finish Tour ✓' : 'Next Step →';
+
+  // Reposition card
+  card.style.top = step.pos.top || 'auto';
+  card.style.left = step.pos.left || 'auto';
+  card.style.right = step.pos.right || 'auto';
+  card.style.bottom = step.pos.bottom || 'auto';
+};
+
+window.nextCcTourStep = function() {
+  if (ccTourCurrentStep < ccTourSteps.length - 1) {
+    ccTourCurrentStep++;
+    window.renderCcTourStep();
+  } else {
+    window.closeCcTour();
+  }
+};
+
+window.prevCcTourStep = function() {
+  if (ccTourCurrentStep > 0) {
+    ccTourCurrentStep--;
+    window.renderCcTourStep();
+  }
+};
+</script>
+<script src="/shared/mindmap.js"></script>
+<script src="/shared/statusBar.js"></script>
+<script src="/shared/aiDrawer.js"></script>
+</body>
+</html>
