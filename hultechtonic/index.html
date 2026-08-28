@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXT — Cultural Decision Infrastructure & AI War Room</title>
+<meta name="description" content="NEXT closes the distance between a live signal and a high-stakes brand decision with 7 autonomous specialist agents, 1 arbiter, and human decision rights.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared/nav.css">
+<style>
+  :root{
+    --ink:#0E1B33; --paper:#F5F7FB; --blue:#1F44D6; --blue-deep:#163398;
+    --line:#DCE3F0; --mute:#5A6B8C; --night:#0a0b0d; --green:#0E9F6E;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Plus Jakarta Sans',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased; font-variant-numeric:tabular-nums;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:var(--mute)}
+
+  header{padding:24px 0 0}
+  .mark{display:flex;align-items:center;gap:12px}
+  .mark .brand-logo{
+    width:38px;height:38px;border-radius:10px;background:var(--blue);
+    display:flex;align-items:center;justify-content:center;color:#fff;
+    font:800 18px/1 'Plus Jakarta Sans';box-shadow:0 4px 14px rgba(31,68,214,0.25);
+  }
+  .mark b{font-size:22px;font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+
+  /* Signature latency line */
+  .latency{margin:24px 0 16px;position:relative;height:36px}
+  .latency .rail{position:absolute;top:17px;left:0;right:0;height:2px;background:var(--line)}
+  .latency .fill{position:absolute;top:17px;left:0;height:2px;width:0;background:var(--blue);animation:cross 9s cubic-bezier(.4,0,.1,1) infinite}
+  .latency .dot{position:absolute;top:11px;left:0;width:14px;height:14px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 6px rgba(31,68,214,.14);animation:travel 9s cubic-bezier(.4,0,.1,1) infinite}
+  .latency .cap{position:absolute;top:26px;font-size:11px}
+  .latency .cap.l{left:0}
+  .latency .cap.r{right:0}
+  @keyframes cross{0%{width:0}70%{width:100%}100%{width:100%}}
+  @keyframes travel{0%{left:0}70%{left:calc(100% - 14px)}100%{left:calc(100% - 14px)}}
+
+  h1{font-size:clamp(30px,4vw,48px);line-height:1.1;letter-spacing:-.02em;font-weight:800;margin:0 0 12px;max-width:20ch}
+  h1 em{font-style:normal;color:var(--blue)}
+  .lede{font-size:15px;line-height:1.6;color:var(--mute);max-width:72ch;margin:0 0 20px}
+
+  /* Live Metrics Counter Strip */
+  .metrics-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .metric-box {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .metric-box .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--mute);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .metric-box .val {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* Real-time AI News & Signal Trigger Box */
+  .ai-scan-banner {
+    background: #FFFFFF;
+    border: 1px solid #C7D6FF;
+    border-left: 4px solid var(--blue);
+    border-radius: 14px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 6px 24px rgba(31,68,214,0.06);
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  .ai-scan-banner input {
+    flex: 1;
+    min-width: 280px;
+    height: 44px;
+    padding: 0 16px;
+    border: 1px solid #DCE3F0;
+    border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .ai-scan-banner input:focus {
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(31,68,214,0.1);
+  }
+  .ai-scan-banner button {
+    height: 44px;
+    padding: 0 22px;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .ai-scan-banner button:hover {
+    background: var(--blue-deep);
+    transform: translateY(-1px);
+  }
+  .ai-scan-banner button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+  }
+
+  /* Main Cards Navigation */
+  .cards{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;margin:20px 0 0}
+  .card{
+    display:flex;flex-direction:column;gap:12px;padding:26px;border-radius:18px;
+    border:1px solid var(--line);background:#fff;text-decoration:none;color:inherit;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover,.card:focus-visible{transform:translateY(-3px);box-shadow:0 14px 34px rgba(14,27,51,.10);border-color:#C3CFE8}
+  .card.dark{background:var(--night);border-color:#24282e;color:#e9eaec}
+  .card.dark .mono{color:#8a9098}
+  .card.dark p{color:#9aa1ab}
+  .card.dark:hover{border-color:#3a4048;box-shadow:0 14px 34px rgba(0,0,0,.45)}
+  .card h2{margin:0;font-size:22px;font-weight:800;letter-spacing:-.01em}
+  .card p{margin:0;font-size:14px;line-height:1.6;color:var(--mute)}
+  .card .go{margin-top:auto;padding-top:12px;font-size:14px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:6px}
+  .card.dark .go{color:#5b8fd6}
+
+  /* Live Ticker Feed Section */
+  .live-ticker-card {
+    margin: 36px 0 0;
+    background: #0E1B33;
+    color: #fff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 10px 30px rgba(14,27,51,0.12);
+  }
+  .ticker-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .ticker-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .ticker-item {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    transition: all 0.2s;
+  }
+  .ticker-item:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.22);
+  }
+  .ticker-badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    white-space: nowrap;
+  }
+
+  /* 7 Specialist Agents Grid */
+  .agent-section {
+    margin: 50px 0 0;
+    border-top: 1px solid var(--line);
+    padding-top: 36px;
+  }
+  .agent-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+  }
+  .agent-card {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.2s ease;
+  }
+  .agent-card:hover {
+    border-color: #BAC8E8;
+    box-shadow: 0 8px 24px rgba(14,27,51,0.06);
+    transform: translateY(-2px);
+  }
+  .agent-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .agent-role {
+    font-size: 14px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .agent-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #EAF0FF;
+    color: var(--blue);
+  }
+  .agent-desc {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--mute);
+  }
+  .agent-guardrail {
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: #0E9F6E;
+    background: #E8F8F0;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin-top: auto;
+    font-weight: 600;
+  }
+
+  /* Six Layers */
+  .layers{margin:50px 0 0;border-top:1px solid var(--line);padding-top:30px}
+  .layers ol{list-style:none;margin:16px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px 26px}
+  .layers li{font-size:13px;line-height:1.55;padding-left:36px;position:relative;color:var(--mute)}
+  .layers li strong{display:block;color:var(--ink);font-weight:700;font-size:14px;margin-bottom:2px}
+  .layers li::before{content:attr(data-n);position:absolute;left:0;top:2px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--blue);border:1px solid var(--line);border-radius:4px;padding:2px 6px;font-weight:600}
+
+  footer{margin:54px 0 64px;border-top:1px solid var(--line);padding-top:24px;display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center}
+  footer a{color:var(--blue);text-decoration:none;font-size:13px;font-weight:600}
+  footer a:hover{color:var(--blue-deep);text-decoration:underline}
+  .note{font-size:12px;color:var(--mute);margin-left:auto}
+
+  @media (max-width:880px){
+    .metrics-strip{grid-template-columns:repeat(2,1fr)}
+    .cards{grid-template-columns:1fr}
+    .agent-grid{grid-template-columns:1fr}
+    .layers ol{grid-template-columns:1fr}
+    .note{margin-left:0}
+  }
+</style>
+</head>
+<body>
+
+<!-- Unified Sticky Navigation Bar -->
+<nav class="next-unified-bar" id="topNav">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/" class="active" style="font-weight:800">NEXT Decision System</a>
+    <span class="next-badge-live"><span class="next-badge-dot"></span> LIVE 7-AGENT MESH ONLINE</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div id="landingAutoScanBadge" style="display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,0.15);color:#93c5fd;font:600 11px 'IBM Plex Mono';padding:4px 10px;border-radius:12px;white-space:nowrap;min-width:150px;justify-content:center;flex-shrink:0">
+      <span style="width:6px;height:6px;border-radius:50%;background:#60a5fa;flex-shrink:0"></span>
+      <span style="white-space:nowrap">AUTO-SCAN: <b id="landingCountdownVal" style="display:inline-block;min-width:42px;text-align:right">09:59</b></span>
+    </div>
+    <button onclick="openJourneyWalkthroughModal()" style="background:#1F44D6;color:#fff;border:none;padding:6px 14px;border-radius:6px;font:700 12px 'Plus Jakarta Sans';cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease" title="Start guided interactive tour">
+      <span>💡</span> Guided Walkthrough
+    </button>
+    <a href="/" class="active">Overview</a>
+    <a href="/command-centre/">Command Centre</a>
+    <a href="/war-room/">War Room (Operator)</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header>
+    <div class="mark">
+      <div class="brand-logo">N</div>
+      <div>
+        <b>NEXT</b>
+        <span class="mono" style="margin-left:8px">Hindustan Unilever Cultural Decision Infrastructure</span>
+      </div>
+    </div>
+
+    <div class="latency" aria-hidden="true">
+      <div class="rail"></div><div class="fill"></div><div class="dot"></div>
+      <span class="cap l mono">Live Signal Ingestion</span>
+      <span class="cap r mono">Human Decision & Cryptographic Ledger</span>
+    </div>
+
+    <h1>The gap isn't intelligence. It's <em>latency</em>.</h1>
+    <p class="lede">
+      A cultural moment breaks across Instagram Reels, YouTube Shorts, Moj, ShareChat, or news wires. Seven autonomous specialist agents debate brand equity, ASCI compliance, and quick commerce ROI in milliseconds. The Arbiter synthesizes trade-offs, a brand leader approves within policy rights, and the outcome is locked into an append-only cryptographic ledger.
+    </p>
+
+    <!-- Real-Time Metrics Strip -->
+    <div class="metrics-strip">
+      <div class="metric-box">
+        <span class="label">Cryptographic Ledger</span>
+        <span class="val" id="metricLedgerCount">—</span>
+      </div>
+      <div class="metric-box">
+        <span class="label">Active Signals</span>
+        <span class="val" id="metricSignalsCount">—</span>
+      </div>
+      <div class="metric-box">
+        <span class="label">Search Citations</span>
+        <span class="val" id="metricCitationsCount">—</span>
+      </div>
+      <div class="metric-box">
+        <span class="label">Decision SLA</span>
+        <span class="val" style="color:var(--green)">&lt; 60 mins</span>
+      </div>
+    </div>
+
+    <!-- AI Real-Time News & Cultural Signal Generator -->
+    <div class="ai-scan-banner">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">⚡</span>
+        <div>
+          <div style="font-weight:800;font-size:14px;color:var(--ink)">Real-Time AI Cultural News & Signal Scanner</div>
+          <div style="font-size:11px;color:var(--mute)">Ingest and evaluate live cultural moments across Indian FMCG & power brands</div>
+        </div>
+      </div>
+      <input type="text" id="brandScanInput" value="" placeholder="Enter target brand (e.g., Dove, Surf Excel, Lifebuoy, Pond's) or trend...">
+      <button id="scanBtn" onclick="triggerAIScan()">
+        <span>Scan AI Signals</span>
+        <span id="scanSpinner" style="display:none">⏳</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Prototype Switcher Cards -->
+  <main class="cards">
+    <a class="card" href="/command-centre/">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="mono">Module 01</span>
+        <span style="font-size:11px;font-weight:700;color:var(--green);background:#E8F8F0;padding:4px 10px;border-radius:20px">Interactive Multi-Category</span>
+      </div>
+      <h2>Decision Command Centre</h2>
+      <p>Seamless category rails (Personal Care, Home Care, Refreshments, Grooming), awaiting queues, 7-agent debate synthesis, policy governance routing, and live multi-adapter execution modal.</p>
+      <span class="go">Launch Command Centre →</span>
+    </a>
+
+    <a class="card dark" href="/war-room/">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="mono">Module 02</span>
+        <span style="font-size:11px;font-weight:700;color:#6ED19C;background:#152B1E;padding:4px 10px;border-radius:20px">Under-Pressure Operator</span>
+      </div>
+      <h2>Cultural War Room</h2>
+      <p>High-tempo war room view for active signals. Real-time clock counter (&lt; 60m SLA), interactive 7-agent radial reasoning topology, live what-if simulation, and deep twin precedent comparisons.</p>
+      <span class="go">Enter the War Room →</span>
+    </a>
+  </main>
+
+  <!-- ====================================================
+       END-TO-END USER JOURNEY INTERACTIVE EXPLORER
+       ==================================================== -->
+  <section id="userJourneySection" style="margin:40px 0 0;background:#FFFFFF;border:1px solid #DCE3F0;border-radius:20px;padding:32px;box-shadow:0 12px 36px rgba(14,27,51,0.06)">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:24px;border-bottom:1px solid #EEF2F8;padding-bottom:20px">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="background:#1F44D6;color:#fff;font:800 11px/1 'IBM Plex Mono';padding:4px 8px;border-radius:6px">END-TO-END WORKFLOW</span>
+          <span style="color:#0E9F6E;font:700 11px 'IBM Plex Mono'">● 6 AUTONOMOUS STAGES</span>
+        </div>
+        <h2 style="font-size:26px;font-weight:800;color:#0E1B33;margin:8px 0 4px;letter-spacing:-.02em">
+          The Cultural Decision Journey in Action
+        </h2>
+        <p style="font-size:14px;color:#5A6B8C;margin:0;max-width:70ch">
+          Follow how a raw cultural moment is captured, tested against brand constitution, debated across 7 autonomous AI specialists, and authorized by a brand leader in under 60 minutes.
+        </p>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px">
+        <button id="journeyAutoplayBtn" onclick="toggleJourneyAutoplay()" style="background:#EEF4FF;color:#1F44D6;border:1px solid #C7D6FF;padding:9px 16px;border-radius:8px;font:700 12px 'Plus Jakarta Sans';cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .2s">
+          <span id="autoplayIcon">▶</span> <span id="autoplayLabel">Auto-Play Journey</span>
+        </button>
+        <button onclick="openJourneyWalkthroughModal()" style="background:#1F44D6;color:#fff;border:none;padding:9px 18px;border-radius:8px;font:700 12px 'Plus Jakarta Sans';cursor:pointer;display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(31,68,214,0.25);transition:all .2s">
+          <span>✨</span> Open Interactive Modal
+        </button>
+      </div>
+    </div>
+
+    <!-- 6 Stage Interactive Navigation Tabs -->
+    <div style="display:grid;grid-template-columns:repeat(6, 1fr);gap:8px;margin-bottom:24px;overflow-x:auto;padding-bottom:4px">
+      <button class="journey-tab active" onclick="selectJourneyStage(0)" id="jTab0" style="background:#F8FAFC;border:1px solid #CBD5E1;border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font:700 10px 'IBM Plex Mono';color:#64748B">STAGE 01</span>
+          <span style="font-size:14px">📡</span>
+        </div>
+        <b style="font-size:12px;color:#0F172A;line-height:1.2">Multi-Lane Ingestion</b>
+        <span style="font-size:10px;color:#64748B">6 Signal Streams</span>
+      </button>
+
+      <button class="journey-tab" onclick="selectJourneyStage(1)" id="jTab1" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font:700 10px 'IBM Plex Mono';color:#64748B">STAGE 02</span>
+          <span style="font-size:14px">🛡️</span>
+        </div>
+        <b style="font-size:12px;color:#0F172A;line-height:1.2">Brand Living Twin</b>
+        <span style="font-size:10px;color:#64748B">Charter Rules Check</span>
+      </button>
+
+      <button class="journey-tab" onclick="selectJourneyStage(2)" id="jTab2" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font:700 10px 'IBM Plex Mono';color:#64748B">STAGE 03</span>
+          <span style="font-size:14px">🤖</span>
+        </div>
+        <b style="font-size:12px;color:#0F172A;line-height:1.2">7-Agent Mesh Debate</b>
+        <span style="font-size:10px;color:#64748B">Parallel Deliberation</span>
+      </button>
+
+      <button class="journey-tab" onclick="selectJourneyStage(3)" id="jTab3" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font:700 10px 'IBM Plex Mono';color:#64748B">STAGE 04</span>
+          <span style="font-size:14px">⚖️</span>
+        </div>
+        <b style="font-size:12px;color:#0F172A;line-height:1.2">Arbiter Synthesis</b>
+        <span style="font-size:10px;color:#64748B">Plain-English Verdict</span>
+      </button>
+
+      <button class="journey-tab" onclick="selectJourneyStage(4)" id="jTab4" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font:700 10px 'IBM Plex Mono';color:#64748B">STAGE 05</span>
+          <span style="font-size:14px">✍️</span>
+        </div>
+        <b style="font-size:12px;color:#0F172A;line-height:1.2">Human Decision</b>
+        <span style="font-size:10px;color:#64748B">Role-Based Signing</span>
+      </button>
+
+      <button class="journey-tab" onclick="selectJourneyStage(5)" id="jTab5" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:12px 10px;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font:700 10px 'IBM Plex Mono';color:#64748B">STAGE 06</span>
+          <span style="font-size:14px">🔒</span>
+        </div>
+        <b style="font-size:12px;color:#0F172A;line-height:1.2">Dispatch & Ledger</b>
+        <span style="font-size:10px;color:#64748B">SHA-256 Audit Seal</span>
+      </button>
+    </div>
+
+    <!-- Active Stage Canvas (2-Column Visuals & Interactive Text) -->
+    <div id="journeyStageCanvas" style="display:grid;grid-template-columns:1.15fr 1fr;gap:24px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:16px;padding:24px">
+      <!-- Content populated dynamically by renderJourneyStage() -->
+    </div>
+
+    <!-- Bottom Stage Navigation Controls -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;padding-top:16px;border-top:1px solid #EEF2F8">
+      <button id="journeyPrevBtn" onclick="prevJourneyStage()" style="background:#FFFFFF;border:1px solid #CBD5E1;color:#475569;padding:8px 18px;border-radius:8px;font:700 12px 'Plus Jakarta Sans';cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+        ← Previous Stage
+      </button>
+
+      <div style="display:flex;align-items:center;gap:6px" id="journeyDots">
+        <span class="j-dot active" style="width:8px;height:8px;border-radius:50%;background:#1F44D6"></span>
+        <span class="j-dot" style="width:8px;height:8px;border-radius:50%;background:#CBD5E1"></span>
+        <span class="j-dot" style="width:8px;height:8px;border-radius:50%;background:#CBD5E1"></span>
+        <span class="j-dot" style="width:8px;height:8px;border-radius:50%;background:#CBD5E1"></span>
+        <span class="j-dot" style="width:8px;height:8px;border-radius:50%;background:#CBD5E1"></span>
+        <span class="j-dot" style="width:8px;height:8px;border-radius:50%;background:#CBD5E1"></span>
+      </div>
+
+      <button id="journeyNextBtn" onclick="nextJourneyStage()" style="background:#1F44D6;border:none;color:#FFFFFF;padding:8px 20px;border-radius:8px;font:700 12px 'Plus Jakarta Sans';cursor:pointer;display:inline-flex;align-items:center;gap:6px">
+        Next Stage: Brand Twin →
+      </button>
+    </div>
+  </section>
+
+  <!-- Live Signal Fabric Ticker Feed -->
+  <section class="live-ticker-card">
+    <div class="ticker-header">
+      <div>
+        <div style="font-weight:800;font-size:17px;letter-spacing:-.01em">Live Signal Fabric & Pending Calls</div>
+        <div style="font-size:12px;color:#94A3B8;margin-top:2px">Real-time incoming stream normalized across Indian social platforms, search spikes, and news wires</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="loadLiveSignals()" style="background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer">Refresh Stream</button>
+      </div>
+    </div>
+    <div class="ticker-list" id="signalsContainer">
+      <div style="padding:20px;text-align:center;color:#94A3B8">Loading real-time signal stream...</div>
+    </div>
+  </section>
+
+  <!-- 7 Specialist Agents Column Breakdown -->
+  <section class="agent-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div>
+        <span class="mono">The Agent Mesh</span>
+        <h2 style="font-size:24px;font-weight:800;margin:4px 0 0;letter-spacing:-.01em">Seven Specialists That Argue Rather Than Agree</h2>
+      </div>
+      <div style="font-size:13px;color:var(--mute);max-width:380px;text-align:right">
+        Instead of a single blind LLM output, seven specialist agents debate tradeoffs across brand equity, ASCI compliance, commercial margin, and risk before the Arbiter synthesizes consensus.
+      </div>
+    </div>
+
+    <div class="agent-grid">
+      <div class="agent-card">
+        <div class="agent-header">
+          <span class="agent-role">01. Trend & Culture</span>
+          <span class="agent-tag">Speed: 400ms</span>
+        </div>
+        <div class="agent-desc">Analyzes viral half-life, subculture nuances, meme trajectories, and platform-specific peak search windows across Instagram Reels, YouTube Shorts, and X in India.</div>
+        <div class="agent-guardrail">Evaluates: Viral crest vs flash-in-the-pan</div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-header">
+          <span class="agent-role">02. Brand Constitution & Twin</span>
+          <span class="agent-tag">Twin Query</span>
+        </div>
+        <div class="agent-desc">Matches the moment against the brand constitution, non-negotiables, past hypocrisy traps, and historical stance consistency.</div>
+        <div class="agent-guardrail">Protects: Long-term Brand Equity</div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-header">
+          <span class="agent-role">03. ASCI & Legal Gate</span>
+          <span class="agent-tag">Zero Defect</span>
+        </div>
+        <div class="agent-desc">Instantly audits against ASCI Advertising Code, CCPA Guidelines, DPDP 2023 privacy mandates, and substantiation requirements.</div>
+        <div class="agent-guardrail">Protects: Regulatory & Compliance risk</div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-header">
+          <span class="agent-role">04. Commercial & ROI</span>
+          <span class="agent-tag">Quick Commerce</span>
+        </div>
+        <div class="agent-desc">Models marginal CAC, Quick Commerce dark-store conversion (Blinkit, Zepto, Swiggy Instamart), budget availability in INR (₹), and expected commercial return per rupee.</div>
+        <div class="agent-guardrail">Protects: Commercial ROI & budget discipline</div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-header">
+          <span class="agent-role">05. Channel & Creative</span>
+          <span class="agent-tag">Asset Mesh</span>
+        </div>
+        <div class="agent-desc">Generates rapid context copy, assesses pre-cleared DAM assets, creator readiness, and 9:16 format specs across Instagram Reels and YouTube Shorts.</div>
+        <div class="agent-guardrail">Delivers: Production ready in &lt; 20m</div>
+      </div>
+
+      <div class="agent-card">
+        <div class="agent-header">
+          <span class="agent-role">06. PR & Community</span>
+          <span class="agent-tag">Troll Defense</span>
+        </div>
+        <div class="agent-desc">Monitors comment toxicity, anticipates bad-faith quote tweets, drafts defensive holding lines, and sets response rules.</div>
+        <div class="agent-guardrail">Protects: Community trust & sentiment</div>
+      </div>
+
+      <div class="agent-card" style="grid-column: 1 / -1; background: #FFFDF7; border-color: #FDE68A;">
+        <div class="agent-header">
+          <span class="agent-role" style="color: #92400E;">07. Devil's Advocate & Risk Skeptic</span>
+          <span class="agent-tag" style="background: #FEF3C7; color: #92400E;">Counter-Factual</span>
+        </div>
+        <div class="agent-desc">Aggressively attacks the consensus: evaluates potential competitor ambush (ITC, Godrej, D2C challengers), moral hazard, hypocrisy traps, and supply chain friction. The Arbiter MUST address these objections before allowing ACT.</div>
+        <div class="agent-guardrail" style="background: #FEF3C7; color: #92400E;">Forces: Rigorous Stress-Testing</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- The 6 Architectural Layers -->
+  <section class="layers">
+    <span class="mono">Architectural Foundation</span>
+    <ol>
+      <li data-n="1"><strong>Signal Fabric</strong>Every external and internal stream, normalized into one event schema.</li>
+      <li data-n="2"><strong>Brand Twin</strong>The brand constitution and tone rules, made queryable instead of tribal.</li>
+      <li data-n="3"><strong>Agent Mesh</strong>Seven specialists arguing independently to reveal blindspots.</li>
+      <li data-n="4"><strong>Decision Rights</strong>Policy as code: what AI executes, what AI recommends, what requires VP signoff.</li>
+      <li data-n="5"><strong>Activation Adapters</strong>Instant simulated dispatch to Meta Ads, Instagram Creator Portal, Blinkit, and Zepto.</li>
+      <li data-n="6"><strong>Outcome Ledger</strong>Append-only SHA-256 memory. Models are rented; decision history is enterprise-owned.</li>
+    </ol>
+  </section>
+
+  <footer>
+    <a href="/command-centre/">Decision Command Centre</a>
+    <a href="/war-room/">Cultural War Room</a>
+    <a href="/docs/NEXT_OpenSpec_Build_Kit.md">Build Kit Specs</a>
+    <a href="/docs/claude-code-brief-live-backend.md">Backend Architecture</a>
+    <span class="note">NEXT Brand Decision Infrastructure · Hindustan Unilever</span>
+  </footer>
+
+</div>
+
+<script>
+let landingCountdown = 600;
+let activeQuery = null;
+let lastSearchResults = null;
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function renderProvenanceBadge(prov) {
+  const p = (prov || "FIXTURE").toUpperCase();
+  let bg = "#6B7280"; // FIXTURE grey
+  let label = prov || "FIXTURE";
+
+  if (p.includes("LIVE_GROUNDED") || p.includes("GROUNDED")) {
+    bg = "#0E9F6E"; // green
+    label = "LIVE_GROUNDED";
+  } else if (p.includes("LIVE_RSS")) {
+    bg = "#2563EB"; // blue
+    label = "LIVE_RSS";
+  } else if (p.includes("CACHED")) {
+    bg = "#4B5563"; // grey-blue
+    label = "CACHED";
+  } else if (p.includes("ARCHIVE")) {
+    bg = "#4B5563"; // grey-blue
+    label = p.includes("REFRESHED") ? "ARCHIVE · REFRESHED" : "ARCHIVE";
+  } else {
+    bg = "#6B7280"; // grey
+    label = "FIXTURE";
+  }
+
+  return `<span style="background:${bg};color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono'">${label}</span>`;
+}
+
+function renderSignalItem(s) {
+  const badgeHtml = renderProvenanceBadge(s.provenance);
+  const headline = escapeHtml(s.headline || "Incoming Signal");
+  const brand = escapeHtml(s.brand || "HUL");
+  const summary = escapeHtml(s.summary || "");
+  const source = escapeHtml(s.source || "Intelligence Feed");
+  const verdict = escapeHtml(s.verdict || "MONITOR");
+  const verdictColor = s.verdictColor || "#0E9F6E";
+  const verdictBg = s.verdictBg || "#E8F8F0";
+  const oppScore = s.opportunityScore !== undefined ? s.opportunityScore : 80;
+
+  return `
+    <div class="ticker-item">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+          <span style="background:#1F44D6;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono'">${brand}</span>
+          <span style="font-weight:700;font-size:14px;color:#fff">${headline}</span>
+          ${badgeHtml}
+        </div>
+        <div style="font-size:12px;color:#94A3B8">${summary} · <span style="color:#CBD5E1">${source}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px">
+        <div style="text-align:right">
+          <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;font-family:'IBM Plex Mono'">Opp Score</div>
+          <div style="font-size:17px;font-weight:800;color:#34D399;font-family:'IBM Plex Mono'">${oppScore}/100</div>
+        </div>
+        <span class="ticker-badge" style="background:${verdictBg};color:${verdictColor}">${verdict}</span>
+        <a href="/war-room/" style="background:#0E9F6E;color:#08090B;padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">Act in War Room →</a>
+      </div>
+    </div>
+  `;
+}
+
+function clearSearchFilter() {
+  activeQuery = null;
+  lastSearchResults = null;
+  const input = document.getElementById('brandScanInput');
+  if (input) input.value = '';
+  loadLiveSignals();
+}
+
+function updateLandingCountdown(sec) {
+  landingCountdown = sec;
+  const mins = String(Math.floor(sec / 60)).padStart(2, '0');
+  const s = String(sec % 60).padStart(2, '0');
+  const el = document.getElementById('landingCountdownVal');
+  if (el) el.innerText = `${mins}:${s}`;
+}
+
+async function loadMetrics() {
+  try {
+    const [diagRes, sigRes, ledRes] = await Promise.all([
+      fetch('/api/diagnostics').then(r => r.json()).catch(() => ({})),
+      fetch('/api/signals').then(r => r.json()).catch(() => ({ count: 0 })),
+      fetch('/api/ledger').then(r => r.json()).catch(() => ({ count: 0 }))
+    ]);
+
+    const ledEl = document.getElementById('metricLedgerCount');
+    if (ledEl) ledEl.innerText = ledRes.count !== undefined ? `${ledRes.count} Blocks` : '—';
+
+    const sigEl = document.getElementById('metricSignalsCount');
+    if (sigEl) sigEl.innerText = sigRes.count !== undefined ? `${sigRes.count} Queued` : '—';
+
+    const citEl = document.getElementById('metricCitationsCount');
+    if (citEl) citEl.innerText = diagRes.citationsInBuffer !== undefined ? `${diagRes.citationsInBuffer} Sources` : '—';
+  } catch (err) {
+    console.warn('Metrics load error:', err);
+  }
+}
+
+function initLandingSSE() {
+  if (typeof EventSource === 'undefined') return;
+  try {
+    const es = new EventSource('/api/news/stream');
+    es.addEventListener('heartbeat', e => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.nextRefreshInSec !== undefined) {
+          updateLandingCountdown(data.nextRefreshInSec);
+        }
+      } catch {}
+    });
+    es.addEventListener('new_signal', () => {
+      if (!activeQuery) {
+        loadLiveSignals();
+      }
+      loadMetrics();
+    });
+    es.addEventListener('decision_executed', () => {
+      if (!activeQuery) {
+        loadLiveSignals();
+      }
+      loadMetrics();
+    });
+    es.addEventListener('context', () => {
+      loadMetrics();
+    });
+  } catch (err) {
+    console.warn('Landing SSE error:', err);
+  }
+}
+
+async function loadLiveSignals() {
+  if (activeQuery) return; // Retain active search filter if active
+  try {
+    const res = await fetch('/api/signals');
+    const data = await res.json();
+    const container = document.getElementById('signalsContainer');
+    if (!container) return;
+    if (!data.signals || data.signals.length === 0) {
+      container.innerHTML = '<div style="padding:24px;text-align:center;color:#94A3B8">No pending signals in queue.</div>';
+      return;
+    }
+    
+    container.innerHTML = data.signals.map(renderSignalItem).join('');
+  } catch (err) {
+    console.error('Error fetching signals:', err);
+  }
+}
+
+async function triggerAIScan() {
+  const input = document.getElementById('brandScanInput');
+  const query = (input ? input.value : '').trim();
+  const btn = document.getElementById('scanBtn');
+  const spinner = document.getElementById('scanSpinner');
+  const container = document.getElementById('signalsContainer');
+
+  if (!query) {
+    clearSearchFilter();
+    return;
+  }
+
+  if (query.length < 3) {
+    if (container) {
+      container.innerHTML = `
+        <div style="padding:14px 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#FCA5A5;font-size:13px;display:flex;align-items:center;justify-content:space-between">
+          <span>Search query must be at least 3 characters.</span>
+          <button onclick="clearSearchFilter()" style="background:none;border:none;color:#FCA5A5;cursor:pointer;font-weight:bold;font-size:14px">✕</button>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  activeQuery = query;
+  if (btn) btn.disabled = true;
+  if (spinner) spinner.style.display = 'inline';
+
+  // Skeleton loading rows
+  if (container) {
+    container.innerHTML = `
+      <div style="padding:12px 16px;background:rgba(31,68,214,0.12);border:1px solid rgba(31,68,214,0.3);border-radius:8px;color:#93C5FD;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#60A5FA;box-shadow:0 0 8px #60A5FA"></span>
+        Retrieving live grounded signals and archived intelligence for "<b>${escapeHtml(query)}</b>"...
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="height:68px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px"></div>
+        <div style="height:68px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px"></div>
+        <div style="height:68px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px"></div>
+      </div>
+    `;
+  }
+
+  try {
+    const res = await fetch('/api/signals/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query, limit: 8 })
+    });
+    const data = await res.json();
+    lastSearchResults = data;
+
+    if (!container) return;
+
+    if (!data.success && data.error) {
+      container.innerHTML = `
+        <div style="padding:14px 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#FCA5A5;font-size:13px;display:flex;align-items:center;justify-content:space-between">
+          <span>${escapeHtml(data.error)}</span>
+          <button onclick="clearSearchFilter()" style="background:none;border:none;color:#FCA5A5;cursor:pointer;font-weight:bold;font-size:14px">✕</button>
+        </div>
+      `;
+      return;
+    }
+
+    const results = data.results || [];
+    const count = data.resultCount !== undefined ? data.resultCount : results.length;
+    const liveMatches = data.liveMatches || 0;
+    const archiveMatches = data.archiveMatches || 0;
+
+    let chipHtml = `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#1E293B;border:1px solid #334155;padding:8px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;color:#E2E8F0">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span>🔍 Showing <b>${count}</b> result${count === 1 ? '' : 's'} for "<b>${escapeHtml(query)}</b>"</span>
+          <span style="color:#94A3B8">·</span>
+          <span style="color:#34D399;font-weight:600">${liveMatches} live</span>
+          <span style="color:#94A3B8">·</span>
+          <span style="color:#93C5FD;font-weight:600">${archiveMatches} archived</span>
+        </div>
+        <button onclick="clearSearchFilter()" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#FCA5A5;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px">Clear ✕</button>
+      </div>
+    `;
+
+    let bannerHtml = '';
+    if (data.mode === 'archive-only') {
+      bannerHtml = `
+        <div style="background:#374151;border:1px solid #4B5563;color:#F3F4F6;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
+          <span>⚠️ Live search unavailable — showing archived results only.</span>
+        </div>
+      `;
+    }
+
+    if (results.length === 0) {
+      container.innerHTML = `
+        ${chipHtml}
+        ${bannerHtml}
+        <div style="padding:28px 16px;text-align:center;color:#94A3B8;font-size:13px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);border-radius:8px">
+          No current signals found for "<b>${escapeHtml(query)}</b>". Try a broader term or a brand name.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = chipHtml + bannerHtml + results.map(renderSignalItem).join('');
+
+  } catch (err) {
+    console.error('Search error:', err);
+    if (container) {
+      container.innerHTML = `
+        <div style="padding:14px 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#FCA5A5;font-size:13px;display:flex;align-items:center;justify-content:space-between">
+          <span>Search failed: ${escapeHtml(err.message)}</span>
+          <button onclick="clearSearchFilter()" style="background:none;border:none;color:#FCA5A5;cursor:pointer;font-weight:bold;font-size:14px">✕</button>
+        </div>
+      `;
+    }
+  } finally {
+    if (btn) btn.disabled = false;
+    if (spinner) spinner.style.display = 'none';
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const scanInput = document.getElementById('brandScanInput');
+  if (scanInput) {
+    scanInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        triggerAIScan();
+      }
+    });
+  }
+});
+</script>
+
+<!-- Interactive Guided Walkthrough Full-Screen Modal -->
+<div id="journeyModalOverlay" style="position:fixed;inset:0;background:rgba(4,7,14,0.85);backdrop-filter:blur(6px);z-index:999999;display:none;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#0C121E;border:1px solid #24344D;border-radius:16px;width:960px;max-width:95vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 25px 70px rgba(0,0,0,0.8);color:#FFFFFF;font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden">
+    <!-- Modal Header -->
+    <div style="padding:18px 24px;border-bottom:1px solid #1E2B40;background:#080D17;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="background:#1F44D6;color:#fff;font:800 11px/1 'IBM Plex Mono';padding:4px 8px;border-radius:4px">NEXT ARCHITECTURE</span>
+        <b style="font-size:16px;color:#F8FAFC">Interactive End-to-End Walkthrough</b>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span id="modalStepIndicator" style="font:700 11px 'IBM Plex Mono';color:#38BDF8">STAGE 1 OF 6</span>
+        <button onclick="closeJourneyWalkthroughModal()" style="background:none;border:none;color:#94A3B8;font-size:20px;cursor:pointer;line-height:1">✕</button>
+      </div>
+    </div>
+
+    <!-- Modal Body with 2-Column Visuals and Explanation -->
+    <div id="modalStageContent" style="flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:1.2fr 1fr;gap:24px;background:#090E18">
+      <!-- Injected by renderModalStage() -->
+    </div>
+
+    <!-- Modal Footer Controls -->
+    <div style="padding:16px 24px;border-top:1px solid #1E2B40;background:#080D17;display:flex;align-items:center;justify-content:space-between">
+      <button id="modalPrevBtn" onclick="prevModalStage()" style="background:#131B2B;border:1px solid #23334D;color:#CBD5E1;padding:8px 16px;border-radius:6px;font:700 12px 'Plus Jakarta Sans';cursor:pointer">← Previous</button>
+      
+      <div style="display:flex;align-items:center;gap:6px" id="modalDots">
+        <!-- Injected dots -->
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px">
+        <button onclick="closeJourneyWalkthroughModal()" style="background:none;border:none;color:#64748B;font-size:12px;cursor:pointer;padding:8px 12px">Close</button>
+        <button id="modalNextBtn" onclick="nextModalStage()" style="background:#10B981;border:none;color:#041D12;padding:8px 20px;border-radius:6px;font:800 12px 'Plus Jakarta Sans';cursor:pointer">Next Stage →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// 6 Stages of the NEXT Cultural Decision System
+const journeyStages = [
+  {
+    stageNum: "01",
+    name: "Multi-Lane Ingestion",
+    tag: "SURVEILLANCE RADAR",
+    title: "1. 6-Lane Real-Time Surveillance & Provenance Ingestion",
+    desc: "NEXT streams real-time data across 6 Indian cultural lanes: National News wires, Instagram Reels / YouTube Shorts audio memes, Google Search trend breakouts, Quick-Commerce Blinkit dark-store surges, Vernacular feeds, and Weather anomalies.",
+    keyTakeaway: "Zero manual social listening delay. Every signal is corroboration-tested and tagged with cryptographic provenance (e.g., GROUNDED · NEWSAPI / SOCIAL STREAM).",
+    visualType: "radar",
+    actionLink: "/command-centre/",
+    actionText: "See Live Radar in Command Centre →"
+  },
+  {
+    stageNum: "02",
+    name: "Brand Living Twin",
+    tag: "EQUITY PROTECTION",
+    title: "2. Living Brand Twin & Constitution Rules Audit",
+    desc: "Before any creative action is explored, the signal is matched against the brand's Living Digital Twin (e.g. Dove's Rule 4.2 Anti-Filter Charter, Surf Excel 'Dirt is Good' moral purpose, Lifebuoy hygiene truth).",
+    keyTakeaway: "Replaces tribal memory with queryable policy. Evaluates historical stance consistency, hypocrisy traps, and pre-cleared DAM asset availability in milliseconds.",
+    visualType: "twin",
+    actionLink: "/war-room/",
+    actionText: "Inspect Brand Twin in War Room →"
+  },
+  {
+    stageNum: "03",
+    name: "7-Agent Mesh Debate",
+    tag: "AUTONOMOUS DELIBERATION",
+    title: "3. Seven Specialists That Argue Rather Than Agree",
+    desc: "Instead of a single blind LLM output, 7 specialist agents evaluate the moment in parallel: Culture (viral half-life), Brand Voice (equity), ASCI Legal (zero-defect compliance), Commercial ROI (CAC & dark-store conversion), Creative DAM (9:16 specs), PR (troll defense), and the Devil's Advocate.",
+    keyTakeaway: "The Devil's Advocate actively attacks consensus, looking for competitor ambush, moral hazard, and supply chain friction.",
+    visualType: "mesh",
+    actionLink: "/command-centre/",
+    actionText: "Watch 7-Agent Debate Live →"
+  },
+  {
+    stageNum: "04",
+    name: "Arbiter Synthesis",
+    tag: "CONSENSUS & DISSENT",
+    title: "4. AI Arbiter Synthesis & Plain-English Verdict",
+    desc: "The Arbiter synthesizes tradeoffs into an unambiguous executive verdict (ACT FAST, HOLD, RE-DIRECT, or VETO), an Opportunity Score (e.g. 92/100), and a strict decision window (&lt; 45 minutes) before social velocity crests.",
+    keyTakeaway: "Calculates the Risk vs Reward Quadrant and details what actions are recommended with projected ROAS impact.",
+    visualType: "verdict",
+    actionLink: "/war-room/",
+    actionText: "View Decision Topology & Mind Map →"
+  },
+  {
+    stageNum: "05",
+    name: "Human Decision",
+    tag: "POLICY-AS-CODE",
+    title: "5. Tiered Governance & Human Decision Rights",
+    desc: "AI recommends; only authorized human leaders execute. NEXT enforces HUL's Decision Rights Matrix: Social Lead (₹0), Brand Manager (₹5 Lakhs), Brand Director (₹25 Lakhs), and Category Head (₹1 Crore).",
+    keyTakeaway: "1-click execution with automated 45-second safety rollback window. If the proposed spend exceeds the user's role limit, an instant escalation workflow is triggered.",
+    visualType: "governance",
+    actionLink: "/command-centre/",
+    actionText: "Test Role Switcher & Signing Limits →"
+  },
+  {
+    stageNum: "06",
+    name: "Dispatch & Ledger",
+    tag: "IMMUTABLE AUDIT",
+    title: "6. Multi-Adapter Dispatch & Cryptographic Audit Ledger",
+    desc: "Upon human authorization, execution instructions are dispatched to Meta Ads API, Instagram Creator DAM, Blinkit dark stores, and PR holding lines. The entire decision loop is sealed into an append-only SHA-256 digital ledger.",
+    keyTakeaway: "Tamper-proof corporate memory. Every agent prompt, vote, human signature, and API payload is verifiable forever.",
+    visualType: "ledger",
+    actionLink: "/war-room/",
+    actionText: "Verify Digital Receipt & Block Hash →"
+  }
+];
+
+let currentJourneyStage = 0;
+let journeyAutoplayTimer = null;
+let currentModalStage = 0;
+
+function renderJourneyVisualHtml(stage, isDark) {
+  const bg = isDark ? '#05080E' : '#FFFFFF';
+  const bd = isDark ? '#1E2B40' : '#DCE3F0';
+  const textPrimary = isDark ? '#F8FAFC' : '#0F172A';
+  const textMute = isDark ? '#94A3B8' : '#64748B';
+
+  if (stage.visualType === 'radar') {
+    return `
+      <div style="background:${bg};border:1px solid ${bd};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid ${bd};padding-bottom:8px">
+          <b style="font:700 11px 'IBM Plex Mono';color:#38BDF8">📡 6 LIVE SURVEILLANCE LANES</b>
+          <span style="font:700 10px 'IBM Plex Mono';color:#10B981;background:rgba(16,185,129,0.15);padding:2px 6px;border-radius:4px">LATENCY: 340ms</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:8px">
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};border:1px solid ${bd};border-radius:6px;padding:8px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#60A5FA">1. NATIONAL NEWS</div>
+            <div style="font:600 11px 'Plus Jakarta Sans';color:${textPrimary};margin-top:2px">Mint, Economic Times, NDTV</div>
+            <div style="font:400 9.5px 'IBM Plex Mono';color:#10B981">● Grounded Stream Active</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};border:1px solid ${bd};border-radius:6px;padding:8px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#EC4899">2. REELS & SHORTS</div>
+            <div style="font:600 11px 'Plus Jakarta Sans';color:${textPrimary};margin-top:2px">Audio Memes & Virality Half-Life</div>
+            <div style="font:400 9.5px 'IBM Plex Mono';color:#10B981">● +480% Velocity Crest</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};border:1px solid ${bd};border-radius:6px;padding:8px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#F59E0B">3. SEARCH SPIKES</div>
+            <div style="font:600 11px 'Plus Jakarta Sans';color:${textPrimary};margin-top:2px">Google India Tier-1/2 queries</div>
+            <div style="font:400 9.5px 'IBM Plex Mono';color:#10B981">● 8.4k searches / hr</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};border:1px solid ${bd};border-radius:6px;padding:8px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#10B981">4. BLINKIT COMMERCE</div>
+            <div style="font:600 11px 'Plus Jakarta Sans';color:${textPrimary};margin-top:2px">Dark-Store Stock & Add-to-Cart</div>
+            <div style="font:400 9.5px 'IBM Plex Mono';color:#10B981">● High Basket Correlation</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};border:1px solid ${bd};border-radius:6px;padding:8px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#8B5CF6">5. VERNACULAR WIRES</div>
+            <div style="font:600 11px 'Plus Jakarta Sans';color:${textPrimary};margin-top:2px">ShareChat & Moj regional dialect</div>
+            <div style="font:400 9.5px 'IBM Plex Mono';color:#10B981">● Hindi & Tamil Pulse</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};border:1px solid ${bd};border-radius:6px;padding:8px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#06B6D4">6. WEATHER SENSORS</div>
+            <div style="font:600 11px 'Plus Jakarta Sans';color:${textPrimary};margin-top:2px">Monsoon & Temperature spikes</div>
+            <div style="font:400 9.5px 'IBM Plex Mono';color:#10B981">● Mumbai 34°C + Humidity</div>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (stage.visualType === 'twin') {
+    return `
+      <div style="background:${bg};border:1px solid ${bd};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid ${bd};padding-bottom:8px">
+          <b style="font:700 11px 'IBM Plex Mono';color:#10B981">🛡️ LIVING BRAND TWIN (DOVE INDIA)</b>
+          <span style="font:700 10px 'IBM Plex Mono';color:#38BDF8">CHARTER AUDIT: PASS ✓</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px 10px;border-radius:6px;font-size:11px">
+            <span style="color:${textPrimary}">Rule 4.2 Anti-Filter & Zero Airbrushing Charter</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">COMPLIANT (100%)</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px 10px;border-radius:6px;font-size:11px">
+            <span style="color:${textPrimary}">Real Beauty & Inclusive Body Self-Esteem Stance</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">ALIGNED (96%)</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px 10px;border-radius:6px;font-size:11px">
+            <span style="color:${textPrimary}">Past Hypocrisy & Competitor Troll Trap Scan</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">NO TRAPS DETECTED</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px 10px;border-radius:6px;font-size:11px">
+            <span style="color:${textPrimary}">Pre-cleared DAM Brand Assets (9:16 Reels)</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#38BDF8">14 ASSETS READY</span>
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (stage.visualType === 'mesh') {
+    return `
+      <div style="background:${bg};border:1px solid ${bd};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid ${bd};padding-bottom:8px">
+          <b style="font:700 11px 'IBM Plex Mono';color:#EC4899">🤖 7 SPECIALISTS IN PARALLEL DEBATE</b>
+          <span style="font:700 10px 'IBM Plex Mono';color:#F59E0B">DISSENT WELCOMED</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:6px">
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:6px 8px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;font-size:10.5px">
+            <span style="color:${textPrimary}">1. Trend & Culture</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">94% GO</span>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:6px 8px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;font-size:10.5px">
+            <span style="color:${textPrimary}">2. Brand Voice</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">98% GO</span>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:6px 8px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;font-size:10.5px">
+            <span style="color:${textPrimary}">3. ASCI & Legal</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">90% PASS</span>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:6px 8px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;font-size:10.5px">
+            <span style="color:${textPrimary}">4. Commercial ROI</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">88% +14% LIFT</span>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:6px 8px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;font-size:10.5px">
+            <span style="color:${textPrimary}">5. Channel & DAM</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">92% READY</span>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:6px 8px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;font-size:10.5px">
+            <span style="color:${textPrimary}">6. PR Defense</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">95% CLEAR</span>
+          </div>
+        </div>
+        <div style="background:${isDark ? '#1C1917' : '#FEF3C7'};border:1px solid #F59E0B;border-radius:6px;padding:8px 10px">
+          <div style="font:700 10px 'IBM Plex Mono';color:#B45309">07. DEVIL'S ADVOCATE (COUNTER-FACTUAL ATTACK)</div>
+          <div style="font:400 11px 'Plus Jakarta Sans';color:${isDark ? '#FDE68A' : '#78350F'};margin-top:2px">
+            "Watch out for competitor counter-narrative on pricing. Guardrail: ensure ASCI disclaimer is rendered on frame 1."
+          </div>
+        </div>
+      </div>
+    `;
+  } else if (stage.visualType === 'verdict') {
+    return `
+      <div style="background:${bg};border:1px solid ${bd};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid ${bd};padding-bottom:8px">
+          <b style="font:700 11px 'IBM Plex Mono';color:#38BDF8">⚖️ AI ARBITER SYNTHESIS</b>
+          <span style="background:#064E3B;color:#34D399;font:700 11px 'IBM Plex Mono';padding:2px 8px;border-radius:4px">FIT SCORE: 92/100</span>
+        </div>
+        <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};border:1px solid ${bd};border-radius:8px;padding:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between">
+            <span style="font:800 14px 'Plus Jakarta Sans';color:#10B981">RECOMMENDATION: ACT FAST</span>
+            <span style="font:700 11px 'IBM Plex Mono';color:#F59E0B">TIME WINDOW: &lt; 42 MINS</span>
+          </div>
+          <div style="font:400 11.5px 'Plus Jakarta Sans';color:${textMute};margin-top:6px;line-height:1.4">
+            "Authorize ₹3.5 Lakh Instagram Reels audio integration and Blinkit hero banner placement in Mumbai & Bengaluru."
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;background:${isDark ? '#080D1A' : '#EFF6FF'};padding:8px 12px;border-radius:6px;font-size:11px">
+          <span style="color:#1F44D6;font-weight:700">Risk vs Reward:</span>
+          <span style="color:${textPrimary}">Quadrant: High Fit / Low Risk (Safe Bet ✓)</span>
+        </div>
+      </div>
+    `;
+  } else if (stage.visualType === 'governance') {
+    return `
+      <div style="background:${bg};border:1px solid ${bd};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid ${bd};padding-bottom:8px">
+          <b style="font:700 11px 'IBM Plex Mono';color:#F59E0B">✍️ HUMAN DECISION RIGHTS MATRIX</b>
+          <span style="font:700 10px 'IBM Plex Mono';color:#10B981">ROLE: BRAND MANAGER</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:6px">
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px;border-radius:6px;border-left:3px solid #64748B">
+            <div style="font:700 9.5px 'IBM Plex Mono';color:#64748B">SOCIAL LEAD</div>
+            <div style="font:700 11px 'Plus Jakarta Sans';color:${textPrimary}">Signing: ₹0 (Review Only)</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#EFF6FF'};padding:8px;border-radius:6px;border-left:3px solid #1F44D6">
+            <div style="font:700 9.5px 'IBM Plex Mono';color:#1F44D6">BRAND MANAGER</div>
+            <div style="font:700 11px 'Plus Jakarta Sans';color:${textPrimary}">Signing: Up to ₹5 Lakhs</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px;border-radius:6px;border-left:3px solid #10B981">
+            <div style="font:700 9.5px 'IBM Plex Mono';color:#10B981">BRAND DIRECTOR</div>
+            <div style="font:700 11px 'Plus Jakarta Sans';color:${textPrimary}">Signing: Up to ₹25 Lakhs</div>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px;border-radius:6px;border-left:3px solid #8B5CF6">
+            <div style="font:700 9.5px 'IBM Plex Mono';color:#8B5CF6">CATEGORY HEAD</div>
+            <div style="font:700 11px 'Plus Jakarta Sans';color:${textPrimary}">Signing: Up to ₹1 Crore</div>
+          </div>
+        </div>
+        <div style="background:#064E3B;color:#34D399;padding:8px 12px;border-radius:6px;display:flex;align-items:center;justify-content:space-between;font:700 11px 'Plus Jakarta Sans'">
+          <span>✓ Proposed Spend (₹3.5L) is within Brand Manager limit</span>
+          <span style="background:#041D12;padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono'">1-CLICK SIGN OFF</span>
+        </div>
+      </div>
+    `;
+  } else if (stage.visualType === 'ledger') {
+    return `
+      <div style="background:${bg};border:1px solid ${bd};border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid ${bd};padding-bottom:8px">
+          <b style="font:700 11px 'IBM Plex Mono';color:#10B981">🔒 CRYPTOGRAPHIC AUDIT LEDGER</b>
+          <span style="font:700 10px 'IBM Plex Mono';color:#38BDF8">BLOCK #00482 SEALED</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px 10px;border-radius:6px;font-size:10.5px;display:flex;align-items:center;justify-content:space-between">
+            <span style="color:${textPrimary}">Meta Ads API Adapter:</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">DISPATCHED (200 OK)</span>
+          </div>
+          <div style="background:${isDark ? '#0F172A' : '#F1F5F9'};padding:8px 10px;border-radius:6px;font-size:10.5px;display:flex;align-items:center;justify-content:space-between">
+            <span style="color:${textPrimary}">Blinkit Dark Store Adapter:</span>
+            <span style="font:700 10px 'IBM Plex Mono';color:#10B981">PUSHED TO 14 HUBS</span>
+          </div>
+          <div style="background:${isDark ? '#04070D' : '#0F172A'};color:#38BDF8;padding:8px 10px;border-radius:6px;font:500 10px 'IBM Plex Mono';word-break:break-all">
+            SHA256: 8f4c9a12b0e7d3845920cde839201f94857bca10e471928472901c8e
+          </div>
+        </div>
+        <div style="font:400 10.5px 'Plus Jakarta Sans';color:${textMute}">
+          Safety Guarantee: 45s automated reverse-dispatch rollback window active.
+        </div>
+      </div>
+    `;
+  }
+  return '';
+}
+
+function renderJourneyStage(idx) {
+  currentJourneyStage = idx;
+  const stage = journeyStages[idx];
+
+  // Update tabs
+  for (let i = 0; i < 6; i++) {
+    const tab = document.getElementById(`jTab${i}`);
+    if (tab) {
+      if (i === idx) {
+        tab.style.background = '#FFFFFF';
+        tab.style.borderColor = '#1F44D6';
+        tab.style.boxShadow = '0 4px 14px rgba(31,68,214,0.12)';
+      } else {
+        tab.style.background = '#F8FAFC';
+        tab.style.borderColor = '#E2E8F0';
+        tab.style.boxShadow = 'none';
+      }
+    }
+  }
+
+  // Update dots
+  const dotsContainer = document.getElementById('journeyDots');
+  if (dotsContainer) {
+    dotsContainer.innerHTML = journeyStages.map((s, i) => `
+      <span onclick="selectJourneyStage(${i})" style="cursor:pointer;width:${i === idx ? '22px' : '8px'};height:8px;border-radius:4px;background:${i === idx ? '#1F44D6' : '#CBD5E1'};transition:all .2s"></span>
+    `).join('');
+  }
+
+  // Update Next/Prev buttons
+  const prevBtn = document.getElementById('journeyPrevBtn');
+  const nextBtn = document.getElementById('journeyNextBtn');
+  if (prevBtn) prevBtn.style.display = idx === 0 ? 'none' : 'inline-flex';
+  if (nextBtn) {
+    if (idx === journeyStages.length - 1) {
+      nextBtn.innerHTML = 'Restart Journey ↺';
+    } else {
+      nextBtn.innerHTML = `Next: ${journeyStages[idx + 1].name} →`;
+    }
+  }
+
+  // Update Canvas HTML
+  const canvas = document.getElementById('journeyStageCanvas');
+  if (canvas) {
+    canvas.innerHTML = `
+      <!-- Left Column: Visual Mock / Interactive Diagram -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <span style="font:700 10px 'IBM Plex Mono';color:#1F44D6;letter-spacing:.08em">${stage.tag}</span>
+          <span style="font:700 11px 'IBM Plex Mono';color:#64748B">STAGE ${stage.stageNum} OF 06</span>
+        </div>
+        ${renderJourneyVisualHtml(stage, false)}
+      </div>
+
+      <!-- Right Column: Plain-English Text & Tactical Takeaways -->
+      <div style="display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <h3 style="font-size:18px;font-weight:800;color:#0E1B33;margin:0 0 10px;line-height:1.3">
+            ${stage.title}
+          </h3>
+          <p style="font-size:13.5px;line-height:1.6;color:#5A6B8C;margin:0 0 14px">
+            ${stage.desc}
+          </p>
+          <div style="background:#EFF6FF;border-left:3px solid #1F44D6;padding:10px 14px;border-radius:0 8px 8px 0;margin-bottom:16px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#1F44D6;margin-bottom:2px">EXECUTIVE TAKEAWAY</div>
+            <div style="font:500 12.5px/1.45 'Plus Jakarta Sans';color:#1E3A8A">
+              ${stage.keyTakeaway}
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-top:auto;padding-top:12px;border-top:1px solid #E2E8F0">
+          <a href="${stage.actionLink}" style="background:#1F44D6;color:#fff;text-decoration:none;padding:8px 16px;border-radius:6px;font:700 11.5px 'Plus Jakarta Sans';display:inline-flex;align-items:center;gap:6px">
+            ${stage.actionText}
+          </a>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function selectJourneyStage(idx) {
+  renderJourneyStage(idx);
+}
+
+function nextJourneyStage() {
+  if (currentJourneyStage < journeyStages.length - 1) {
+    selectJourneyStage(currentJourneyStage + 1);
+  } else {
+    selectJourneyStage(0);
+  }
+}
+
+function prevJourneyStage() {
+  if (currentJourneyStage > 0) {
+    selectJourneyStage(currentJourneyStage - 1);
+  }
+}
+
+function toggleJourneyAutoplay() {
+  const icon = document.getElementById('autoplayIcon');
+  const label = document.getElementById('autoplayLabel');
+  const btn = document.getElementById('journeyAutoplayBtn');
+
+  if (journeyAutoplayTimer) {
+    clearInterval(journeyAutoplayTimer);
+    journeyAutoplayTimer = null;
+    if (icon) icon.innerText = '▶';
+    if (label) label.innerText = 'Auto-Play Journey';
+    if (btn) btn.style.background = '#EEF4FF';
+  } else {
+    if (icon) icon.innerText = '⏸';
+    if (label) label.innerText = 'Pause Auto-Play';
+    if (btn) btn.style.background = '#DCE8FF';
+    
+    journeyAutoplayTimer = setInterval(() => {
+      nextJourneyStage();
+    }, 4000);
+  }
+}
+
+// Full-screen Modal Walkthrough functions
+window.openJourneyWalkthroughModal = function() {
+  const modal = document.getElementById('journeyModalOverlay');
+  if (modal) {
+    modal.style.display = 'flex';
+    renderModalStage(0);
+  }
+};
+
+window.closeJourneyWalkthroughModal = function() {
+  const modal = document.getElementById('journeyModalOverlay');
+  if (modal) modal.style.display = 'none';
+};
+
+function renderModalStage(idx) {
+  currentModalStage = idx;
+  const stage = journeyStages[idx];
+
+  document.getElementById('modalStepIndicator').innerText = `STAGE ${idx + 1} OF ${journeyStages.length}`;
+  
+  const prevBtn = document.getElementById('modalPrevBtn');
+  const nextBtn = document.getElementById('modalNextBtn');
+  if (prevBtn) prevBtn.style.display = idx === 0 ? 'none' : 'block';
+  if (nextBtn) nextBtn.innerText = idx === journeyStages.length - 1 ? 'Finish Tour ✓' : 'Next Stage →';
+
+  // Render dots
+  const dots = document.getElementById('modalDots');
+  if (dots) {
+    dots.innerHTML = journeyStages.map((s, i) => `
+      <span onclick="renderModalStage(${i})" style="cursor:pointer;width:${i === idx ? '20px' : '8px'};height:8px;border-radius:4px;background:${i === idx ? '#38BDF8' : '#334155'};transition:all .2s"></span>
+    `).join('');
+  }
+
+  // Render content
+  const content = document.getElementById('modalStageContent');
+  if (content) {
+    content.innerHTML = `
+      <div>
+        <div style="font:700 10px 'IBM Plex Mono';color:#38BDF8;letter-spacing:.08em;margin-bottom:8px">${stage.tag}</div>
+        ${renderJourneyVisualHtml(stage, true)}
+      </div>
+
+      <div style="display:flex;flex-direction:column;justify-content:space-between">
+        <div>
+          <h3 style="font-size:20px;font-weight:800;color:#F8FAFC;margin:0 0 12px;line-height:1.3">${stage.title}</h3>
+          <p style="font-size:13.5px;line-height:1.6;color:#94A3B8;margin:0 0 16px">${stage.desc}</p>
+          <div style="background:#131B2B;border-left:3px solid #38BDF8;padding:12px 16px;border-radius:0 8px 8px 0;margin-bottom:20px">
+            <div style="font:700 10px 'IBM Plex Mono';color:#38BDF8;margin-bottom:4px">KEY EXECUTIVE TAKEAWAY</div>
+            <div style="font:500 13px/1.45 'Plus Jakarta Sans';color:#E2E8F0">${stage.keyTakeaway}</div>
+          </div>
+        </div>
+
+        <div style="padding-top:14px;border-top:1px solid #1E2B40">
+          <a href="${stage.actionLink}" onclick="closeJourneyWalkthroughModal()" style="background:#1F44D6;color:#fff;text-decoration:none;padding:10px 18px;border-radius:6px;font:700 12px 'Plus Jakarta Sans';display:inline-flex;align-items:center;gap:8px">
+            ${stage.actionText}
+          </a>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function nextModalStage() {
+  if (currentModalStage < journeyStages.length - 1) {
+    renderModalStage(currentModalStage + 1);
+  } else {
+    closeJourneyWalkthroughModal();
+  }
+}
+
+function prevModalStage() {
+  if (currentModalStage > 0) {
+    renderModalStage(currentModalStage - 1);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (typeof loadLiveSignals === 'function') loadLiveSignals();
+  if (typeof loadMetrics === 'function') loadMetrics();
+  if (typeof initLandingSSE === 'function') initLandingSSE();
+  renderJourneyStage(0);
+  
+  // Periodic fallback refresh for live metrics & signals
+  setInterval(() => {
+    if (typeof loadLiveSignals === 'function') loadLiveSignals();
+    if (typeof loadMetrics === 'function') loadMetrics();
+  }, 8000);
+
+  setInterval(() => {
+    if (typeof landingCountdown !== 'undefined' && landingCountdown > 0) {
+      landingCountdown--;
+      if (typeof updateLandingCountdown === 'function') updateLandingCountdown(landingCountdown);
+    }
+  }, 1000);
+});
+</script>
+<script src="/shared/statusBar.js"></script>
+<script src="/shared/aiDrawer.js"></script>
+</body>
+</html>

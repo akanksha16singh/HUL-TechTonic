@@ -1,0 +1,581 @@
+/* NEXT Shared Layout, Global Status Bar, AI Activity Drawer & Mind Map Styles */
+
+/* ====================================================
+   1. GLOBAL STATUS BAR
+   ==================================================== */
+.next-global-status-bar {
+  background: #080D1A;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 20px;
+  font-family: 'IBM Plex Mono', 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 11px;
+  color: #E2E8F0;
+  position: relative;
+  z-index: 10000;
+}
+
+.next-status-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.next-status-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.next-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.chip-grounded {
+  background: rgba(14, 159, 110, 0.2);
+  color: #34D399;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+}
+.chip-ungrounded {
+  background: rgba(184, 119, 10, 0.2);
+  color: #FBBF24;
+  border: 1px solid rgba(251, 191, 36, 0.4);
+}
+.chip-demo {
+  background: rgba(90, 104, 132, 0.25);
+  color: #94A3B8;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+}
+.chip-scanning {
+  background: rgba(31, 68, 214, 0.3);
+  color: #60A5FA;
+  border: 1px solid rgba(96, 165, 250, 0.5);
+  animation: pulse-scan 1.5s infinite;
+}
+
+@keyframes pulse-scan {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.next-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.next-status-detail {
+  font-size: 11px;
+  color: #CBD5E1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.demo-warning-text {
+  color: #94A3B8;
+  font-style: normal;
+}
+
+.next-status-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.next-status-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: #94A3B8;
+}
+
+.meta-label {
+  color: #64748B;
+}
+
+.meta-separator {
+  color: #475569;
+}
+
+/* ====================================================
+   2. UNIFIED TOP NAVIGATION
+   ==================================================== */
+.next-unified-bar {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+  background: #0E1B33;
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+.next-unified-bar a {
+  color: #D1D5DB;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.next-unified-bar a:hover {
+  color: #FFFFFF;
+  background: rgba(255,255,255,0.1);
+}
+.next-unified-bar a.active {
+  color: #FFFFFF;
+  background: #1F44D6;
+  font-weight: 700;
+}
+.next-badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(14, 159, 110, 0.2);
+  color: #34D399;
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.04em;
+}
+.next-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34D399;
+  box-shadow: 0 0 8px #34D399;
+}
+
+/* ====================================================
+   3. PROVENANCE ORIGIN TAGS
+   ==================================================== */
+.provenance-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.prov-grounded {
+  background: rgba(14, 159, 110, 0.15);
+  color: #0E9F6E;
+  border: 1px solid rgba(14, 159, 110, 0.3);
+}
+
+.prov-ungrounded {
+  background: rgba(184, 119, 10, 0.15);
+  color: #B8770A;
+  border: 1px solid rgba(184, 119, 10, 0.3);
+}
+
+.prov-fixture {
+  background: rgba(90, 104, 132, 0.12);
+  color: #5A6884;
+  border: 1px solid rgba(90, 104, 132, 0.25);
+}
+
+/* ====================================================
+   4. COLLAPSIBLE AI ACTIVITY LOG DRAWER
+   ==================================================== */
+.next-ai-drawer {
+  position: fixed;
+  bottom: 0;
+  right: 20px;
+  z-index: 10001;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.next-drawer-toggle {
+  background: #0E1B33;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  padding: 8px 16px;
+  border-radius: 8px 8px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.next-drawer-toggle:hover {
+  background: #182848;
+}
+
+.drawer-count {
+  background: #1F44D6;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 10px;
+  font-size: 10px;
+}
+
+.next-drawer-panel {
+  display: none;
+  width: 680px;
+  max-width: calc(100vw - 40px);
+  height: 380px;
+  background: #090E17;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
+  flex-direction: column;
+}
+
+.next-drawer-panel.open {
+  display: flex;
+}
+
+.next-drawer-header {
+  padding: 10px 16px;
+  background: #0E1726;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mono-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #34D399;
+  letter-spacing: 0.08em;
+}
+
+.drawer-sub {
+  font-size: 10px;
+  color: #64748B;
+  margin-left: 8px;
+}
+
+.drawer-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #CBD5E1;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  cursor: pointer;
+}
+
+.drawer-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+}
+
+.next-drawer-table-header {
+  display: flex;
+  padding: 6px 14px;
+  background: #05080F;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 9px;
+  font-weight: 700;
+  color: #64748B;
+  letter-spacing: 0.06em;
+}
+
+.next-drawer-list {
+  flex: 1;
+  overflow-y: auto;
+  font-size: 10.5px;
+}
+
+.drawer-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background 0.15s;
+  color: #CBD5E1;
+}
+
+.drawer-row:hover {
+  background: rgba(31, 68, 214, 0.2);
+  color: #FFFFFF;
+}
+
+.col-time { width: 75px; color: #94A3B8; font-size: 10px; }
+.col-prompt { width: 130px; font-weight: 700; color: #60A5FA; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.col-model { width: 120px; color: #A78BFA; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.col-lat { width: 65px; color: #F59E0B; }
+.col-stat { width: 40px; }
+.col-summary { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #94A3B8; }
+
+.drawer-empty {
+  padding: 30px;
+  text-align: center;
+  color: #64748B;
+  font-size: 11px;
+}
+
+/* ====================================================
+   5. RAW PROMPT / RESPONSE INSPECTION MODAL
+   ==================================================== */
+.next-inspector-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.next-inspector-modal {
+  background: #0B111E;
+  border: 1px solid #1E293B;
+  border-radius: 12px;
+  width: 900px;
+  max-width: 95vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.inspector-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid #1E293B;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.inspector-title {
+  font-size: 14px;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.inspector-meta {
+  font-size: 11px;
+  color: #34D399;
+  margin-top: 4px;
+}
+
+.inspector-close {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.inspector-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.inspector-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #60A5FA;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+}
+
+.copy-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.inspector-code {
+  background: #04070D;
+  border: 1px solid #1E293B;
+  border-radius: 6px;
+  padding: 12px;
+  font-size: 11px;
+  color: #E2E8F0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+/* ====================================================
+   6. MIND MAP CONTAINER & SVG STYLING
+   ==================================================== */
+.next-mindmap-container {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.mindmap-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mindmap-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #94A3B8;
+}
+
+.mm-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #CBD5E1;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'IBM Plex Mono', monospace;
+  cursor: pointer;
+  margin-left: 6px;
+}
+
+.mm-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+}
+
+.mm-btn.active {
+  background: #B8770A;
+  color: #FFFFFF;
+  border-color: #F59E0B;
+}
+
+.mindmap-svg-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.theme-dark {
+  background: #0A0B0D;
+}
+
+.theme-light {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+}
+
+.mindmap-tooltip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #0B111E;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  padding: 14px;
+  width: 320px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+  z-index: 100;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #E2E8F0;
+}
+
+.mm-popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.pop-close {
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+}
+
+/* ====================================================
+   7. RESPONSIVE BREAKPOINTS (1400px, 1024px, 768px)
+   ==================================================== */
+@media (max-width: 1400px) {
+  .next-drawer-panel {
+    width: 600px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .next-status-meta {
+    display: none;
+  }
+  .next-drawer-panel {
+    width: calc(100vw - 40px);
+  }
+}
+
+@media (max-width: 768px) {
+  .next-unified-bar {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+  .next-global-status-bar {
+    padding: 4px 10px;
+  }
+  .next-status-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .next-drawer-toggle {
+    font-size: 10px;
+    padding: 6px 12px;
+  }
+  .col-summary {
+    display: none;
+  }
+}
