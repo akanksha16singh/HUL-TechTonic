@@ -36,8 +36,8 @@
   /* Signature latency line */
   .latency{margin:24px 0 16px;position:relative;height:36px}
   .latency .rail{position:absolute;top:17px;left:0;right:0;height:2px;background:var(--line)}
-  .latency .fill{position:absolute;top:17px;left:0;height:2px;width:0;background:var(--blue);animation:cross 9s cubic-bezier(.4,0,.1,1) infinite}
-  .latency .dot{position:absolute;top:11px;left:0;width:14px;height:14px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 6px rgba(31,68,214,.14);animation:travel 9s cubic-bezier(.4,0,.1,1) infinite}
+  .latency .fill{position:absolute;top:17px;left:0;height:2px;width:0;background:var(--blue);animation:cross 3.4s cubic-bezier(.4,0,.1,1) infinite}
+  .latency .dot{position:absolute;top:11px;left:0;width:14px;height:14px;border-radius:50%;background:var(--blue);box-shadow:0 0 0 6px rgba(31,68,214,.14);animation:travel 3.4s cubic-bezier(.4,0,.1,1) infinite}
   .latency .cap{position:absolute;top:26px;font-size:11px}
   .latency .cap.l{left:0}
   .latency .cap.r{right:0}
@@ -288,9 +288,9 @@
     <span class="next-badge-live"><span class="next-badge-dot"></span> LIVE 7-AGENT MESH ONLINE</span>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <div id="landingAutoScanBadge" style="display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,0.15);color:#93c5fd;font:600 11px 'IBM Plex Mono';padding:4px 10px;border-radius:12px;white-space:nowrap;min-width:150px;justify-content:center;flex-shrink:0">
-      <span style="width:6px;height:6px;border-radius:50%;background:#60a5fa;flex-shrink:0"></span>
-      <span style="white-space:nowrap">AUTO-SCAN: <b id="landingCountdownVal" style="display:inline-block;min-width:42px;text-align:right">09:59</b></span>
+    <div id="landingAutoScanBadge" style="display:flex;align-items:center;gap:6px;background:rgba(59,130,246,0.15);color:#93c5fd;font:600 11px 'IBM Plex Mono';padding:4px 10px;border-radius:12px">
+      <span style="width:6px;height:6px;border-radius:50%;background:#60a5fa;animation:cross 2s infinite"></span>
+      <span>AUTO-SCAN: <b id="landingCountdownVal">09:59</b></span>
     </div>
     <button onclick="openJourneyWalkthroughModal()" style="background:#1F44D6;color:#fff;border:none;padding:6px 14px;border-radius:6px;font:700 12px 'Plus Jakarta Sans';cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .18s ease" title="Start guided interactive tour">
       <span>💡</span> Guided Walkthrough
@@ -611,86 +611,12 @@
 
 </div>
 
+<!-- Global Status Bar & AI Activity Drawer Components -->
+<script src="/shared/statusBar.js"></script>
+<script src="/shared/aiDrawer.js"></script>
+
 <script>
 let landingCountdown = 600;
-let activeQuery = null;
-let lastSearchResults = null;
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function renderProvenanceBadge(prov) {
-  const p = (prov || "FIXTURE").toUpperCase();
-  let bg = "#6B7280"; // FIXTURE grey
-  let label = prov || "FIXTURE";
-
-  if (p.includes("LIVE_GROUNDED") || p.includes("GROUNDED")) {
-    bg = "#0E9F6E"; // green
-    label = "LIVE_GROUNDED";
-  } else if (p.includes("LIVE_RSS")) {
-    bg = "#2563EB"; // blue
-    label = "LIVE_RSS";
-  } else if (p.includes("CACHED")) {
-    bg = "#4B5563"; // grey-blue
-    label = "CACHED";
-  } else if (p.includes("ARCHIVE")) {
-    bg = "#4B5563"; // grey-blue
-    label = p.includes("REFRESHED") ? "ARCHIVE · REFRESHED" : "ARCHIVE";
-  } else {
-    bg = "#6B7280"; // grey
-    label = "FIXTURE";
-  }
-
-  return `<span style="background:${bg};color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono'">${label}</span>`;
-}
-
-function renderSignalItem(s) {
-  const badgeHtml = renderProvenanceBadge(s.provenance);
-  const headline = escapeHtml(s.headline || "Incoming Signal");
-  const brand = escapeHtml(s.brand || "HUL");
-  const summary = escapeHtml(s.summary || "");
-  const source = escapeHtml(s.source || "Intelligence Feed");
-  const verdict = escapeHtml(s.verdict || "MONITOR");
-  const verdictColor = s.verdictColor || "#0E9F6E";
-  const verdictBg = s.verdictBg || "#E8F8F0";
-  const oppScore = s.opportunityScore !== undefined ? s.opportunityScore : 80;
-
-  return `
-    <div class="ticker-item">
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-          <span style="background:#1F44D6;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono'">${brand}</span>
-          <span style="font-weight:700;font-size:14px;color:#fff">${headline}</span>
-          ${badgeHtml}
-        </div>
-        <div style="font-size:12px;color:#94A3B8">${summary} · <span style="color:#CBD5E1">${source}</span></div>
-      </div>
-      <div style="display:flex;align-items:center;gap:14px">
-        <div style="text-align:right">
-          <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;font-family:'IBM Plex Mono'">Opp Score</div>
-          <div style="font-size:17px;font-weight:800;color:#34D399;font-family:'IBM Plex Mono'">${oppScore}/100</div>
-        </div>
-        <span class="ticker-badge" style="background:${verdictBg};color:${verdictColor}">${verdict}</span>
-        <a href="/war-room/" style="background:#0E9F6E;color:#08090B;padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">Act in War Room →</a>
-      </div>
-    </div>
-  `;
-}
-
-function clearSearchFilter() {
-  activeQuery = null;
-  lastSearchResults = null;
-  const input = document.getElementById('brandScanInput');
-  if (input) input.value = '';
-  loadLiveSignals();
-}
 
 function updateLandingCountdown(sec) {
   landingCountdown = sec;
@@ -734,18 +660,11 @@ function initLandingSSE() {
       } catch {}
     });
     es.addEventListener('new_signal', () => {
-      if (!activeQuery) {
-        loadLiveSignals();
-      }
+      loadLiveSignals();
       loadMetrics();
     });
     es.addEventListener('decision_executed', () => {
-      if (!activeQuery) {
-        loadLiveSignals();
-      }
-      loadMetrics();
-    });
-    es.addEventListener('context', () => {
+      loadLiveSignals();
       loadMetrics();
     });
   } catch (err) {
@@ -754,154 +673,66 @@ function initLandingSSE() {
 }
 
 async function loadLiveSignals() {
-  if (activeQuery) return; // Retain active search filter if active
   try {
     const res = await fetch('/api/signals');
     const data = await res.json();
     const container = document.getElementById('signalsContainer');
-    if (!container) return;
     if (!data.signals || data.signals.length === 0) {
-      container.innerHTML = '<div style="padding:24px;text-align:center;color:#94A3B8">No pending signals in queue.</div>';
+      container.innerHTML = '<div style="padding:15px;color:#94A3B8">No pending signals in queue.</div>';
       return;
     }
     
-    container.innerHTML = data.signals.map(renderSignalItem).join('');
+    container.innerHTML = data.signals.map(s => {
+      const prov = s.provenance || "MODEL · GROUNDED";
+      const provBg = prov.includes('GROUNDED') ? '#0E9F6E' : '#6B7280';
+      return `
+      <div class="ticker-item">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
+            <span style="background:#1F44D6;color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;font-family:'IBM Plex Mono'">${s.brand}</span>
+            <span style="font-weight:700;font-size:14px;color:#fff">${s.headline}</span>
+            <span style="background:${provBg};color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:'IBM Plex Mono'">${prov}</span>
+          </div>
+          <div style="font-size:12px;color:#94A3B8">${s.summary} · <span style="color:#CBD5E1">${s.source}</span></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="text-align:right">
+            <div style="font-size:9px;color:#94A3B8;text-transform:uppercase;font-family:'IBM Plex Mono'">Opp Score</div>
+            <div style="font-size:17px;font-weight:800;color:#34D399;font-family:'IBM Plex Mono'">${s.opportunityScore}/100</div>
+          </div>
+          <span class="ticker-badge" style="background:${s.verdictBg};color:${s.verdictColor}">${s.verdict}</span>
+          <a href="/war-room/" style="background:#0E9F6E;color:#08090B;padding:8px 14px;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;white-space:nowrap">Act in War Room →</a>
+        </div>
+      </div>
+    `}).join('');
   } catch (err) {
     console.error('Error fetching signals:', err);
   }
 }
 
 async function triggerAIScan() {
-  const input = document.getElementById('brandScanInput');
-  const query = (input ? input.value : '').trim();
+  const query = document.getElementById('brandScanInput').value.trim();
   const btn = document.getElementById('scanBtn');
   const spinner = document.getElementById('scanSpinner');
-  const container = document.getElementById('signalsContainer');
-
-  if (!query) {
-    clearSearchFilter();
-    return;
-  }
-
-  if (query.length < 3) {
-    if (container) {
-      container.innerHTML = `
-        <div style="padding:14px 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#FCA5A5;font-size:13px;display:flex;align-items:center;justify-content:space-between">
-          <span>Search query must be at least 3 characters.</span>
-          <button onclick="clearSearchFilter()" style="background:none;border:none;color:#FCA5A5;cursor:pointer;font-weight:bold;font-size:14px">✕</button>
-        </div>
-      `;
-    }
-    return;
-  }
-
-  activeQuery = query;
-  if (btn) btn.disabled = true;
-  if (spinner) spinner.style.display = 'inline';
-
-  // Skeleton loading rows
-  if (container) {
-    container.innerHTML = `
-      <div style="padding:12px 16px;background:rgba(31,68,214,0.12);border:1px solid rgba(31,68,214,0.3);border-radius:8px;color:#93C5FD;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-        <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#60A5FA;box-shadow:0 0 8px #60A5FA"></span>
-        Retrieving live grounded signals and archived intelligence for "<b>${escapeHtml(query)}</b>"...
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <div style="height:68px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px"></div>
-        <div style="height:68px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px"></div>
-        <div style="height:68px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:8px"></div>
-      </div>
-    `;
-  }
+  btn.disabled = true;
+  spinner.style.display = 'inline';
 
   try {
-    const res = await fetch('/api/signals/search', {
+    const res = await fetch('/api/signals/refresh', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, limit: 8 })
+      body: JSON.stringify({ brandQuery: query || "HUL Brands" })
     });
-    const data = await res.json();
-    lastSearchResults = data;
-
-    if (!container) return;
-
-    if (!data.success && data.error) {
-      container.innerHTML = `
-        <div style="padding:14px 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#FCA5A5;font-size:13px;display:flex;align-items:center;justify-content:space-between">
-          <span>${escapeHtml(data.error)}</span>
-          <button onclick="clearSearchFilter()" style="background:none;border:none;color:#FCA5A5;cursor:pointer;font-weight:bold;font-size:14px">✕</button>
-        </div>
-      `;
-      return;
-    }
-
-    const results = data.results || [];
-    const count = data.resultCount !== undefined ? data.resultCount : results.length;
-    const liveMatches = data.liveMatches || 0;
-    const archiveMatches = data.archiveMatches || 0;
-
-    let chipHtml = `
-      <div style="display:flex;align-items:center;justify-content:space-between;background:#1E293B;border:1px solid #334155;padding:8px 14px;border-radius:8px;margin-bottom:12px;font-size:12px;color:#E2E8F0">
-        <div style="display:flex;align-items:center;gap:8px">
-          <span>🔍 Showing <b>${count}</b> result${count === 1 ? '' : 's'} for "<b>${escapeHtml(query)}</b>"</span>
-          <span style="color:#94A3B8">·</span>
-          <span style="color:#34D399;font-weight:600">${liveMatches} live</span>
-          <span style="color:#94A3B8">·</span>
-          <span style="color:#93C5FD;font-weight:600">${archiveMatches} archived</span>
-        </div>
-        <button onclick="clearSearchFilter()" style="background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);color:#FCA5A5;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:4px">Clear ✕</button>
-      </div>
-    `;
-
-    let bannerHtml = '';
-    if (data.mode === 'archive-only') {
-      bannerHtml = `
-        <div style="background:#374151;border:1px solid #4B5563;color:#F3F4F6;padding:8px 12px;border-radius:6px;font-size:12px;margin-bottom:12px;display:flex;align-items:center;gap:8px">
-          <span>⚠️ Live search unavailable — showing archived results only.</span>
-        </div>
-      `;
-    }
-
-    if (results.length === 0) {
-      container.innerHTML = `
-        ${chipHtml}
-        ${bannerHtml}
-        <div style="padding:28px 16px;text-align:center;color:#94A3B8;font-size:13px;background:rgba(255,255,255,0.02);border:1px dashed rgba(255,255,255,0.1);border-radius:8px">
-          No current signals found for "<b>${escapeHtml(query)}</b>". Try a broader term or a brand name.
-        </div>
-      `;
-      return;
-    }
-
-    container.innerHTML = chipHtml + bannerHtml + results.map(renderSignalItem).join('');
-
+    await res.json();
+    await loadLiveSignals();
+    await loadMetrics();
   } catch (err) {
-    console.error('Search error:', err);
-    if (container) {
-      container.innerHTML = `
-        <div style="padding:14px 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#FCA5A5;font-size:13px;display:flex;align-items:center;justify-content:space-between">
-          <span>Search failed: ${escapeHtml(err.message)}</span>
-          <button onclick="clearSearchFilter()" style="background:none;border:none;color:#FCA5A5;cursor:pointer;font-weight:bold;font-size:14px">✕</button>
-        </div>
-      `;
-    }
+    console.error('Scan error:', err);
   } finally {
-    if (btn) btn.disabled = false;
-    if (spinner) spinner.style.display = 'none';
+    btn.disabled = false;
+    spinner.style.display = 'none';
   }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-  const scanInput = document.getElementById('brandScanInput');
-  if (scanInput) {
-    scanInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        triggerAIScan();
-      }
-    });
-  }
-});
 </script>
 
 <!-- Interactive Guided Walkthrough Full-Screen Modal -->
@@ -1413,13 +1244,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof loadMetrics === 'function') loadMetrics();
   if (typeof initLandingSSE === 'function') initLandingSSE();
   renderJourneyStage(0);
-  
-  // Periodic fallback refresh for live metrics & signals
-  setInterval(() => {
-    if (typeof loadLiveSignals === 'function') loadLiveSignals();
-    if (typeof loadMetrics === 'function') loadMetrics();
-  }, 8000);
-
   setInterval(() => {
     if (typeof landingCountdown !== 'undefined' && landingCountdown > 0) {
       landingCountdown--;

@@ -1,0 +1,126 @@
+/* NEXT Cultural Decision System Unified Navigation & Shared Styles */
+:root {
+  --next-blue: #1F44D6;
+  --next-blue-deep: #163398;
+  --next-ink: #0E1B33;
+  --next-paper: #F5F7FB;
+  --next-line: #DCE3F0;
+  --next-mute: #5A6B8C;
+  --next-green: #0E9F6E;
+  --next-amber: #B8770A;
+  --next-crimson: #DC2626;
+  --next-night: #08090B;
+  --next-night-card: #0F1216;
+  --next-night-line: #1F2329;
+}
+
+.next-unified-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  height: 52px;
+  background: #08090B;
+  border-bottom: 1px solid #1F2329;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  color: #E9EAEC;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-size: 13px;
+}
+
+.next-unified-bar a {
+  color: #94A3B8;
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.18s ease;
+}
+
+.next-unified-bar a:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.next-unified-bar a.active {
+  color: #FFFFFF;
+  background: rgba(31, 68, 214, 0.35);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+}
+
+.next-badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(14, 159, 110, 0.15);
+  color: #34D399;
+  border: 1px solid rgba(14, 159, 110, 0.3);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+  letter-spacing: 0.04em;
+}
+
+.next-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+  animation: nextPulse 2s infinite;
+}
+
+@keyframes nextPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* Global status footer */
+.next-status-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  background: #080D1A;
+  border-top: 1px solid #1E2B40;
+  color: #94A3B8;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 9999;
+}
+
+.next-status-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* AI Drawer */
+.next-ai-drawer {
+  position: fixed;
+  right: 0;
+  top: 52px;
+  bottom: 36px;
+  width: 380px;
+  background: #0B0F19;
+  border-left: 1px solid #1E2B40;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+}
+
+.next-ai-drawer.open {
+  transform: translateX(0);
+}

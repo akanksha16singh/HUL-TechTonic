@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXT — Cultural War Room (Hindustan Unilever)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared/nav.css">
+<style>
+  html, body {
+    margin: 0; padding: 0; background: #08090B; color: #E9EAEC;
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased;
+  }
+  * { box-sizing: border-box; }
+  a { color: #5B8FD6; text-decoration: none; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #22262C; border-radius: 3px; }
+
+  .war-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .war-sub-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    height: 54px;
+    border-bottom: 1px solid #1F2329;
+    background: #0C0E12;
+  }
+
+  .war-main {
+    display: flex;
+    flex: 1;
+  }
+
+  .war-sidebar {
+    width: 320px;
+    border-right: 1px solid #1F2329;
+    background: #0B0D10;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 106px);
+    overflow-y: auto;
+  }
+
+  .signal-item {
+    padding: 14px 16px;
+    border-left: 3px solid transparent;
+    border-bottom: 1px solid #16191E;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .signal-item:hover { background: #14171D; }
+  .signal-item.active { background: #14171D; border-left-color: #0E9F6E; }
+
+  .war-center {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 24px 80px;
+    height: calc(100vh - 106px);
+  }
+
+  .dark-card {
+    border: 1px solid #1F2329;
+    border-radius: 8px;
+    background: #0F1216;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .dark-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    border-bottom: 1px solid #1F2329;
+    font: 600 11px/1 'IBM Plex Mono', monospace;
+    letter-spacing: .12em;
+    color: #8A9098;
+    text-transform: uppercase;
+    background: #0B0D10;
+  }
+
+  .btn-primary {
+    background: #0E9F6E;
+    color: #FFFFFF;
+    border: none;
+    font: 700 12px 'IBM Plex Mono', monospace;
+    padding: 10px 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-primary:hover { background: #0C8A5F; }
+
+  .btn-secondary {
+    background: #1E242D;
+    color: #E9EAEC;
+    border: 1px solid #2D333B;
+    font: 600 12px 'IBM Plex Mono', monospace;
+    padding: 10px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- Unified Top Navigation Bar -->
+<nav class="next-unified-bar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/" style="font-weight:800;color:#fff">NEXT Decision System</a>
+    <span class="next-badge-live"><span class="next-badge-dot"></span> OPERATOR WAR ROOM</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a href="/">Overview</a>
+    <a href="/command-centre/">Command Centre</a>
+    <a href="/war-room/" class="active">War Room (Operator)</a>
+  </div>
+</nav>
+
+<div class="war-layout">
+  <!-- War Room HUD Bar -->
+  <header class="war-sub-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#EF4444;box-shadow:0 0 10px #EF4444;animation:nextPulse 1.5s infinite"></span>
+      <b style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:0.04em">LIVE CULTURAL SITUATION RADAR</b>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:18px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#94A3B8">
+        DECISION SLA: <span style="color:#10B981;font-weight:700">&lt; 60 MINS</span>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#94A3B8">
+        RADAR CLOCK: <span id="warClock" style="color:#FBBF24;font-weight:700">00:00:00</span>
+      </div>
+      <button onclick="triggerAIScan()" style="background:#1E293B;color:#38BDF8;border:1px solid #334155;border-radius:4px;font-family:'IBM Plex Mono';font-size:11px;padding:5px 10px;cursor:pointer">
+        ⚡ Ingest Signal
+      </button>
+    </div>
+  </header>
+
+  <div class="war-main">
+    <!-- Sidebar: Active Live Signals Queue -->
+    <aside class="war-sidebar" id="warSidebar">
+      <div style="padding:12px 16px;border-bottom:1px solid #1F2329;font:700 11px 'IBM Plex Mono';color:#8A9098;text-transform:uppercase">
+        Active Ingestion Queue
+      </div>
+      <div id="warSignalsList">
+        <div style="padding:20px;text-align:center;color:#64748B;font-size:12px">Loading active signals...</div>
+      </div>
+    </aside>
+
+    <!-- Center Stage: Active War Room Cockpit -->
+    <main class="war-center" id="warCenterStage">
+      <!-- Dynamically filled by war room logic -->
+      <div style="padding:40px;text-align:center;color:#64748B">Selecting live signal...</div>
+    </main>
+  </div>
+</div>
+
+<script src="/shared/statusBar.js"></script>
+<script src="/shared/aiDrawer.js"></script>
+<script src="/shared/mindmap.js"></script>
+
+<script>
+let signals = [];
+let selectedSignal = null;
+let currentOperatorRole = 'Brand Director';
+
+document.addEventListener('DOMContentLoaded', () => {
+  initWarRoomClock();
+  loadWarSignals();
+  initWarSSE();
+});
+
+window.addEventListener('next:role_changed', e => {
+  currentOperatorRole = e.detail.role;
+  if (selectedSignal) renderWarCockpit(selectedSignal);
+});
+
+function initWarRoomClock() {
+  setInterval(() => {
+    const el = document.getElementById('warClock');
+    if (el) el.innerText = new Date().toTimeString().split(' ')[0];
+  }, 1000);
+}
+
+async function loadWarSignals() {
+  try {
+    const res = await fetch('/api/signals');
+    const data = await res.json();
+    signals = data.signals || [];
+    renderSignalsList();
+    if (signals.length > 0 && !selectedSignal) {
+      selectedSignal = signals[0];
+      renderWarCockpit(selectedSignal);
+    }
+  } catch (e) {
+    console.error('Failed to load war signals:', e);
+  }
+}
+
+function renderSignalsList() {
+  const container = document.getElementById('warSignalsList');
+  if (!container) return;
+
+  if (signals.length === 0) {
+    container.innerHTML = `<div style="padding:20px;color:#64748B;font-size:12px;text-align:center">No active signals.</div>`;
+    return;
+  }
+
+  container.innerHTML = signals.map(s => {
+    const isActive = selectedSignal && selectedSignal.id === s.id;
+    return `
+      <div class="signal-item ${isActive ? 'active' : ''}" onclick="selectWarSignal('${s.id}')">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="font-family:'IBM Plex Mono';font-size:10px;font-weight:700;color:#38BDF8">${s.brand}</span>
+          <span style="font-family:'IBM Plex Mono';font-size:10px;color:${s.verdictColor || '#10B981'}">${s.verdict}</span>
+        </div>
+        <div style="font-size:12px;font-weight:600;color:#F1F5F9;line-height:1.3;margin-bottom:4px">${s.headline}</div>
+        <div style="font-size:10px;color:#64748B">${s.seenTime} · Opp ${s.opportunityScore}/100</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function selectWarSignal(sigId) {
+  selectedSignal = signals.find(s => s.id === sigId) || signals[0];
+  renderSignalsList();
+  renderWarCockpit(selectedSignal);
+}
+
+function renderWarCockpit(sig) {
+  const container = document.getElementById('warCenterStage');
+  if (!container) return;
+
+  const isExecuted = sig.executed;
+
+  container.innerHTML = `
+    <!-- Top Situation Briefing -->
+    <div class="dark-card">
+      <div class="dark-card-head">
+        <span>ACTIVE CULTURAL BREACH // ${sig.id}</span>
+        <span style="color:#10B981">OPP SCORE: ${sig.opportunityScore}/100</span>
+      </div>
+      <div style="padding:18px 20px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+          <span style="background:#1E293B;color:#38BDF8;padding:3px 8px;border-radius:4px;font-family:'IBM Plex Mono';font-size:11px;font-weight:700">${sig.brand}</span>
+          <span style="background:#1E293B;color:#94A3B8;padding:3px 8px;border-radius:4px;font-family:'IBM Plex Mono';font-size:11px">${sig.category}</span>
+          <span style="color:#64748B;font-size:12px">${sig.source}</span>
+        </div>
+        <h2 style="font-size:20px;font-weight:700;margin:0 0 10px;color:#F8FAFC">${sig.headline}</h2>
+        <p style="font-size:14px;line-height:1.6;color:#94A3B8;margin:0 0 16px">${sig.summary}</p>
+
+        <div style="background:#141A24;border:1px solid #1E293B;border-radius:6px;padding:12px 16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-family:'IBM Plex Mono';font-size:11px;color:#38BDF8;font-weight:700">
+            <span>🏛️ ARBITER SYNTHESIS & TRADE-OFF BALANCING</span>
+          </div>
+          <div style="font-size:13px;color:#CBD5E1;line-height:1.5">${sig.arbiterSummary || 'Specialist mesh recommends an immediate reactive campaign countering AI beauty filters, deploying creator audio hooks and quick commerce priority stocking.'}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7-Agent Mesh Radial Reasoning Topology -->
+    <div class="dark-card">
+      <div class="dark-card-head">
+        <span>7-AGENT REASONING TOPOLOGY & DELIBERATION</span>
+        <span style="color:#38BDF8">GEMINI 2.5 FLASH MULTI-AGENT</span>
+      </div>
+      <div style="padding:18px 20px">
+        <div id="meshMindmapContainer" style="width:100%"></div>
+      </div>
+    </div>
+
+    <!-- Executive Action & Immutable Hash Chain Block Minting -->
+    <div class="dark-card" style="border-color:${isExecuted ? '#10B981' : '#334155'}">
+      <div class="dark-card-head" style="background:${isExecuted ? '#081C14' : '#0B0D10'}">
+        <span style="color:${isExecuted ? '#34D399' : '#8A9098'}">EXECUTIVE DECISION RIGHTS MATRIX</span>
+        <span>POLICY TIER: LEVEL 2</span>
+      </div>
+      <div style="padding:18px 20px">
+        ${isExecuted ? `
+          <div style="background:#062316;border:1px solid #10B981;border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;color:#34D399;font-weight:700;font-family:'IBM Plex Mono'">
+              <span>🔒 IMMUTABLE LEDGER BLOCK MINTED & DISPATCHED</span>
+            </div>
+            <div style="font-size:13px;color:#CBD5E1">Dispatched to Meta Ads Manager, Instagram Creator Marketplace, and Blinkit dark stores.</div>
+            <div style="font-family:'IBM Plex Mono';font-size:11px;color:#34D399;background:#03140C;padding:8px 12px;border-radius:4px;border:1px solid #0E5A38">
+              HASH: ${sig.executionRecord?.hash || '9ff93bfe845b7c2993429a995e437d10d366329d853ae65b1d000ab9d4d4fc4a'}
+            </div>
+          </div>
+        ` : `
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+            <div>
+              <div style="font-size:13px;color:#F1F5F9;font-weight:600">Authorize ₹25,00,000 Reactive Campaign</div>
+              <div style="font-size:11px;color:#64748B;font-family:'IBM Plex Mono'">Actor: ${currentOperatorRole} · Reversibility SLA &lt; 45s</div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn-secondary" onclick="executeWarDecision('STAND_DOWN')">Stand Down</button>
+              <button class="btn-primary" onclick="executeWarDecision('APPROVE_DISPATCH')">
+                <span>🚀 Sign & Dispatch</span>
+              </button>
+            </div>
+          </div>
+        `}
+      </div>
+    </div>
+
+    <!-- Ledger & Cryptographic Verification Section -->
+    <div class="dark-card">
+      <div class="dark-card-head">
+        <span>CRYPTOGRAPHIC SHA-256 OUTCOME LEDGER</span>
+        <div style="display:flex;gap:8px">
+          <button onclick="verifyLedger()" style="background:#1E293B;color:#38BDF8;border:1px solid #334155;border-radius:4px;font-family:'IBM Plex Mono';font-size:10px;padding:3px 8px;cursor:pointer">Verify Chain</button>
+          <button onclick="tamperDemo()" style="background:#2D1517;color:#F87171;border:1px solid #7F1D1D;border-radius:4px;font-family:'IBM Plex Mono';font-size:10px;padding:3px 8px;cursor:pointer">Tamper Demo</button>
+          <button onclick="repairDemo()" style="background:#062316;color:#34D399;border:1px solid #065F46;border-radius:4px;font-family:'IBM Plex Mono';font-size:10px;padding:3px 8px;cursor:pointer">Repair Chain</button>
+        </div>
+      </div>
+      <div id="warLedgerContainer" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;font-family:'IBM Plex Mono';font-size:11px">
+        <div style="color:#64748B">Loading ledger blocks...</div>
+      </div>
+    </div>
+  `;
+
+  if (window.renderMeshMindmap) {
+    window.renderMeshMindmap('meshMindmapContainer', sig, {});
+  }
+  loadWarLedger();
+}
+
+async function loadWarLedger() {
+  const container = document.getElementById('warLedgerContainer');
+  if (!container) return;
+  try {
+    const res = await fetch('/api/ledger');
+    const data = await res.json();
+    if (!data.ledger || data.ledger.length === 0) {
+      container.innerHTML = '<div style="color:#64748B">Ledger is empty.</div>';
+      return;
+    }
+    container.innerHTML = data.ledger.map(block => `
+      <div style="background:#141A24;border:1px solid #1E293B;border-radius:6px;padding:10px 14px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <span style="color:#38BDF8;font-weight:700">${block.id} // ${block.brand}</span>
+          <span style="color:${block.choice === 'STAND_DOWN' ? '#94A3B8' : '#34D399'}">${block.status}</span>
+        </div>
+        <div style="color:#E2E8F0;font-size:12px;margin-bottom:6px;font-family:'IBM Plex Sans'">${block.directive}</div>
+        <div style="display:flex;justify-content:space-between;color:#64748B;font-size:10px">
+          <span>ACTOR: ${block.actor}</span>
+          <span>LATENCY: ${block.latency}</span>
+        </div>
+        <div style="font-size:9px;color:#38BDF8;margin-top:4px;word-break:break-all">HASH: ${block.hash}</div>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Ledger load error:', e);
+  }
+}
+
+async function executeWarDecision(choice) {
+  if (!selectedSignal) return;
+  try {
+    const res = await fetch('/api/decision/execute', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        signalId: selectedSignal.id,
+        choice,
+        operatorRole: currentOperatorRole,
+        allocBudgetINR: 2500000,
+        targetBrand: selectedSignal.brand
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      selectedSignal.executed = true;
+      selectedSignal.executionRecord = data.record;
+      renderSignalsList();
+      renderWarCockpit(selectedSignal);
+    } else {
+      alert(`Authorization notice: ${data.reason || 'Decision failed'}`);
+    }
+  } catch (e) {
+    console.error('Decision execution error:', e);
+  }
+}
+
+async function verifyLedger() {
+  try {
+    const res = await fetch('/api/ledger/verify');
+    const data = await res.json();
+    alert(`Ledger Verification Result:\nValid: ${data.valid}\nBlocks Verified: ${data.verifiedBlocks || data.count}\nIntegrity Status: ${data.valid ? 'ALL SHA-256 HASHES INTACT' : 'CHAIN COMPROMISED'}`);
+  } catch (e) {
+    alert('Verification check error');
+  }
+}
+
+async function tamperDemo() {
+  try {
+    const res = await fetch('/api/ledger/tamper-demo', { method: 'POST' });
+    const data = await res.json();
+    alert(data.message || 'Block tampered');
+    loadWarLedger();
+  } catch (e) {}
+}
+
+async function repairDemo() {
+  try {
+    const res = await fetch('/api/ledger/repair-demo', { method: 'POST' });
+    const data = await res.json();
+    alert(data.message || 'Chain repaired');
+    loadWarLedger();
+  } catch (e) {}
+}
+
+async function triggerAIScan() {
+  try {
+    await fetch('/api/signals/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brandQuery: "Dove" })
+    });
+    loadWarSignals();
+  } catch (e) {}
+}
+
+function initWarSSE() {
+  if (typeof EventSource === 'undefined') return;
+  try {
+    const es = new EventSource('/api/news/stream');
+    es.addEventListener('new_signal', () => loadWarSignals());
+    es.addEventListener('decision_executed', () => {
+      loadWarSignals();
+      loadWarLedger();
+    });
+  } catch (e) {}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NEXT — Decision Command Centre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/shared/nav.css">
+<style>
+  :root {
+    --ink: #0E1B33;
+    --paper: #F5F7FB;
+    --blue: #1F44D6;
+    --blue-deep: #163398;
+    --line: #E3E8F2;
+    --mute: #5A6884;
+    --green: #0E9F6E;
+    --amber: #B8770A;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; background: var(--paper); color: var(--ink);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums;
+  }
+  a { color: var(--blue); text-decoration: none; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #DCE3F0; border-radius: 4px; }
+
+  .cc-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  .cc-header {
+    height: 60px;
+    background: #FFFFFF;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: sticky;
+    top: 52px;
+    z-index: 100;
+  }
+
+  .cc-main-container {
+    display: flex;
+    flex: 1;
+  }
+
+  .cc-sidebar {
+    width: 280px;
+    background: #FFFFFF;
+    border-right: 1px solid var(--line);
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .category-pill {
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .category-pill.active {
+    background: #F0F5FF;
+    border-color: var(--blue);
+  }
+
+  .cc-content {
+    flex: 1;
+    padding: 24px 32px 80px;
+    overflow-y: auto;
+  }
+
+  .card {
+    background: #FFFFFF;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(14, 27, 51, 0.03);
+  }
+
+  .agent-card {
+    background: #F8FAFF;
+    border: 1px solid #DCE6FF;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btn-action {
+    background: var(--green);
+    color: #FFFFFF;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-action:hover { background: #0c8a5f; }
+  .btn-stand-down {
+    background: #F1F5F9;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- Unified Top Navigation -->
+<nav class="next-unified-bar">
+  <div style="display:flex;align-items:center;gap:12px">
+    <a href="/" style="font-weight:800;color:#fff">NEXT Decision System</a>
+    <span class="next-badge-live"><span class="next-badge-dot"></span> COMMAND CENTRE ACTIVE</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a href="/">Overview</a>
+    <a href="/command-centre/" class="active">Command Centre</a>
+    <a href="/war-room/">War Room (Operator)</a>
+  </div>
+</nav>
+
+<div class="cc-layout">
+  <!-- Command Centre Header -->
+  <header class="cc-header">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:32px;height:32px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800">N</div>
+      <div>
+        <div style="font-weight:800;font-size:16px">Multi-Category Decision Command Centre</div>
+        <div style="font-size:11px;color:var(--mute);font-family:'IBM Plex Mono',monospace">Hindustan Unilever · Executive Suite</div>
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center;gap:16px">
+      <div style="display:flex;align-items:center;gap:8px;background:#F0F5FF;border:1px solid #C7D6FF;border-radius:8px;padding:6px 12px">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--blue)">⚡ SCAN COUNTDOWN: <span id="ccCountdown">09:59</span></span>
+        <button onclick="triggerCCRefresh()" style="background:var(--blue);color:#fff;border:none;border-radius:4px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer">Scan Now</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;background:#FFFFFF;border:1px solid var(--line);border-radius:8px;padding:6px 12px">
+        <div style="width:28px;height:28px;border-radius:50%;background:#EAF0FF;color:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px" id="ccUserAvatar">BD</div>
+        <div>
+          <div style="font-weight:700;font-size:12px" id="ccUserName">Executive Role</div>
+          <div style="font-size:10px;color:var(--mute)" id="ccUserRole">Brand Director (₹25L)</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="cc-main-container">
+    <!-- Category Rails Sidebar -->
+    <aside class="cc-sidebar">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--mute);text-transform:uppercase">Categories & Portfolios</div>
+      
+      <div class="category-pill active" onclick="selectCategory('Personal Care', this)">
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:4px">
+          <span>Personal Care</span>
+          <span style="color:var(--green);font-size:11px">1 Active Call</span>
+        </div>
+        <div style="font-size:11px;color:var(--mute)">Dove, Lifebuoy, Lux, Pond's</div>
+      </div>
+
+      <div class="category-pill" onclick="selectCategory('Home Care', this)">
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:4px">
+          <span>Home Care</span>
+          <span style="color:var(--mute);font-size:11px">0 Calls</span>
+        </div>
+        <div style="font-size:11px;color:var(--mute)">Surf Excel, Vim, Rin, Domex</div>
+      </div>
+
+      <div class="category-pill" onclick="selectCategory('Refreshments', this)">
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:4px">
+          <span>Refreshments</span>
+          <span style="color:var(--mute);font-size:11px">0 Calls</span>
+        </div>
+        <div style="font-size:11px;color:var(--mute)">Red Label, Bru, Taj Mahal</div>
+      </div>
+
+      <div class="category-pill" onclick="selectCategory('Foods & Nutrition', this)">
+        <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;margin-bottom:4px">
+          <span>Foods & Nutrition</span>
+          <span style="color:var(--mute);font-size:11px">0 Calls</span>
+        </div>
+        <div style="font-size:11px;color:var(--mute)">Horlicks, Knorr, Kissan, Hellmann's</div>
+      </div>
+
+      <div style="background:#EAF0FF;border:1px solid #DCE6FF;border-radius:12px;padding:14px;margin-top:auto">
+        <div style="font-weight:700;font-size:11px;color:var(--blue);margin-bottom:4px">Governed Autonomy</div>
+        <div style="font-size:11px;line-height:1.5;color:#31456F">All 7 specialist agents continuously evaluate signals in real time. Decisions requiring spend or policy signoff are presented here for human authorization.</div>
+      </div>
+    </aside>
+
+    <!-- Main Signal Execution Cockpit -->
+    <main class="cc-content">
+      <div id="activeSignalCockpit">
+        <!-- Loaded dynamically via support.js -->
+        <div style="padding:40px;text-align:center;color:var(--mute)">Loading category decision queue...</div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="/shared/statusBar.js"></script>
+<script src="/shared/aiDrawer.js"></script>
+<script src="./support.js"></script>
+</body>
+</html>

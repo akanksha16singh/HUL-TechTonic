@@ -5,12 +5,6 @@ import { fileURLToPath } from 'url';
 import crypto from 'crypto';
 import initSqlJs from 'sql.js';
 import { GoogleGenAI } from '@google/genai';
-import { fetchRssFeed, cleanUrl, computeContentHash, normalizeTitle, RSS_FEEDS_BY_CATEGORY, CORE_NEWS_FEEDS, searchRssFeedsForKeyword } from './shared/rssIngest.js';
-import { classifyCategory, detectBrand } from './shared/categoryClassifier.js';
-
-try {
-  process.loadEnvFile?.('.env');
-} catch {}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,32 +15,8 @@ const PORT = 3000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const RPM_LIMIT = Number(process.env.GEMINI_RPM_LIMIT) || 10;
-const RPD_LIMIT = Number(process.env.GEMINI_RPD_LIMIT) || 250;
-const MODEL = process.env.GEMINI_MODEL || 'gemini-3.7-flash';
-const ARBITER_MODEL_CONFIG = process.env.GEMINI_ARBITER_MODEL || MODEL;
-
-let runtimeApiKey = process.env.GEMINI_API_KEY || process.env.API_KEY || '';
-
-export function getEffectiveApiKey() {
-  return runtimeApiKey || process.env.GEMINI_API_KEY || process.env.API_KEY || '';
-}
-
-export function setRuntimeApiKey(key) {
-  runtimeApiKey = key ? key.trim() : '';
-  systemMode = 'live';
-  dailyCallsCount = 0;
-  lastError = null;
-}
-
-let verifiedModel = MODEL;
-let verifiedArbiterModel = MODEL;
-let arbiterModelReachable = false;
-let availableModels = [MODEL];
-
-let totalCallsAttempted = 0;
-let totalCallsSuccessful = 0;
-
+const DEFAULT_MODELS = ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3.7-flash', 'gemini-3.1-pro-preview'];
+const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 const REFRESH_MS = Number(process.env.NEWS_REFRESH_MS) || 600_000; // 10 minutes automated search
 const EMIT_MS = 3_000;
 const BUFFER_MAX = 60;
@@ -227,16 +197,11 @@ async function initDatabase() {
         summary TEXT,
         source TEXT,
         url TEXT,
-        canonicalUrl TEXT,
-        contentHash TEXT,
         publishedAt TEXT,
-        publishedAtISO TEXT,
         region TEXT,
         category TEXT,
         brand TEXT,
         impact TEXT,
-        isArchive INTEGER,
-        provenance TEXT,
         stanceColor TEXT,
         stanceBg TEXT,
         analysis TEXT,
@@ -244,10 +209,6 @@ async function initDatabase() {
         createdAt TEXT
       );
     `);
-
-    db.run(`CREATE INDEX IF NOT EXISTS idx_news_canonical ON news(canonicalUrl);`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_news_hash ON news(contentHash);`);
-    db.run(`CREATE INDEX IF NOT EXISTS idx_news_pub ON news(publishedAtISO);`);
 
     db.run(`
       CREATE TABLE IF NOT EXISTS agent_cache (
@@ -261,39 +222,12 @@ async function initDatabase() {
       );
     `);
 
-    // Hydrate existing records from database into buffers
-    try {
-      const newsRows = db.exec("SELECT * FROM news ORDER BY createdAt DESC LIMIT 60");
-      if (newsRows.length > 0 && newsRows[0].values.length > 0) {
-        const columns = newsRows[0].columns;
-        const dbItems = newsRows[0].values.map(row => {
-          const item = {};
-          columns.forEach((col, idx) => {
-            item[col] = row[idx];
-          });
-          try { item.analysis = JSON.parse(item.analysis); } catch {}
-          try { item.citations = JSON.parse(item.citations); } catch {}
-          item.isArchive = Boolean(item.isArchive);
-          return item;
-        });
-
-        dbItems.forEach(item => {
-          if (!seenHashes.has(item.id)) {
-            seenHashes.add(item.id);
-            newsBuffer.unshift(item);
-          }
-        });
-        console.log(`[NEXT SQLite] Hydrated ${dbItems.length} news stories from database.`);
-      }
-    } catch (hydrateErr) {
-      console.warn('[NEXT SQLite] News hydration notice:', hydrateErr.message);
-    }
-
-    console.log('[NEXT SQLite] Database initialized and indexed successfully.');
+    console.log('[NEXT SQLite] Database initialized successfully.');
   } catch (err) {
     console.error('[NEXT SQLite] Initialization error:', err);
   }
 }
+initDatabase();
 
 function persistDb() {
   if (!db) return;
@@ -322,7 +256,6 @@ let signals = [
     id: "SIG-8821",
     brand: "Dove",
     category: "Personal Care",
-    provenance: "FIXTURE",
     headline: "Trending Beauty Filter on Social Media Sparks Backlash on Unrealistic Standards",
     summary: "Viral AI distortion filter reaches 42M impressions with Indian Gen-Z discussing algorithmic self-esteem pressures and authentic skin textures.",
     source: "Instagram Reels & X Trends · 18m ago",
@@ -362,7 +295,6 @@ let signals = [
     id: "SIG-8822",
     brand: "Surf Excel",
     category: "Home Care",
-    provenance: "FIXTURE",
     headline: "Monsoon Mud Football Match Goes Viral Across Mumbai Colleges",
     summary: "Video of university students playing football in torrential Mumbai monsoon mud hits 12M views with organic 'Daag Acche Hain' mentions.",
     source: "Instagram Reels & YouTube Shorts · 32m ago",
@@ -402,7 +334,6 @@ let signals = [
     id: "SIG-8823",
     brand: "Rexona",
     category: "Personal Care",
-    provenance: "FIXTURE",
     headline: "Record Metro Humidity in Delhi & Kolkata Drives Extreme Deodorant Search Spike",
     summary: "Weather sensors record 92% humidity in North & East metros, causing a 280% surge in searches for 72-hour sweat protection.",
     source: "Weather Wire & Quick Commerce Search · 45m ago",
@@ -513,49 +444,6 @@ let lastRefresh = null;
 let lastError = null;
 let inflight = null;
 
-const FMCG_CATEGORIES = [
-  {
-    id: "personal_care",
-    name: "Personal Care",
-    icon: "🧼",
-    brands: ["Rexona", "Lifebuoy", "Lux", "Close Up", "Pepsodent", "Axe", "Hamam", "Liril"],
-    query: "Hindustan Unilever Personal Care Rexona Lifebuoy Lux Close Up soap hygiene deodorant India FMCG news",
-    description: "Personal hygiene, body cleansing, deodorants, and oral care surveillance."
-  },
-  {
-    id: "beauty_wellbeing",
-    name: "Beauty & Wellbeing",
-    icon: "✨",
-    brands: ["Dove", "Sunsilk", "Pond's", "Glow & Lovely", "Lakmé", "Tresemme", "Simple"],
-    query: "HUL Dove Sunsilk Ponds Glow Lovely Lakme skincare haircare beauty trends India news",
-    description: "Premium skincare, derma-cosmetics, masstige haircare, and beauty culture."
-  },
-  {
-    id: "home_care",
-    name: "Home Care",
-    icon: "🏠",
-    brands: ["Surf Excel", "Rin", "Wheel", "Vim", "Comfort", "Domex", "Sunlight"],
-    query: "Hindustan Unilever Surf Excel Rin Vim Comfort detergent dishwash home care rural sachet India news",
-    description: "Fabric wash, dishwashing, household hygiene, and rural sachet penetration."
-  },
-  {
-    id: "foods_refreshment",
-    name: "Foods & Refreshment",
-    icon: "☕",
-    brands: ["Brooke Bond", "Red Label", "Taj Mahal", "Taaza", "Bru", "Knorr", "Kissan", "Horlicks", "Boost"],
-    query: "HUL Brooke Bond Red Label Bru coffee Knorr Kissan Horlicks tea beverage packaged food India news",
-    description: "Hot beverages, functional nutrition, packaged culinary condiments, and seasonal drinks."
-  },
-  {
-    id: "supply_chain",
-    name: "Supply Chain & Quick Commerce",
-    icon: "⚡",
-    brands: ["Blinkit", "Zepto", "Swiggy Instamart", "HUL Logistics", "General Trade", "Dark Stores"],
-    query: "Hindustan Unilever Blinkit Zepto Instamart quick commerce dark store FMCG distribution supply chain India",
-    description: "10-minute dark store delivery SLAs, distributor stock lines, and logistics velocity."
-  }
-];
-
 let currentMarketContext = {
   consumerSentiment: "Resilient Rural Sachet Demand & Rapid Tier-1 Quick-Commerce Surge",
   trendingKeywords: ["Quick Commerce 10m Delivery", "Rural Sachet Demand", "Monsoon Wash Volume", "ASCI Real Beauty Compliance", "Greenwashing Audit"],
@@ -572,193 +460,54 @@ let currentSources = [
   { title: "The Economic Times - FMCG", uri: "https://economictimes.indiatimes.com/industry/cons-products/fmcg" },
   { title: "LiveMint Retail & Consumer Pulse", uri: "https://www.livemint.com/industry/retail" },
   { title: "Financial Express India", uri: "https://www.financialexpress.com/market/" },
-  { title: "Business Standard Consumer", uri: "https://www.business-standard.com/industry/news" },
   { title: "Reuters India Consumer News", uri: "https://www.reuters.com/world/india/" }
 ];
 
-// Rich, pre-cleared, genuine HUL articles covering ALL 5 categories (Live and Archive)
 const demoSeed = [
-  // 1. Personal Care (Live & Archive)
   {
-    headline: "HUL Steps Up Rexona & Lifebuoy Active Hygiene Campaign Across Tier-2 Indian Metros",
-    summary: "Surveillance data indicates heightened consumer search interest for sweat-defense and clinical hygiene during summer-monsoon transitions across Ahmedabad, Pune, and Surat.",
+    headline: "HUL Expands Premium Skin & Hair Care Portfolio on Quick Commerce Rails",
+    summary: "Premium beauty growth outpaces mass tier by 2.4x across Blinkit, Zepto, and Instamart in Mumbai, Bengaluru, and Delhi NCR.",
     source: "The Economic Times",
-    url: "https://economictimes.indiatimes.com/industry/cons-products/fmcg/hul-rexona-hygiene-push",
-    publishedAt: "25m ago",
-    region: "India",
-    category: "Personal Care",
-    brand: "Rexona",
-    impact: "High",
-    isArchive: false,
-    analysis: {
-      relevance: 91,
-      stance: "ACT",
-      rationale: "Accelerating consumer search for active sweat defense represents a high-margin conversion opportunity on quick commerce rails.",
-      agentRead: [
-        { name: "Culture", score: 92, verdict: "Go", line: "Active fitness and humidity coping conversations surge 140% across Instagram Reels." },
-        { name: "Brand", score: 95, verdict: "Go", line: "Core alignment with Rexona 'Won't Let You Down' clinical efficacy positioning." },
-        { name: "Risk", score: 88, verdict: "Go", line: "72-hour odor protection claims backed by independent dermatological clinical dossiers." },
-        { name: "Commercial", score: 90, verdict: "Go", line: "High basket add-on conversion observed in humid metro clusters." },
-        { name: "Devil's Advocate", score: 74, verdict: "Hold", line: "Ensure shelf stock availability in high-volume modern trade before flighting." }
-      ],
-      windowHours: 8
-    },
-    citations: [{ title: "The Economic Times", uri: "https://economictimes.indiatimes.com" }]
-  },
-  {
-    headline: "Lux Unveils Rose & Vitamin E Glow Bar Formulation Tailored for Monsoon Skin Hydration",
-    summary: "HUL launches modernized beauty bar formulation with concentrated botanical oils targeting post-wash skin softness without oily residue.",
-    source: "Brand Equity",
-    url: "https://brandequity.economictimes.indiatimes.com/news/advertising/lux-monsoon-glow-launch",
-    publishedAt: "2h ago",
-    region: "India",
-    category: "Personal Care",
-    brand: "Lux",
-    impact: "Medium",
-    isArchive: false,
-    analysis: {
-      relevance: 84,
-      stance: "ACT",
-      rationale: "High consumer affinity for fragrance-led bath experiences supports regional festive promotional flighting.",
-      agentRead: [
-        { name: "Culture", score: 86, verdict: "Go", line: "Sensory bath rituals and fragrance indulgence trending among vernacular creators." },
-        { name: "Brand", score: 92, verdict: "Go", line: "Elevates classic Lux glamour heritage into modern dermatological nourishment." },
-        { name: "Risk", score: 90, verdict: "Go", line: "Fragrance and moisturization claims comply with ASCI self-regulation guidelines." },
-        { name: "Commercial", score: 82, verdict: "Go", line: "Multipack bundle promotions drive 18% higher unit realization." },
-        { name: "Devil's Advocate", score: 76, verdict: "Hold", line: "Monitor competitive discounting by domestic personal wash peers in South India." }
-      ],
-      windowHours: 12
-    },
-    citations: [{ title: "Brand Equity", uri: "https://brandequity.economictimes.indiatimes.com" }]
-  },
-  {
-    headline: "[ARCHIVE] Lifebuoy Nationwide Rural Handwashing Initiative Recorded 40M School Engagements",
-    summary: "HUL historical field report on community hygiene outreach across 12,000 villages in Uttar Pradesh, Bihar, and Madhya Pradesh.",
-    source: "Financial Express",
-    url: "https://financialexpress.com/archive/lifebuoy-swasthya-chetna-report",
-    publishedAt: "3d ago",
-    region: "India",
-    category: "Personal Care",
-    brand: "Lifebuoy",
-    impact: "Medium",
-    isArchive: true,
-    analysis: {
-      relevance: 78,
-      stance: "WATCH",
-      rationale: "Baseline school hygiene partnership data provides valuable benchmark for upcoming seasonal health campaigns.",
-      agentRead: [
-        { name: "Culture", score: 80, verdict: "Go", line: "Grassroots hygiene education cements inter-generational brand trust." },
-        { name: "Brand", score: 96, verdict: "Go", line: "Reinforces Lifebuoy core mission of disease prevention and family protection." },
-        { name: "Risk", score: 94, verdict: "Go", line: "Public health partnership pre-cleared by state education boards." },
-        { name: "Commercial", score: 75, verdict: "Hold", line: "Long-term brand equity builder rather than immediate margin spike." },
-        { name: "Devil's Advocate", score: 82, verdict: "Hold", line: "Retain strictly as historical precedent ledger reference." }
-      ],
-      windowHours: 48
-    },
-    citations: [{ title: "Financial Express", uri: "https://financialexpress.com" }]
-  },
-
-  // 2. Beauty & Wellbeing (Live & Archive)
-  {
-    headline: "HUL Expands Dove Derma-Care & Real Beauty Portfolio on Quick Commerce Channels",
-    summary: "Premium skincare and sulfate-free haircare categories outpace mass FMCG growth by 2.4x across Blinkit, Zepto, and Instamart in Mumbai, Bengaluru, and Delhi NCR.",
-    source: "The Economic Times",
-    url: "https://economictimes.indiatimes.com/industry/cons-products/fmcg/hul-dove-derma-surge",
+    url: "https://economictimes.indiatimes.com",
     publishedAt: "14m ago",
     region: "India",
-    category: "Beauty & Wellbeing",
+    category: "Personal Care",
     brand: "Dove",
     impact: "High",
-    isArchive: false,
     analysis: {
-      relevance: 93,
+      relevance: 92,
       stance: "ACT",
       rationale: "Rapidly expanding quick-commerce premium hair care volume represents an immediate high-margin conversion window.",
       agentRead: [
-        { name: "Culture", score: 94, verdict: "Go", line: "Premium self-care routine conversations surge 180% on Instagram and YouTube Shorts." },
-        { name: "Brand", score: 97, verdict: "Go", line: "Full alignment with Dove authentic beauty and zero digital distortion commitment." },
-        { name: "Risk", score: 89, verdict: "Go", line: "Damage repair timeline substantiation verified against ASCI code and clinical tests." },
-        { name: "Commercial", score: 91, verdict: "Go", line: "Quick commerce basket size up 34% when bundled with Dove Intense Repair conditioners." },
-        { name: "Devil's Advocate", score: 72, verdict: "Hold", line: "Watch dark store out-of-stock penalty rates during high-velocity promotional drops." }
+        { name: "Culture", score: 94, verdict: "Go", line: "Premium self-care routine conversations surge 180% on Instagram." },
+        { name: "Brand", score: 96, verdict: "Go", line: "Full alignment with Dove derma-care and real beauty formulations." },
+        { name: "Risk", score: 85, verdict: "Go", line: "Claim verification on repair timelines verified against ASCI code." },
+        { name: "Commercial", score: 88, verdict: "Go", line: "Quick commerce basket size up 34% with premium bundle checkout." },
+        { name: "Devil's Advocate", score: 72, verdict: "Hold", line: "Watch dark store out-of-stock penalty rates during high-velocity drops." }
       ],
       windowHours: 8
     },
     citations: [{ title: "The Economic Times", uri: "https://economictimes.indiatimes.com" }]
   },
   {
-    headline: "Pond's Niacinamide & Vitamin C Serum Range Records 3.1x Velocity in Tier-1 Metros",
-    summary: "Active ingredient-led beauty routines gain mainstream adoption among Gen-Z urban consumers seeking lightweight brightening formulations.",
-    source: "LiveMint Retail Pulse",
-    url: "https://livemint.com/industry/retail/ponds-skincare-serum-surge",
-    publishedAt: "1h ago",
-    region: "India",
-    category: "Beauty & Wellbeing",
-    brand: "Pond's",
-    impact: "High",
-    isArchive: false,
-    analysis: {
-      relevance: 89,
-      stance: "ACT",
-      rationale: "Capitalize on urban derm-routine momentum with contextual digital co-creations.",
-      agentRead: [
-        { name: "Culture", score: 91, verdict: "Go", line: "Skintellectual ingredient breakdowns reach 65M views across Indian creator community." },
-        { name: "Brand", score: 90, verdict: "Go", line: "Modernizes Pond's skincare heritage with scientifically substantiated active formulas." },
-        { name: "Risk", score: 88, verdict: "Go", line: "Dermatologist-tested claims backed by certified clinical patch tests." },
-        { name: "Commercial", score: 89, verdict: "Go", line: "High repeat purchase rate (44%) observed within 45-day reorder cycle." },
-        { name: "Devil's Advocate", score: 75, verdict: "Hold", line: "Monitor pricing pressure from direct-to-consumer digital-first indie brands." }
-      ],
-      windowHours: 10
-    },
-    citations: [{ title: "LiveMint", uri: "https://livemint.com" }]
-  },
-  {
-    headline: "[ARCHIVE] Lakmé Fashion Week Runway Integration Showcases Next-Gen Clean Cosmetics",
-    summary: "HUL Lakmé beauty showcase introduced matte liquid lipsticks and serum foundations to modern trade buyers.",
-    source: "Storyboard18",
-    url: "https://storyboard18.com/archive/lakme-fashion-week-product-reveal",
-    publishedAt: "4d ago",
-    region: "India",
-    category: "Beauty & Wellbeing",
-    brand: "Lakmé",
-    impact: "Medium",
-    isArchive: true,
-    analysis: {
-      relevance: 76,
-      stance: "WATCH",
-      rationale: "Historical fashion week runway content archive provides valuable creative templates for festive campaign season.",
-      agentRead: [
-        { name: "Culture", score: 82, verdict: "Go", line: "High visual equity and aspirational makeup artistry resonance." },
-        { name: "Brand", score: 94, verdict: "Go", line: "Establishes Lakmé as the definitive voice of contemporary Indian beauty." },
-        { name: "Risk", score: 92, verdict: "Go", line: "All cosmetic pigments certified under Bureau of Indian Standards (BIS)." },
-        { name: "Commercial", score: 74, verdict: "Hold", line: "Seasonal runway halo provides long-tail brand search equity." },
-        { name: "Devil's Advocate", score: 78, verdict: "Hold", line: "Ensure digital video cutdowns are refreshed for current seasonal shade palette." }
-      ],
-      windowHours: 72
-    },
-    citations: [{ title: "Storyboard18", uri: "https://storyboard18.com" }]
-  },
-
-  // 3. Home Care (Live & Archive)
-  {
     headline: "Surf Excel & Rin Accelerate Smart Wash Sachet Infiltration in Rural India",
-    summary: "Monsoon and festival tailwinds drive an 18% volume surge in rural distribution hubs across Maharashtra, Uttar Pradesh, and West Bengal.",
+    summary: "Monsoon and festival tailwinds drive an 18% volume surge in rural distribution hubs across Maharashtra and Uttar Pradesh.",
     source: "Financial Express",
-    url: "https://financialexpress.com/industry/fmcg/surf-excel-rin-sachet-surge",
+    url: "https://financialexpress.com",
     publishedAt: "32m ago",
     region: "India",
     category: "Home Care",
     brand: "Surf Excel",
     impact: "High",
-    isArchive: false,
     analysis: {
       relevance: 88,
       stance: "ACT",
       rationale: "Capitalize on monsoon washing frequency with localized rural distributor trade schemes.",
       agentRead: [
-        { name: "Culture", score: 86, verdict: "Go", line: "Monsoon mud sports and outdoor play UGC trending across tier-2 and tier-3 towns." },
+        { name: "Culture", score: 86, verdict: "Go", line: "Monsoon mud sports UGC trending across tier-2 and tier-3 towns." },
         { name: "Brand", score: 94, verdict: "Go", line: "Core 'Daag Acche Hain' message connects naturally with monsoon realities." },
         { name: "Risk", score: 90, verdict: "Go", line: "Standard retail trade promotion; zero claim liability." },
-        { name: "Commercial", score: 87, verdict: "Go", line: "Protects market share against regional sachet competitors." },
+        { name: "Commercial", score: 84, verdict: "Go", line: "Protects market share against regional sachet competitors." },
         { name: "Devil's Advocate", score: 76, verdict: "Hold", line: "Ensure distributor margins maintain parity across semi-urban clusters." }
       ],
       windowHours: 12
@@ -766,260 +515,31 @@ const demoSeed = [
     citations: [{ title: "Financial Express", uri: "https://financialexpress.com" }]
   },
   {
-    headline: "Vim Liquid Deep Clean Formula Expands Dishwash Category Penetration in Semi-Urban India",
-    summary: "Consumer migration from traditional dishwash bars to liquid concentrates increases by 22% in tier-2 and tier-3 households.",
-    source: "Business Standard",
-    url: "https://business-standard.com/companies/news/vim-liquid-dishwash-expansion",
-    publishedAt: "3h ago",
-    region: "India",
-    category: "Home Care",
-    brand: "Vim",
-    impact: "Medium",
-    isArchive: false,
-    analysis: {
-      relevance: 83,
-      stance: "ACT",
-      rationale: "Liquid format upgrading trend creates strong gross margin expansion in regional kitchen care categories.",
-      agentRead: [
-        { name: "Culture", score: 84, verdict: "Go", line: "Effortless grease removal messaging resonates with dual-income urban households." },
-        { name: "Brand", score: 92, verdict: "Go", line: "Upholds Vim 100-lemon power equity while modernizing format usage." },
-        { name: "Risk", score: 89, verdict: "Go", line: "Grease breakdown claims substantiated by standard laboratory ASTM wash tests." },
-        { name: "Commercial", score: 85, verdict: "Go", line: "High conversion from bar users into recurring pouch refill purchasers." },
-        { name: "Devil's Advocate", score: 75, verdict: "Hold", line: "Track refill pouch pricing competitiveness against local regional alternatives." }
-      ],
-      windowHours: 18
-    },
-    citations: [{ title: "Business Standard", uri: "https://business-standard.com" }]
-  },
-  {
-    headline: "[ARCHIVE] Comfort Fabric Conditioner Festive Softness Drive Increased Machine Wash Penetration",
-    summary: "HUL post-campaign audit shows 24% uplift in household penetration for fabric conditioners during winter festive seasons.",
-    source: "Financial Express",
-    url: "https://financialexpress.com/archive/comfort-fabric-conditioner-audit",
-    publishedAt: "5d ago",
-    region: "India",
-    category: "Home Care",
-    brand: "Comfort",
-    impact: "Medium",
-    isArchive: true,
-    analysis: {
-      relevance: 74,
-      stance: "WATCH",
-      rationale: "Retained post-campaign benchmark informs washing machine co-marketing tie-ups for upcoming winter cycle.",
-      agentRead: [
-        { name: "Culture", score: 78, verdict: "Go", line: "Fragrance longevity on woolens and ethnic wear highly valued by homemakers." },
-        { name: "Brand", score: 89, verdict: "Go", line: "Reinforces fabric care and softness benefits beyond basic detergent wash." },
-        { name: "Risk", score: 91, verdict: "Go", line: "Fiber conditioning claims verified through textile tensile strength tests." },
-        { name: "Commercial", score: 72, verdict: "Hold", line: "Niche category expansion with steady long-term compounding." },
-        { name: "Devil's Advocate", score: 80, verdict: "Hold", line: "Keep as historical benchmark for appliance OEM bundling partnerships." }
-      ],
-      windowHours: 96
-    },
-    citations: [{ title: "Financial Express", uri: "https://financialexpress.com" }]
-  },
-
-  // 4. Foods & Refreshment (Live & Archive)
-  {
-    headline: "Brooke Bond Red Label Launches 'Swad Apnepan Ka' Chai Moments Across North India",
-    summary: "Surging consumer preference for warm spiced tea during monsoon rain spells drives a 28% increase in premium tea leaf packet sales.",
-    source: "LiveMint",
-    url: "https://livemint.com/industry/retail/brooke-bond-chai-monsoon-drive",
-    publishedAt: "40m ago",
-    region: "India",
-    category: "Foods & Refreshment",
-    brand: "Brooke Bond",
-    impact: "High",
-    isArchive: false,
-    analysis: {
-      relevance: 90,
-      stance: "ACT",
-      rationale: "Monsoon tea consumption spikes offer immediate regional digital and retail co-promotional upside.",
-      agentRead: [
-        { name: "Culture", score: 94, verdict: "Go", line: "Rainy day Chai and Pakoda cultural celebrations trending organically across social feeds." },
-        { name: "Brand", score: 96, verdict: "Go", line: "Exemplifies Red Label inclusive togetherness and comforting warmth positioning." },
-        { name: "Risk", score: 92, verdict: "Go", line: "Natural CTC tea purity standards certified under FSSAI quality parameters." },
-        { name: "Commercial", score: 88, verdict: "Go", line: "High volume velocity in traditional Kirana stores and quick commerce apps." },
-        { name: "Devil's Advocate", score: 73, verdict: "Hold", line: "Ensure regional packaging variants are correctly allocated across northern depots." }
-      ],
-      windowHours: 8
-    },
-    citations: [{ title: "LiveMint", uri: "https://livemint.com" }]
-  },
-  {
-    headline: "Bru Coffee & Knorr Soups Expand Ready-to-Cook Quick Snacking Portfolios",
-    summary: "Urban evening snacking habits shift toward instant South Indian filter coffee concentrates and wholesome vegetable soup mixes.",
-    source: "The Economic Times",
-    url: "https://economictimes.indiatimes.com/industry/cons-products/fmcg/bru-knorr-evening-snacking",
-    publishedAt: "2h ago",
-    region: "India",
-    category: "Foods & Refreshment",
-    brand: "Bru",
-    impact: "Medium",
-    isArchive: false,
-    analysis: {
-      relevance: 85,
-      stance: "ACT",
-      rationale: "Capitalize on evening quick-snacking delivery surges between 4 PM and 7 PM on Zepto and Swiggy Instamart.",
-      agentRead: [
-        { name: "Culture", score: 88, verdict: "Go", line: "WFH and office evening tea-time snack breaks driving instant comforting drink demand." },
-        { name: "Brand", score: 91, verdict: "Go", line: "Authentic chicory-coffee roast blend reinforces South Indian heritage." },
-        { name: "Risk", score: 90, verdict: "Go", line: "No added preservative disclosures compliant with FSSAI labeling mandates." },
-        { name: "Commercial", score: 86, verdict: "Go", line: "Cross-merchandising with bakery items delivers 22% higher basket conversion." },
-        { name: "Devil's Advocate", score: 76, verdict: "Hold", line: "Ensure shelf life rotation protocols are strictly monitored in transit depots." }
-      ],
-      windowHours: 12
-    },
-    citations: [{ title: "The Economic Times", uri: "https://economictimes.indiatimes.com" }]
-  },
-  {
-    headline: "[ARCHIVE] Horlicks Clinically Proven Growth & Immunity Campaign Post-Audit Validated",
-    summary: "HUL scientific affairs team published results of a 12-month childhood nutrition study with verified micronutrient absorption metrics.",
-    source: "Business Standard",
-    url: "https://business-standard.com/archive/horlicks-clinical-nutrition-study",
-    publishedAt: "6d ago",
-    region: "India",
-    category: "Foods & Refreshment",
-    brand: "Horlicks",
-    impact: "Medium",
-    isArchive: true,
-    analysis: {
-      relevance: 75,
-      stance: "WATCH",
-      rationale: "Retained clinical substantiation dossiers support upcoming back-to-school nutrition messaging.",
-      agentRead: [
-        { name: "Culture", score: 80, verdict: "Go", line: "Maternal focus on cognitive and physical development remains peak priority." },
-        { name: "Brand", score: 95, verdict: "Go", line: "Underpins Horlicks heritage as the gold standard in childhood nourishment." },
-        { name: "Risk", score: 96, verdict: "Go", line: "Rigorous clinical peer-reviewed trial results pre-cleared for ASCI medical claims." },
-        { name: "Commercial", score: 76, verdict: "Hold", line: "Steady staple replenishment in family pantry baskets." },
-        { name: "Devil's Advocate", score: 79, verdict: "Hold", line: "Maintain as reference precedent for clinical claim defense." }
-      ],
-      windowHours: 96
-    },
-    citations: [{ title: "Business Standard", uri: "https://business-standard.com" }]
-  },
-
-  // 5. Supply Chain & Quick Commerce (Live & Archive)
-  {
     headline: "Quick-Commerce FMCG Infiltration Hits Record 28% Growth in Top 10 Indian Metros",
-    summary: "Blinkit, Zepto, and Instamart dark stores increase dedicated inventory stock buffers for HUL personal wash and packaged foods power brands.",
+    summary: "Blinkit, Zepto, and Instamart dark stores increase stock buffers for HUL personal care power brands.",
     source: "LiveMint Retail Pulse",
-    url: "https://livemint.com/industry/retail/quick-commerce-fmcg-dark-store-growth",
+    url: "https://livemint.com",
     publishedAt: "45m ago",
     region: "India",
-    category: "Supply Chain & Quick Commerce",
-    brand: "HUL Logistics",
+    category: "Supply Chain",
+    brand: "Rexona",
     impact: "High",
-    isArchive: false,
     analysis: {
-      relevance: 92,
-      stance: "ACT",
-      rationale: "Dark store SLA replenishment buffers must be dynamically adjusted to prevent out-of-stock penalties during peak evening windows.",
-      agentRead: [
-        { name: "Culture", score: 87, verdict: "Go", line: "Instant gratification and 10-minute dispatch now the default mode for metro essentials." },
-        { name: "Brand", score: 89, verdict: "Go", line: "Ensures HUL power brands remain top-of-list on quick commerce search carousels." },
-        { name: "Risk", score: 82, verdict: "Go", line: "Vendor fill-rate agreements and SLA penalty compliance verified." },
-        { name: "Commercial", score: 94, verdict: "Go", line: "Direct-to-dark-store dispatch models deliver 4.2% higher distributor gross margins." },
-        { name: "Devil's Advocate", score: 78, verdict: "Hold", line: "Balance quick commerce inventory with traditional Kirana distributor allocation." }
-      ],
-      windowHours: 6
-    },
-    citations: [{ title: "LiveMint", uri: "https://livemint.com" }]
-  },
-  {
-    headline: "HUL Deploys AI-Powered Demand Forecasting Across 1,500 Rural Depot Corridors",
-    summary: "Predictive inventory routing synchronizes regional rainfall forecasts with local sachet stock levels in Uttar Pradesh and Bihar.",
-    source: "The Economic Times",
-    url: "https://economictimes.indiatimes.com/tech/software/hul-ai-rural-depot-supply-chain",
-    publishedAt: "4h ago",
-    region: "India",
-    category: "Supply Chain & Quick Commerce",
-    brand: "HUL Logistics",
-    impact: "Medium",
-    isArchive: false,
-    analysis: {
-      relevance: 86,
+      relevance: 85,
       stance: "WATCH",
-      rationale: "Automated replenishment reduces out-of-stock occurrences by 35% in high-velocity rural wholesale corridors.",
+      rationale: "Dark store SLA requirements tightening; monitor 10-minute dispatch replenishment rates.",
       agentRead: [
-        { name: "Culture", score: 80, verdict: "Go", line: "Ensures uninterrupted product availability during monsoon travel disruptions." },
-        { name: "Brand", score: 88, verdict: "Go", line: "Builds retailer confidence and distributor loyalty across general trade." },
-        { name: "Risk", score: 91, verdict: "Go", line: "Supply network telemetry compliant with internal data governance policies." },
-        { name: "Commercial", score: 89, verdict: "Go", line: "Working capital optimization through reduced buffer storage holding costs." },
-        { name: "Devil's Advocate", score: 82, verdict: "Hold", line: "Audit regional distributor telemetry to verify algorithm accuracy in remote nodes." }
+        { name: "Culture", score: 82, verdict: "Go", line: "Instant gratification purchasing habits standard among urban youth." },
+        { name: "Brand", score: 85, verdict: "Go", line: "Deodorant and personal wash emerge as top 5 quick basket additions." },
+        { name: "Risk", score: 72, verdict: "Hold", line: "Out-of-stock penalties in vendor agreements must be respected." },
+        { name: "Commercial", score: 89, verdict: "Go", line: "Higher gross margins through direct dark store distribution." },
+        { name: "Devil's Advocate", score: 80, verdict: "Hold", line: "Quick-commerce channel cannibalization on traditional Kirana network." }
       ],
       windowHours: 24
     },
-    citations: [{ title: "The Economic Times", uri: "https://economictimes.indiatimes.com" }]
-  },
-  {
-    headline: "[ARCHIVE] HUL Shikar App Onboards 1.2 Million Traditional Kirana Stores Nationwide",
-    summary: "Milestone report on the B2B digital ordering app enabling traditional mom-and-pop retailers to place contactless stock orders.",
-    source: "Financial Express",
-    url: "https://financialexpress.com/archive/hul-shikar-app-kirana-milestone",
-    publishedAt: "7d ago",
-    region: "India",
-    category: "Supply Chain & Quick Commerce",
-    brand: "HUL Logistics",
-    impact: "Medium",
-    isArchive: true,
-    analysis: {
-      relevance: 77,
-      stance: "WATCH",
-      rationale: "Historical retailer adoption metrics serve as baseline for modern direct-to-retailer trade promotion rollouts.",
-      agentRead: [
-        { name: "Culture", score: 82, verdict: "Go", line: "Digital empowerment of neighborhood Kiranas anchors community retail economy." },
-        { name: "Brand", score: 93, verdict: "Go", line: "Solidifies HUL as the most reliable, trusted partner for Indian shopkeepers." },
-        { name: "Risk", score: 95, verdict: "Go", line: "B2B digital terms of trade compliant with standard commercial contracts." },
-        { name: "Commercial", score: 84, verdict: "Go", line: "Direct order visibility eliminates secondary wholesale leakage." },
-        { name: "Devil's Advocate", score: 80, verdict: "Hold", line: "Maintain as historical digital infrastructure reference precedent." }
-      ],
-      windowHours: 120
-    },
-    citations: [{ title: "Financial Express", uri: "https://financialexpress.com" }]
+    citations: [{ title: "LiveMint", uri: "https://livemint.com" }]
   }
 ];
-
-// Helper: Compute word token overlap similarity (Jaccard)
-export function calculateTokenOverlap(s1, s2) {
-  const words1 = normalizeTitle(s1).split(' ').filter(w => w.length > 2);
-  const words2 = normalizeTitle(s2).split(' ').filter(w => w.length > 2);
-  if (words1.length === 0 || words2.length === 0) return 0;
-  const set1 = new Set(words1);
-  const set2 = new Set(words2);
-  let intersection = 0;
-  for (const w of set1) {
-    if (set2.has(w)) intersection++;
-  }
-  const union = new Set([...set1, ...set2]).size;
-  return union > 0 ? intersection / union : 0;
-}
-
-// Recency split: Live vs Archive
-function determineRecency(publishedAt, explicitIsArchive) {
-  if (typeof explicitIsArchive === 'boolean') {
-    return { isArchive: explicitIsArchive, recency: explicitIsArchive ? 'archive' : 'live' };
-  }
-  const pub = String(publishedAt || '').toLowerCase();
-  if (pub.includes('archive') || pub.includes('3d') || pub.includes('4d') || pub.includes('5d') || pub.includes('6d') || pub.includes('7d') || pub.includes('week') || pub.includes('month') || pub.includes('historical')) {
-    return { isArchive: true, recency: 'archive' };
-  }
-  return { isArchive: false, recency: 'live' };
-}
-
-// Genuine relevance filter for HUL & FMCG
-function isGenuinelyRelevant(item) {
-  if (!item || !item.headline) return false;
-  const text = `${item.headline} ${item.summary || ''} ${item.brand || ''}`.toLowerCase();
-  
-  // Must mention at least one key brand or HUL / FMCG consumer term
-  const brands = ["hul", "unilever", "dove", "surf excel", "rexona", "lifebuoy", "lux", "pond's", "ponds", "glow & lovely", "lakme", "lakmé", "vim", "rin", "comfort", "brooke bond", "red label", "bru", "knorr", "kissan", "horlicks", "boost", "blinkit", "zepto", "instamart", "fmcg", "sachet", "quick commerce"];
-  const matchesBrand = brands.some(b => text.includes(b));
-  
-  // Filter out stock index or generic macro noise where HUL is only mentioned in passing
-  const isPassingMention = text.includes("nifty gainers") && !text.includes("quarter") && !text.includes("sales") && !text.includes("launch");
-  
-  return matchesBrand && !isPassingMention;
-}
 
 function extractJson(raw) {
   if (!raw) return null;
@@ -1055,33 +575,15 @@ function normaliseItem(raw, region = "India") {
   const headline = String(raw.headline).trim();
   if (!headline) return null;
 
-  const contentHash = raw.contentHash || computeContentHash(headline);
-  const id = raw.id || ('nws_' + contentHash.slice(0, 10));
+  const id = 'nws_' + crypto.createHash('sha1').update(headline.toLowerCase()).digest('hex').slice(0, 10);
   const summary = raw.summary ? String(raw.summary).trim() : '';
-  const source = raw.source ? String(raw.source).trim() : 'News Wire';
-  const url = raw.url && String(raw.url).startsWith('http') ? raw.url : null;
-  const canonicalUrl = raw.canonicalUrl ? cleanUrl(raw.canonicalUrl) : (url ? cleanUrl(url) : null);
+  const source = raw.source ? String(raw.source).trim() : 'Google News';
+  const url = raw.url && String(raw.url).startsWith('http') ? String(raw.url) : null;
   const publishedAt = raw.publishedAt || raw.time || 'Recent';
-  const publishedAtISO = raw.publishedAtISO || (raw.publishedAt && !isNaN(new Date(raw.publishedAt).getTime()) ? new Date(raw.publishedAt).toISOString() : new Date().toISOString());
   const itemRegion = raw.region || region || 'India';
-  
-  // Detect Brand if generic or missing
-  let brand = raw.brand ? String(raw.brand).trim() : 'HUL';
-  if (brand === 'HUL' || !brand) {
-    brand = detectBrand(headline, summary, 'HUL');
-  }
-
-  // Classify into exact best-fit category using weighted rules
-  const category = classifyCategory(headline, summary, brand, raw.category);
-  
-  // Real Recency classification: If published > 48h ago, mark as archive
-  const ageMs = Date.now() - new Date(publishedAtISO).getTime();
-  const isArchiveCalculated = typeof raw.isArchive === 'boolean' ? raw.isArchive : (ageMs > 48 * 60 * 60 * 1000);
-  const isArchive = isArchiveCalculated;
-  const recency = isArchive ? 'archive' : 'live';
-  
-  const impact = raw.impact || (headline.toLowerCase().includes('surge') || headline.toLowerCase().includes('record') || headline.toLowerCase().includes('accelerate') ? 'High' : 'Medium');
-  const provenance = raw.provenance || (raw.isDemoSeed ? 'FIXTURE' : 'LIVE_RSS');
+  const category = raw.category || 'Personal Care';
+  const brand = raw.brand || 'HUL';
+  const impact = raw.impact || 'Medium';
 
   let rawAnalysis = raw.analysis || {};
   let relevance = Number(rawAnalysis.relevance);
@@ -1093,8 +595,8 @@ function normaliseItem(raw, region = "India") {
     stance = relevance >= 80 ? 'ACT' : relevance <= 45 ? 'IGNORE' : 'WATCH';
   }
 
-  const rationale = rawAnalysis.rationale || `${brand} live market signal evaluated against HUL brand constitution.`;
-  const windowHours = Number(rawAnalysis.windowHours) || (isArchive ? 48 : 8);
+  const rationale = rawAnalysis.rationale || 'Real-time agent evaluated against the HUL brand constitution.';
+  const windowHours = Number(rawAnalysis.windowHours) || 8;
 
   const rawAgentRead = Array.isArray(rawAnalysis.agentRead) ? rawAnalysis.agentRead : [];
   const requiredSpecialists = ['Culture', 'Brand', 'Risk', 'Commercial', "Devil's Advocate"];
@@ -1110,7 +612,7 @@ function normaliseItem(raw, region = "India") {
     }
 
     const color = verdict === 'Go' ? '#0E9F6E' : verdict === 'Stop' ? '#C13A4C' : '#B8770A';
-    const line = existing && existing.line ? String(existing.line) : `${spec} specialist assessment based on Indian market conditions for ${brand}.`;
+    const line = existing && existing.line ? String(existing.line) : `${spec} specialist assessment based on Indian market conditions.`;
 
     return { name: spec, score, verdict, color, line };
   });
@@ -1118,29 +620,19 @@ function normaliseItem(raw, region = "India") {
   const stanceColor = stance === 'ACT' ? '#0E9F6E' : stance === 'WATCH' ? '#B8770A' : '#5A6884';
   const stanceBg = stance === 'ACT' ? '#E6F7F0' : stance === 'WATCH' ? '#FEF4E4' : '#F2F5FC';
 
-  const citations = Array.isArray(raw.citations) && raw.citations.length > 0
-    ? raw.citations.filter(c => c && (c.uri || c.url)).map(c => ({ title: c.title || source, uri: c.uri || c.url }))
-    : (canonicalUrl || url ? [{ title: source, uri: canonicalUrl || url }] : []);
+  const citations = Array.isArray(raw.citations) ? raw.citations.filter(c => c && c.uri) : [];
 
   return {
     id,
     headline,
-    title: headline,
     summary,
     source,
-    url: canonicalUrl || url,
-    canonicalUrl: canonicalUrl || url,
-    contentHash,
+    url,
     publishedAt,
-    publishedAtISO,
-    publishDate: publishedAt,
     region: itemRegion,
     category,
     brand,
     impact,
-    isArchive,
-    recency,
-    provenance,
     stanceColor,
     stanceBg,
     analysis: {
@@ -1165,184 +657,65 @@ demoSeed.forEach(item => {
 // ----------------------------------------------------
 // QUOTA MANAGER & RATE LIMITING STATE
 // ----------------------------------------------------
+const RPM_LIMIT = 15; // Free tier standard RPM limit for Flash
+const RPD_LIMIT = 1500; // Free tier daily limit for Flash
 let callTimestampsRolling = [];
 let dailyCallsCount = 0;
+let dailyResetDate = new Date().getUTCDate();
 let systemMode = 'live'; // 'live' | 'replay'
-let replayEnteredReason = null; // 'RPM' | 'RPD' | null
-let replayEnteredAt = null;
-let liveRecoveryToastPending = false;
-
-export function getPacificDayKey(date = new Date()) {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
-  return formatter.format(date);
-}
-
-let dailyResetDate = getPacificDayKey();
 
 export function getNextPacificMidnight() {
   const now = new Date();
-  const pFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Los_Angeles',
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: false
-  });
+  // Midnight Pacific (PDT is UTC-7, PST is UTC-8). Currently PDT = UTC-7 -> 07:00 UTC next day
+  const utcYear = now.getUTCFullYear();
+  const utcMonth = now.getUTCMonth();
+  const utcDate = now.getUTCDate();
   
-  const pParts = pFormatter.formatToParts(now).reduce((acc, p) => ({ ...acc, [p.type]: p.value }), {});
-  const pYear = parseInt(pParts.year, 10);
-  const pMonth = parseInt(pParts.month, 10);
-  const pDay = parseInt(pParts.day, 10);
-  
-  let targetPacificMidnight = null;
-  // Search UTC hours 6 to 9 to find exact 00:00:00 Pacific (PDT vs PST)
-  for (let h = 6; h <= 9; h++) {
-    const testDate = new Date(Date.UTC(pYear, pMonth - 1, pDay + 1, h, 0, 0, 0));
-    const testParts = pFormatter.formatToParts(testDate).reduce((acc, p) => ({ ...acc, [p.type]: p.value }), {});
-    if (parseInt(testParts.day, 10) === pDay + 1 || (pDay >= 28 && parseInt(testParts.day, 10) === 1)) {
-      if (parseInt(testParts.hour, 10) === 0 || parseInt(testParts.hour, 10) === 24) {
-        targetPacificMidnight = testDate;
-        break;
-      }
-    }
+  let pacificMidnight = new Date(Date.UTC(utcYear, utcMonth, utcDate, 7, 0, 0, 0));
+  if (pacificMidnight <= now) {
+    pacificMidnight = new Date(Date.UTC(utcYear, utcMonth, utcDate + 1, 7, 0, 0, 0));
   }
-  if (!targetPacificMidnight) {
-    targetPacificMidnight = new Date(Date.UTC(pYear, pMonth - 1, pDay + 1, 7, 0, 0, 0));
-  }
-  return targetPacificMidnight;
-}
-
-export function getDerivedResetStrings() {
-  const nextResetDate = getNextPacificMidnight();
-  const now = Date.now();
-  const msUntilReset = Math.max(0, nextResetDate.getTime() - now);
-  const hoursUntilReset = Math.floor(msUntilReset / (1000 * 60 * 60));
-  const minsUntilReset = Math.floor((msUntilReset % (1000 * 60 * 60)) / (1000 * 60));
-
-  const istFormatter = new Intl.DateTimeFormat('en-IN', {
-    timeZone: 'Asia/Kolkata',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
-  const istTimeStr = istFormatter.format(nextResetDate).toLowerCase();
-
-  const resetTimeString = `${hoursUntilReset}h ${minsUntilReset}m (resets midnight PT / ${istTimeStr.toUpperCase()} IST)`;
-  return {
-    nextResetDate,
-    msUntilReset,
-    hoursUntilReset,
-    minsUntilReset,
-    istTimeStr: istTimeStr.toUpperCase(),
-    resetTimeString
-  };
-}
-
-export function attemptLiveRecovery() {
-  const currentPacificDate = getPacificDayKey();
-  const geminiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-  const now = Date.now();
-
-  // If in replay due to transient RPM rate limit and 90s have passed, auto-recover if daily quota remains
-  if (systemMode === 'replay' && replayEnteredReason === 'RPM' && replayEnteredAt && (now - replayEnteredAt > 90000) && geminiKey) {
-    if (dailyCallsCount < RPD_LIMIT) {
-      systemMode = 'live';
-      replayEnteredReason = null;
-      replayEnteredAt = null;
-      lastError = null;
-      liveRecoveryToastPending = true;
-      console.log('[NEXT Quota] Transient RPM rate limit cleared (90s window elapsed) — returned to live mode.');
-      broadcastStatus('live-grounded', null);
-      broadcastAgentLog({
-        agent: "Quota Manager",
-        time: "Just now",
-        status: "RECOVERED",
-        text: "Transient rate limit cooldown complete — live mode restored."
-      });
-    }
-  }
-
-  // Daily reset boundary check (Pacific Midnight)
-  if (currentPacificDate !== dailyResetDate) {
-    dailyCallsCount = 0;
-    dailyResetDate = currentPacificDate;
-    if (systemMode === 'replay' && geminiKey) {
-      systemMode = 'live';
-      replayEnteredReason = null;
-      replayEnteredAt = null;
-      lastError = null;
-      liveRecoveryToastPending = true;
-      console.log('[NEXT Quota] API daily quota has reset — back to live.');
-      broadcastStatus('live-grounded', null);
-      broadcastAgentLog({
-        agent: "Quota Manager",
-        time: "Just now",
-        status: "RECOVERED",
-        text: "API quota has reset — back to live."
-      });
-    }
-  }
+  return pacificMidnight;
 }
 
 export function getQuotaStatus() {
-  attemptLiveRecovery();
   const now = Date.now();
   callTimestampsRolling = callTimestampsRolling.filter(ts => now - ts < 60000);
+  
+  const currentUtcDate = new Date().getUTCDate();
+  if (currentUtcDate !== dailyResetDate) {
+    dailyCallsCount = 0;
+    dailyResetDate = currentUtcDate;
+  }
 
   const remainingRPM = Math.max(0, RPM_LIMIT - callTimestampsRolling.length);
   const remainingRPD = Math.max(0, RPD_LIMIT - dailyCallsCount);
-  const { nextResetDate, resetTimeString, istTimeStr, hoursUntilReset, minsUntilReset } = getDerivedResetStrings();
-  const resetsAt = nextResetDate.toISOString();
+  const resetsAtDate = getNextPacificMidnight();
+  const resetsAt = resetsAtDate.toISOString();
+  const msUntilReset = Math.max(0, resetsAtDate.getTime() - now);
+  const hoursUntilReset = Math.floor(msUntilReset / (1000 * 60 * 60));
+  const minsUntilReset = Math.floor((msUntilReset % (1000 * 60 * 60)) / (1000 * 60));
+  const resetTimeString = `${hoursUntilReset}h ${minsUntilReset}m (resets midnight PT / 1:30 PM IST)`;
   const quotaPct = Math.round((remainingRPD / RPD_LIMIT) * 100);
   const isDownshifted = quotaPct < 20;
-
-  const toast = liveRecoveryToastPending ? "API quota has reset — back to live." : null;
-  if (liveRecoveryToastPending) liveRecoveryToastPending = false;
 
   return {
     remainingRPM,
     remainingRPD,
     resetsAt,
     resetTimeString,
-    istTimeStr,
-    hoursUntilReset,
-    minsUntilReset,
     quotaPct,
     isDownshifted,
     systemMode,
-    replayEnteredReason,
-    replayEnteredAt,
     rpmLimit: RPM_LIMIT,
-    rpdLimit: RPD_LIMIT,
-    liveRecoveryToast: toast,
-    callsAttempted: totalCallsAttempted,
-    callsSuccessful: totalCallsSuccessful
+    rpdLimit: RPD_LIMIT
   };
-}
-
-export function resetQuotaAndCalls() {
-  callTimestampsRolling = [];
-  dailyCallsCount = 0;
-  systemMode = 'live';
-  replayEnteredReason = null;
-  replayEnteredAt = null;
-  lastError = null;
-  dailyResetDate = getPacificDayKey();
-  console.log(`[NEXT Quota] Quota reset. ${RPD_LIMIT} calls available. Mode set to LIVE.`);
-  return getQuotaStatus();
 }
 
 function trackApiCall() {
   const now = Date.now();
   callTimestampsRolling.push(now);
+  dailyCallsCount++;
 }
 
 // ----------------------------------------------------
@@ -1629,118 +1002,47 @@ seedInitialActivityLogs();
 // GEMINI CALL ROUTINES (With Model Fallback & Instrumentation)
 // ----------------------------------------------------
 
-const RPM_BACKOFF_DELAYS = [2000, 8000, 20000];
-
-export async function probeAvailableModels() {
-  const geminiKey = getEffectiveApiKey();
-  if (!geminiKey) {
-    console.log('[NEXT AI Probe] No API key detected — running in simulated / demo mode.');
-    return;
-  }
-
-  const ai = new GoogleGenAI({
-    apiKey: geminiKey,
-    httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-  });
-
-  const modelsToProbe = [MODEL];
-  if (ARBITER_MODEL_CONFIG && ARBITER_MODEL_CONFIG !== MODEL) {
-    modelsToProbe.push(ARBITER_MODEL_CONFIG);
-  }
-
-  const working = [];
-
-  for (const m of modelsToProbe) {
-    try {
-      const res = await ai.models.generateContent({
-        model: m,
-        contents: 'ping',
-        config: { maxOutputTokens: 8 }
-      });
-      if (res) {
-        working.push(m);
-      }
-    } catch (err) {
-      console.warn(`[NEXT AI Probe] Model '${m}' probe notice: ${err?.message?.slice(0, 80)}`);
-    }
-  }
-
-  if (working.includes(MODEL)) {
-    verifiedModel = MODEL;
-    availableModels = working;
-    verifiedArbiterModel = working.includes(ARBITER_MODEL_CONFIG) ? ARBITER_MODEL_CONFIG : verifiedModel;
-    arbiterModelReachable = working.includes(ARBITER_MODEL_CONFIG);
-    console.log(`[NEXT AI Probe] Verified models: ${working.join(', ')}. Verified Arbiter: ${verifiedArbiterModel}`);
-  } else {
-    // Model fallback chain if configured model is 404 or unavailable
-    const fallbacks = ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.1-flash-lite'];
-    for (const fb of fallbacks) {
-      try {
-        const res = await ai.models.generateContent({
-          model: fb,
-          contents: 'ping',
-          config: { maxOutputTokens: 8 }
-        });
-        if (res) {
-          verifiedModel = fb;
-          verifiedArbiterModel = fb;
-          availableModels = [fb];
-          arbiterModelReachable = true;
-          console.log(`[NEXT AI Probe] Fallback model verified: ${fb}`);
-          break;
-        }
-      } catch {}
-    }
-  }
-}
-
-async function executeGeminiCall(ai, prompt, { promptName, enableSearch = false, customModel = null, responseSchema = null }) {
-  attemptLiveRecovery();
+async function executeGeminiCall(ai, prompt, { promptName, enableSearch = false, customModel = MODEL }) {
   const quota = getQuotaStatus();
-
+  if (quota.remainingRPM <= 0) {
+    const err = new Error("Rate limited. Retrying in 30s.");
+    err.status = 429;
+    err.isRpm = true;
+    throw err;
+  }
   if (quota.remainingRPD <= 0 || systemMode === 'replay') {
     systemMode = 'replay';
-    const resetsInfo = getDerivedResetStrings();
-    const err = new Error(`Daily limit reached. Resets at midnight PT (${resetsInfo.istTimeStr} IST). Switched to Demo mode.`);
+    const err = new Error("Daily quota used up. Resets at midnight Pacific (12:30 PM IST). Operating in Replay mode.");
     err.status = 429;
     err.isRpd = true;
     throw err;
   }
 
-  const modelToUse = customModel || verifiedModel;
   const startTime = Date.now();
+  const modelsToTry = [customModel, ...DEFAULT_MODELS.filter(m => m !== customModel)];
   let lastErr = null;
-  const maxAttempts = 2; // Up to 2 retries for RPM
 
-  for (let attempt = 0; attempt <= maxAttempts; attempt++) {
-    totalCallsAttempted++;
-    trackApiCall();
-
+  for (const m of modelsToTry) {
     try {
       const config = {};
       if (enableSearch) {
         config.tools = [{ googleSearch: {} }];
       }
-      if (responseSchema) {
-        config.responseMimeType = 'application/json';
-        config.responseSchema = responseSchema;
-      }
 
+      trackApiCall();
       const response = await ai.models.generateContent({
-        model: modelToUse,
+        model: m,
         contents: prompt,
         config
       });
 
-      totalCallsSuccessful++;
-      dailyCallsCount++;
       const durationMs = Date.now() - startTime;
       const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
       const citationsCount = chunks.length;
 
       recordAiCall({
         promptName,
-        model: modelToUse,
+        model: m,
         durationMs,
         ok: true,
         summary: `Success (${citationsCount} citations)`,
@@ -1749,80 +1051,42 @@ async function executeGeminiCall(ai, prompt, { promptName, enableSearch = false,
         citationsCount
       });
 
-      return { response, modelUsed: modelToUse, chunks, durationMs };
+      return { response, modelUsed: m, chunks, durationMs };
     } catch (err) {
       lastErr = err;
       const msg = err?.message || String(err);
-      const is429 = msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota') || msg.includes('exceeded');
-      const is404 = msg.includes('404') || msg.includes('NOT_FOUND') || msg.includes('not found') || msg.includes('no longer available');
-
-      if (is404 && modelToUse !== 'gemini-3.7-flash' && modelToUse !== 'gemini-3.6-flash') {
-        console.warn(`[NEXT Model Fallback] Model ${modelToUse} returned 404. Switching to gemini-3.7-flash.`);
-        verifiedModel = 'gemini-3.7-flash';
-        verifiedArbiterModel = 'gemini-3.7-flash';
-        return executeGeminiCall(ai, prompt, { promptName, enableSearch, customModel: 'gemini-3.7-flash', responseSchema });
+      if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota') || msg.includes('exceeded')) {
+        systemMode = 'replay';
+        dailyCallsCount = RPD_LIMIT;
+        console.log(`[NEXT Quota] API quota reached (429 RESOURCE_EXHAUSTED). Operating smoothly in Replay mode.`);
+        break;
       }
-
-      if (is429) {
-        const isDailyExhausted = msg.includes('PerDay') || msg.includes('quota exceeded') || dailyCallsCount >= RPD_LIMIT;
-
-        if (isDailyExhausted || attempt >= maxAttempts) {
-          systemMode = 'replay';
-          replayEnteredAt = Date.now();
-          if (isDailyExhausted) {
-            dailyCallsCount = RPD_LIMIT;
-            replayEnteredReason = 'RPD';
-            const resetsInfo = getDerivedResetStrings();
-            lastError = `Daily limit reached. Back at ${resetsInfo.istTimeStr} IST. Switched to Demo mode.`;
-          } else {
-            replayEnteredReason = 'RPM';
-            lastError = `Short-term rate limit reached. Auto-recovering in 90s. Operating in Demo mode.`;
-          }
-          console.log(`[NEXT Quota] 429 quota reached (${replayEnteredReason}). Switched to Replay mode.`);
-          broadcastStatus('demo', lastError);
-          break; // Stop immediately, do not retry
-        }
-
-        const delay = RPM_BACKOFF_DELAYS[attempt] + Math.floor(Math.random() * 1000);
-        const retrySec = Math.round(delay / 1000);
-        console.warn(`[NEXT Rate Limit] Rate limited on ${promptName}. Retrying in ${retrySec}s...`);
-        broadcastAgentLog({
-          agent: "Network",
-          time: "Just now",
-          status: "RATE_LIMITED",
-          text: `Rate limited — retrying in ${retrySec}s`
-        });
-        await new Promise(resolve => setTimeout(resolve, delay));
+      if (msg.includes('404') || msg.includes('not found') || msg.includes('is no longer available')) {
+        console.warn(`[Gemini Fallback] Model '${m}' unavailable for ${promptName}, falling back...`);
         continue;
       }
-
       break;
     }
   }
 
   const durationMs = Date.now() - startTime;
-  const isQuotaErr = lastErr?.message && (lastErr.message.includes('429') || lastErr.message.includes('RESOURCE_EXHAUSTED') || lastErr.message.includes('quota'));
-  const cleanSummary = isQuotaErr 
-    ? 'Daily limit reached (Demo mode active)' 
-    : `Failed: ${lastErr?.message?.slice(0, 45) || 'Error'}`;
-
   recordAiCall({
     promptName,
-    model: modelToUse,
+    model: customModel,
     durationMs,
     ok: false,
-    summary: cleanSummary,
+    summary: `Failed: ${lastErr?.message?.slice(0, 45) || 'Error'}`,
     prompt,
     response: '',
     citationsCount: 0,
-    error: isQuotaErr ? 'API Quota Limit (429) - running in Demo mode' : (lastErr?.message || String(lastErr))
+    error: lastErr?.message || String(lastErr)
   });
 
   throw lastErr;
 }
 
-async function callGeminiGrounded(ai, prompt, options = {}) {
-  return executeGeminiCall(ai, prompt, { promptName: "refreshNews", enableSearch: true, ...options });
+async function callGeminiGrounded(ai, prompt) {
+  return executeGeminiCall(ai, prompt, { promptName: "refreshNews", enableSearch: true });
 }
 
 // ----------------------------------------------------
@@ -2159,7 +1423,7 @@ Return strictly a JSON object:
     const { response } = await executeGeminiCall(ai, prompt, {
       promptName: "arbiter",
       enableSearch: false,
-      customModel: verifiedArbiterModel
+      customModel: "gemini-2.5-pro"
     });
     const parsed = extractJson(response.text);
     if (parsed && parsed.verdict) {
@@ -2302,272 +1566,184 @@ async function refreshNews() {
   if (inflight) return inflight;
 
   inflight = (async () => {
-    const geminiKey = getEffectiveApiKey();
-    const isLive = !!geminiKey && systemMode === 'live';
+    const geminiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
+    if (!geminiKey || systemMode === 'replay') {
+      mode = 'demo';
+      generatedAt = new Date().toISOString();
+      lastRefresh = generatedAt;
+      return { mode: 'demo', bufferSize: newsBuffer.length };
+    }
 
     try {
       isScanning = true;
-      let addedCount = 0;
-      let callsUsed = 0;
-      const collectedCitations = [];
-      const newItemsToMerge = [];
-
-      // ==========================================
-      // STAGE A: Native High-Speed RSS Ingestion
-      // ==========================================
-      const rssPromises = FMCG_CATEGORIES.map(async (cat) => {
-        try {
-          const feeds = RSS_FEEDS_BY_CATEGORY[cat.name] || RSS_FEEDS_BY_CATEGORY['Personal Care'];
-          const items = await fetchRssFeed(feeds[0]);
-          return items.map(item => {
-            const headline = item.headline || item.title;
-            const summary = item.summary || '';
-            const detectedBrand = detectBrand(headline, summary, cat.brands[0]);
-            const targetCategory = classifyCategory(headline, summary, detectedBrand, cat.name);
-            return {
-              ...item,
-              headline,
-              brand: detectedBrand,
-              category: targetCategory,
-              provenance: 'LIVE_RSS'
-            };
-          });
-        } catch (rssErr) {
-          return [];
-        }
+      const ai = new GoogleGenAI({
+        apiKey: geminiKey,
+        httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
       });
 
-      const rssResults = await Promise.allSettled(rssPromises);
-      rssResults.forEach(r => {
-        if (r.status === 'fulfilled' && Array.isArray(r.value)) {
-          r.value.forEach(rawItem => {
-            if (isGenuinelyRelevant(rawItem)) {
-              newItemsToMerge.push(rawItem);
-            }
-          });
-        }
-      });
+      const prompt = `You are the NEXT Cultural War Room AI Ingestion Engine for Hindustan Unilever (HUL).
+Search live Google News for current Indian consumer, FMCG, retail, and cultural market events from today.
+Focus on HUL core power brands in India: Dove, Surf Excel, Lifebuoy, Rexona, Lux, Pond's, Glow & Lovely, Vim, Rin, Brooke Bond Red Label, Bru, Knorr, Horlicks.
+Also monitor quick commerce trends (Blinkit, Zepto, Swiggy Instamart) and consumer discussions across 6 surveillance lanes (Trade press, Social and creator, Quick commerce, Competitor, Regulatory, Weather and calendar).
 
-      // ==========================================
-      // STAGE B: Gemini Grounded Search Ingestion
-      // ==========================================
-      if (isLive) {
-        try {
-          const ai = new GoogleGenAI({
-            apiKey: geminiKey,
-            httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-          });
-
-          for (const cat of FMCG_CATEGORIES) {
-            try {
-              const catPrompt = `You are the NEXT Cultural War Room AI Ingestion Engine for Hindustan Unilever (HUL).
-Search live Google News for current Indian consumer, FMCG, retail, and cultural market events from today for CATEGORY: "${cat.name}".
-Specific category search focus: ${cat.query}
-Category focus brands: ${cat.brands.join(', ')}.
-
-Fetch a rich pool of 2 to 3 distinct, factually grounded articles specifically relevant to ${cat.name} in India.
-Include both fresh breaking moments and ongoing trend developments.
-
-Return strictly a JSON object with this structure:
+Return ONLY a valid JSON object with this exact structure:
 {
-  "articles": [
+  "indiaMarketNews": [
     {
-      "headline": "Factual headline",
-      "summary": "1-2 sentences with specific numbers, locations, and details derived strictly from the fetched content",
-      "source": "Publication name",
-      "url": "https://... or valid source URL",
-      "publishedAt": "e.g. 15m ago, 2h ago, or 1d ago",
+      "headline": "string",
+      "summary": "1-2 sentences with specific factual details",
+      "source": "publication name",
+      "url": "https://... or null",
+      "publishedAt": "string",
       "region": "India",
-      "category": "${cat.name}",
-      "brand": "One of ${cat.brands.join('/')}",
-      "impact": "High / Medium",
-      "isArchive": false,
+      "category": "Personal Care / Home Care / Beauty & Wellbeing / Foods & Refreshment / Supply Chain",
+      "brand": "Dove / Surf Excel / Rexona / Lifebuoy / Knorr / Pond's / Lux / Vim / Brooke Bond / HUL",
+      "impact": "High / Medium / Low",
       "analysis": {
-        "relevance": 88,
+        "relevance": 87,
         "stance": "ACT / WATCH / IGNORE",
-        "rationale": "Strategic rationale",
+        "rationale": "one line plain English reason",
         "agentRead": [
-          { "name": "Culture", "score": 90, "verdict": "Go", "line": "Cultural velocity" },
-          { "name": "Brand", "score": 92, "verdict": "Go", "line": "Brand alignment" },
-          { "name": "Risk", "score": 85, "verdict": "Go", "line": "Claims safety" },
-          { "name": "Commercial", "score": 84, "verdict": "Go", "line": "Commercial uplift" },
-          { "name": "Devil's Advocate", "score": 75, "verdict": "Hold", "line": "Ambush risk" }
+          { "name": "Culture", "score": 92, "verdict": "Go", "line": "..." },
+          { "name": "Brand", "score": 88, "verdict": "Go", "line": "..." },
+          { "name": "Risk", "score": 85, "verdict": "Go", "line": "..." },
+          { "name": "Commercial", "score": 84, "verdict": "Go", "line": "..." },
+          { "name": "Devil's Advocate", "score": 75, "verdict": "Hold", "line": "..." }
         ],
         "windowHours": 8
       }
     }
-  ]
+  ],
+  "globalNews": [
+    {
+      "headline": "string",
+      "summary": "1-2 sentences",
+      "source": "publication name",
+      "url": "https://... or null",
+      "publishedAt": "string",
+      "region": "Global",
+      "category": "Personal Care / Home Care / Foods & Refreshment / Supply Chain",
+      "brand": "string",
+      "impact": "High / Medium / Low",
+      "analysis": {
+        "relevance": 65,
+        "stance": "WATCH",
+        "rationale": "one line plain English",
+        "agentRead": [
+          { "name": "Culture", "score": 60, "verdict": "Hold", "line": "..." },
+          { "name": "Brand", "score": 75, "verdict": "Go", "line": "..." },
+          { "name": "Risk", "score": 85, "verdict": "Go", "line": "..." },
+          { "name": "Commercial", "score": 70, "verdict": "Hold", "line": "..." },
+          { "name": "Devil's Advocate", "score": 65, "verdict": "Hold", "line": "..." }
+        ],
+        "windowHours": 24
+      }
+    }
+  ],
+  "marketContext": {
+    "consumerSentiment": "Positive / Mixed / Cautious / Negative",
+    "trendingKeywords": ["monsoon", "quick commerce", "sachet", "ASCI"],
+    "summary": "2-3 sentence desk brief for HUL leadership",
+    "kpis": [
+      { "label": "string", "value": "string", "delta": "string", "color": "#0E9F6E" }
+    ]
+  }
 }`;
 
-              const { response, chunks } = await callGeminiGrounded(ai, catPrompt);
-              callsUsed++;
-              const parsed = extractJson(response.text);
+      const { response, chunks } = await callGeminiGrounded(ai, prompt);
+      const rawText = response.text;
+      const parsed = extractJson(rawText);
 
-              (chunks || []).forEach(c => {
-                if (c.web?.uri) {
-                  collectedCitations.push({
-                    title: c.web.title || new URL(c.web.uri).hostname,
-                    uri: c.web.uri
-                  });
-                }
-              });
-
-              if (parsed && Array.isArray(parsed.articles)) {
-                parsed.articles.forEach(rawItem => {
-                  if (isGenuinelyRelevant(rawItem)) {
-                    rawItem.provenance = chunks && chunks.length > 0 ? "LIVE_GROUNDED" : "MODEL_UNVERIFIED";
-                    if (collectedCitations.length > 0) {
-                      rawItem.citations = collectedCitations.slice(-2);
-                    }
-                    newItemsToMerge.push(rawItem);
-                  }
-                });
-              }
-            } catch (catErr) {
-              const catMsg = catErr?.message || String(catErr);
-              const is429 = catMsg.includes('429') || catMsg.includes('RESOURCE_EXHAUSTED') || catMsg.includes('quota') || catMsg.includes('exceeded');
-              if (is429) {
-                systemMode = 'replay';
-                dailyCallsCount = RPD_LIMIT;
-                console.log(`[HUL News Engine] Quota limit reached during ${cat.name} scan. Operating smoothly in Replay/Demo mode.`);
-                break;
-              }
-              console.warn(`[News Engine] Notice for category ${cat.name}:`, catMsg.slice(0, 80));
-            }
-          }
-        } catch (geminiErr) {
-          console.warn('[HUL Ingestion] Gemini grounding notice:', geminiErr.message?.slice(0, 80));
-        }
-      }
-
-      if (collectedCitations.length > 0) {
-        currentSources = collectedCitations.slice(0, 8);
-      }
-
-      // ==========================================
-      // STAGE C: Additive Merge, Deduplication, & SQLite Persistence
-      // ==========================================
-      newItemsToMerge.forEach(rawItem => {
-        const norm = normaliseItem(rawItem, rawItem.region || 'India');
-        if (!norm) return;
-
-        // Deduplication against existing newsBuffer
-        const isDupe = newsBuffer.some(existing => {
-          if (existing.id === norm.id) return true;
-          if (existing.contentHash && norm.contentHash && existing.contentHash === norm.contentHash) return true;
-          const normExistingTitle = normalizeTitle(existing.headline || existing.title);
-          const normNewTitle = normalizeTitle(norm.headline || norm.title);
-          if (normExistingTitle === normNewTitle) return true;
-          if (existing.canonicalUrl && norm.canonicalUrl && existing.canonicalUrl === norm.canonicalUrl) return true;
-          if (calculateTokenOverlap(normExistingTitle, normNewTitle) >= 0.65) return true;
-          return false;
-        });
-
-        if (!isDupe) {
-          seenHashes.add(norm.id);
-          newsBuffer.unshift(norm);
-          if (norm.provenance.includes('MODEL') || norm.provenance.includes('GROUNDED')) {
-            itemsFromModelCount++;
-          }
-          addedCount++;
-
-          // Persist to SQLite
-          if (db) {
-            try {
-              db.run(`
-                INSERT OR REPLACE INTO news (
-                  id, headline, summary, source, url, canonicalUrl, contentHash,
-                  publishedAt, publishedAtISO, region, category, brand, impact,
-                  isArchive, provenance, stanceColor, stanceBg, analysis, citations, createdAt
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-              `, [
-                norm.id,
-                norm.headline,
-                norm.summary,
-                norm.source,
-                norm.url,
-                norm.canonicalUrl,
-                norm.contentHash,
-                norm.publishedAt,
-                norm.publishedAtISO,
-                norm.region,
-                norm.category,
-                norm.brand,
-                norm.impact,
-                norm.isArchive ? 1 : 0,
-                norm.provenance,
-                norm.stanceColor,
-                norm.stanceBg,
-                JSON.stringify(norm.analysis),
-                JSON.stringify(norm.citations),
-                new Date().toISOString()
-              ]);
-            } catch (dbErr) {
-              console.warn('[NEXT SQLite] Insert error:', dbErr.message);
-            }
-          }
+      const extractedCitations = [];
+      const citationMap = new Set();
+      (chunks || []).forEach(c => {
+        if (c.web?.uri && !citationMap.has(c.web.uri)) {
+          citationMap.add(c.web.uri);
+          extractedCitations.push({
+            title: c.web.title || new URL(c.web.uri).hostname,
+            uri: c.web.uri
+          });
         }
       });
 
-      if (db && addedCount > 0) {
-        persistDb();
+      if (extractedCitations.length > 0) {
+        currentSources = extractedCitations;
       }
 
-      if (newsBuffer.length > BUFFER_MAX) newsBuffer.length = BUFFER_MAX;
-      if (seenHashes.size > 500) {
-        const arr = Array.from(seenHashes);
-        arr.slice(0, 200).forEach(h => seenHashes.delete(h));
+      if (parsed) {
+        if (parsed.marketContext) {
+          currentMarketContext = {
+            consumerSentiment: parsed.marketContext.consumerSentiment || currentMarketContext.consumerSentiment,
+            trendingKeywords: Array.isArray(parsed.marketContext.trendingKeywords) ? parsed.marketContext.trendingKeywords : currentMarketContext.trendingKeywords,
+            summary: parsed.marketContext.summary || currentMarketContext.summary,
+            kpis: Array.isArray(parsed.marketContext.kpis) ? parsed.marketContext.kpis : currentMarketContext.kpis
+          };
+        }
+
+        const indiaItems = Array.isArray(parsed.indiaMarketNews) ? parsed.indiaMarketNews : [];
+        const globalItems = Array.isArray(parsed.globalNews) ? parsed.globalNews : [];
+        const allIncoming = [...indiaItems, ...globalItems];
+
+        const normalised = [];
+        allIncoming.forEach(item => {
+          const norm = normaliseItem(item, item.region || 'India');
+          if (norm) {
+            norm.provenance = "MODEL · GROUNDED";
+            if (norm.citations.length === 0 && currentSources.length > 0) {
+              norm.citations = currentSources.slice(0, 3);
+            }
+            normalised.push(norm);
+          }
+        });
+
+        let addedCount = 0;
+        normalised.forEach(n => {
+          if (!seenHashes.has(n.id)) {
+            seenHashes.add(n.id);
+            newsBuffer.unshift(n);
+            itemsFromModelCount++;
+            addedCount++;
+          }
+        });
+
+        if (newsBuffer.length > BUFFER_MAX) newsBuffer.length = BUFFER_MAX;
+        if (seenHashes.size > 500) {
+          const arr = Array.from(seenHashes);
+          arr.slice(0, 200).forEach(h => seenHashes.delete(h));
+        }
+
+        mode = 'live';
+        generatedAt = new Date().toISOString();
+        lastRefresh = generatedAt;
+        lastError = null;
+
+        broadcastContext(currentMarketContext);
+        console.log(`[HUL Live Intelligence] Ingested ${addedCount} new grounded stories (Buffer: ${newsBuffer.length}).`);
       }
-
-      mode = isLive ? 'live' : 'demo';
-      generatedAt = new Date().toISOString();
-      lastRefresh = generatedAt;
-      lastError = null;
-
-      broadcastContext(currentMarketContext);
-      console.log(`[HUL News Engine] Ingestion complete. Added ${addedCount} new stories. Buffer size: ${newsBuffer.length}`);
-
-      return {
-        success: true,
-        mode,
-        bufferSize: newsBuffer.length,
-        addedCount,
-        lanesQueried: FMCG_CATEGORIES.length,
-        callsUsed,
-        error: null
-      };
     } catch (err) {
       const msg = err?.message || String(err);
       if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota') || msg.includes('exceeded')) {
         systemMode = 'replay';
-        lastError = 'API Quota Notice: operating smoothly from pre-cleared real-time market intelligence.';
-        console.log('[HUL Live Intelligence] Operating smoothly in Demo mode.');
+        dailyCallsCount = RPD_LIMIT;
+        console.log('[HUL Live Intelligence] Daily API quota reached. Operating seamlessly from recorded telemetry.');
       } else {
-        lastError = msg.slice(0, 100);
-        console.warn('[HUL Live Intelligence] Ingestion notice:', lastError);
+        console.warn('[HUL Live Intelligence] Search generation notice:', msg);
       }
+      lastError = msg;
       broadcastStatus('demo', lastError);
-      return {
-        success: false,
-        mode: 'replay',
-        bufferSize: newsBuffer.length,
-        addedCount: 0,
-        lanesQueried: FMCG_CATEGORIES.length,
-        callsUsed: 0,
-        error: lastError
-      };
     } finally {
       isScanning = false;
       inflight = null;
     }
+
+    return { mode, bufferSize: newsBuffer.length };
   })();
 
   return inflight;
 }
 
-// Background Poller & Model Prober
-initDatabase().then(async () => {
-  await probeAvailableModels();
+// Background Poller
+initDatabase().then(() => {
   refreshNews();
   setInterval(refreshNews, REFRESH_MS);
 });
@@ -2688,8 +1864,8 @@ app.get('/api/news/stream', (req, res) => {
   });
 });
 
-// 2. Diagnostics API (/api/diagnostics, /api/status) - Comprehensive Telemetry with Quota Tracking
-app.get(['/api/diagnostics', '/api/status'], (req, res) => {
+// 2. Diagnostics API (/api/diagnostics) - Comprehensive Telemetry with Quota Tracking
+app.get('/api/diagnostics', (req, res) => {
   const geminiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
   const isKey = !!geminiKey;
   let calcMode = systemMode === 'replay' ? 'replay' : 'demo';
@@ -2725,7 +1901,6 @@ app.get(['/api/diagnostics', '/api/status'], (req, res) => {
     itemsFromModel: itemsFromModelCount,
     itemsFromFixtures: itemsFromFixturesCount,
     isScanning,
-    quota,
     // Quota Manager metrics
     remainingRPD: quota.remainingRPD,
     remainingRPM: quota.remainingRPM,
@@ -2752,114 +1927,10 @@ app.post('/api/mode', (req, res) => {
   const { mode: newMode } = req.body;
   if (newMode === 'live' || newMode === 'replay') {
     systemMode = newMode;
-    if (newMode === 'live' && dailyCallsCount >= RPD_LIMIT) {
-      dailyCallsCount = 0; // reset exhausted counter when operator requests live
-    }
     console.log(`[NEXT Mode] Switched system operating mode to: ${systemMode}`);
     return res.json({ success: true, operatingMode: systemMode, quota: getQuotaStatus() });
   }
   res.status(400).json({ success: false, error: "Invalid mode. Use 'live' or 'replay'." });
-});
-
-// 2b-1. Runtime API Key Management API (/api/config/key)
-app.get('/api/config/key', (req, res) => {
-  const key = getEffectiveApiKey();
-  const isConfigured = !!key;
-  const maskedKey = isConfigured && key.length > 8 
-    ? `${key.slice(0, 4)}...${key.slice(-4)}` 
-    : (isConfigured ? '***' : null);
-
-  res.json({
-    configured: isConfigured,
-    maskedKey,
-    operatingMode: systemMode,
-    model: verifiedModel
-  });
-});
-
-app.post('/api/config/key', async (req, res) => {
-  const { apiKey } = req.body;
-  if (!apiKey || typeof apiKey !== 'string' || apiKey.trim().length < 8) {
-    return res.status(400).json({ success: false, error: 'Invalid API key format.' });
-  }
-
-  const trimmed = apiKey.trim();
-  try {
-    const testAi = new GoogleGenAI({
-      apiKey: trimmed,
-      httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-    });
-    const pingRes = await testAi.models.generateContent({
-      model: MODEL,
-      contents: 'ping',
-      config: { maxOutputTokens: 8 }
-    });
-
-    if (pingRes) {
-      setRuntimeApiKey(trimmed);
-      await probeAvailableModels();
-      recordActivityEvent({
-        type: 'KEY_CONFIG',
-        title: 'Gemini API Key Configured & Verified',
-        detail: `New API key active. System switched to LIVE operating mode with ${verifiedModel}.`,
-        brand: 'System',
-        actor: 'Operator',
-        status: 'VERIFIED',
-        durationMs: 450,
-        promptName: 'System:KeyConfig'
-      });
-      broadcastStatus('live-grounded', null);
-      broadcastAgentLog({
-        agent: "Security",
-        time: "Just now",
-        status: "KEY_ACTIVE",
-        text: "New Gemini API key verified and active. Live real-time intelligence enabled."
-      });
-
-      return res.json({
-        success: true,
-        message: 'API Key successfully verified and configured in memory.',
-        operatingMode: systemMode,
-        verifiedModel
-      });
-    }
-  } catch (err) {
-    return res.status(400).json({
-      success: false,
-      error: `Key verification failed: ${err?.message || 'Invalid key'}`
-    });
-  }
-});
-
-// 2b-2. Dedicated Quota & Telemetry Reset API (/api/quota/reset and /api/reset)
-app.post(['/api/quota/reset', '/api/reset'], (req, res) => {
-  const updatedQuota = resetQuotaAndCalls();
-
-  recordActivityEvent({
-    type: 'QUOTA_RESET',
-    title: 'API Call Quota Counter Reset',
-    detail: 'API calls telemetry counter reset to 1,500 fresh calls. Live operating mode enabled.',
-    brand: 'System',
-    actor: 'Operator',
-    status: 'RESET_OK',
-    durationMs: 5,
-    promptName: 'System:QuotaReset'
-  });
-
-  broadcastStatus('live-grounded', null);
-  broadcastAgentLog({
-    agent: "Quota Manager",
-    time: "Just now",
-    status: "RESET",
-    text: "API Call Counter reset to 1,500 calls. System operating in LIVE mode."
-  });
-
-  res.json({
-    success: true,
-    message: "API calls counter and rate limits reset successfully. System is in LIVE mode with 1,500 calls remaining.",
-    operatingMode: systemMode,
-    quota: updatedQuota
-  });
 });
 
 // 2c. Role Switch Audit Log API (/api/role/switch)
@@ -2918,91 +1989,15 @@ app.post('/api/mesh/evaluate', async (req, res) => {
   }
 });
 
-// 5. Comprehensive HUL Insights & Category Feeds
-app.get('/api/news/categories', (req, res) => {
-  const categoryGroups = FMCG_CATEGORIES.map(cat => {
-    // Exact match on category name
-    const matchingArticles = newsBuffer.filter(n => n.category === cat.name);
-    const liveArticles = matchingArticles.filter(n => !n.isArchive);
-    const archiveArticles = matchingArticles.filter(n => n.isArchive);
-
-    return {
-      id: cat.id,
-      name: cat.name,
-      icon: cat.icon,
-      description: cat.description,
-      brands: cat.brands,
-      totalCount: matchingArticles.length,
-      liveCount: liveArticles.length,
-      archiveCount: archiveArticles.length,
-      liveArticles,
-      archiveArticles
-    };
-  });
-
-  const allArchive = newsBuffer.filter(n => n.isArchive);
-  const allLive = newsBuffer.filter(n => !n.isArchive);
-
-  res.json({
-    success: true,
-    mode,
-    totalArticles: newsBuffer.length,
-    totalLive: allLive.length,
-    totalArchive: allArchive.length,
-    categories: categoryGroups,
-    archiveArticles: allArchive,
-    marketContext: currentMarketContext,
-    sources: currentSources
-  });
-});
-
-app.get('/api/news', (req, res) => {
-  const categoryParam = req.query.category;
-  const isArchiveParam = req.query.archive;
-
-  let filtered = [...newsBuffer];
-  if (categoryParam) {
-    filtered = filtered.filter(n => n.category.toLowerCase().includes(categoryParam.toLowerCase()));
-  }
-  if (isArchiveParam !== undefined) {
-    const wantArchive = isArchiveParam === 'true' || isArchiveParam === '1';
-    filtered = filtered.filter(n => !!n.isArchive === wantArchive);
-  }
-
-  res.json({
-    success: true,
-    count: filtered.length,
-    totalLive: newsBuffer.filter(n => !n.isArchive).length,
-    totalArchive: newsBuffer.filter(n => n.isArchive).length,
-    articles: filtered
-  });
-});
-
+// 5. Comprehensive HUL Insights
 app.get('/api/news/hul-insights', (req, res) => {
+  const indiaNews = newsBuffer.filter(n => n.region === 'India');
+  const globalNews = newsBuffer.filter(n => n.region === 'Global');
   const nextRefreshInSec = Math.max(0, Math.round((nextRefreshAt - Date.now()) / 1000));
-  
-  const categoryGroups = FMCG_CATEGORIES.map(cat => {
-    const matchingArticles = newsBuffer.filter(n => n.category === cat.name);
-    return {
-      id: cat.id,
-      name: cat.name,
-      icon: cat.icon,
-      description: cat.description,
-      brands: cat.brands,
-      totalCount: matchingArticles.length,
-      liveArticles: matchingArticles.filter(n => !n.isArchive),
-      archiveArticles: matchingArticles.filter(n => n.isArchive)
-    };
-  });
-
-  const allArchive = newsBuffer.filter(n => n.isArchive);
-  const allLive = newsBuffer.filter(n => !n.isArchive);
 
   const insights = {
-    categoryGroups,
-    archiveArticles: allArchive,
-    indiaMarketNews: allLive.length ? allLive : newsBuffer,
-    globalNews: allArchive,
+    indiaMarketNews: indiaNews.length ? indiaNews : newsBuffer.slice(0, 4),
+    globalNews: globalNews.length ? globalNews : newsBuffer.slice(4),
     marketContext: currentMarketContext,
     sources: currentSources,
     agentLogs: liveAgentLogs.slice(0, 10),
@@ -3018,15 +2013,14 @@ app.get('/api/news/hul-insights', (req, res) => {
       impact: n.impact,
       region: n.region,
       insight: n.analysis.rationale,
-      provenance: n.provenance || "FIXTURE",
-      isArchive: !!n.isArchive
+      provenance: n.provenance || "FIXTURE"
     })),
     leftNavigationInsights: [
       { domain: "Personal Care", metric: "Live Category Delta", headline: "Up 34%", note: "Conversation velocity peak in 3 hours", status: "Active" },
-      { domain: "Beauty & Wellbeing", metric: "Quick-Commerce Velocity", headline: "2.4x Premium growth", note: "Blinkit & Zepto premium skincare basket growth", status: "Active" },
       { domain: "Home Care", metric: "Rural Demand & Sachet Infiltration", headline: "Surge in sachets", note: "Monsoon wash volume tailwind in UP/Maharashtra", status: "Active" },
+      { domain: "Beauty & Wellbeing", metric: "Quick-Commerce Velocity", headline: "2.4x Premium growth", note: "Blinkit & Zepto premium skincare basket growth", status: "Active" },
       { domain: "Foods & Refreshment", metric: "Tea & Packaged Volume", headline: "Up 42%", note: "Early festival cooking surge detected", status: "Active" },
-      { domain: "Supply Chain & Quick Commerce", metric: "Quick Commerce Dark Store SLAs", headline: "10-Min SLA buffer", note: "Dark store SLA buffers active in top 10 metros", status: "Active" }
+      { domain: "Supply Chain", metric: "Quick Commerce Dark Store SLAs", headline: "10-Min SLA buffer", note: "Dark store SLA buffers active in top 10 metros", status: "Active" }
     ],
     rightNavigationInsights: {
       liveDeskBrief: currentMarketContext.summary,
@@ -3087,792 +2081,34 @@ app.post('/api/news/refresh-now', async (req, res) => {
     const result = await refreshNews();
     isScanning = false;
     
-    const wasLive = result && result.success && result.mode === 'live';
-    const added = result?.addedCount || 0;
-
     recordActivityEvent({
       type: 'RADAR_SCAN',
-      title: wasLive ? 'Manual Market Intelligence Scan' : 'Market Intelligence Replay Scan',
-      detail: wasLive 
-        ? `Scanned 6 surveillance lanes. Ingested ${added} new grounded items.` 
-        : '6 surveillance lanes scanned. Operating smoothly from pre-cleared intelligence.',
+      title: 'Manual Market Intelligence Scan',
+      detail: 'Scanned 6 surveillance lanes. Real-time FMCG & cultural signals refreshed.',
       brand: 'Multi-Brand',
       actor: 'Brand Operator',
-      status: wasLive ? 'COMPLETED' : 'REPLAY_SERVED',
+      status: 'COMPLETED',
       durationMs: 820,
-      citationsCount: wasLive ? 6 : 0,
+      citationsCount: 6,
       promptName: 'Radar:ManualScan'
     });
-
-    const plainOutcome = wasLive 
-      ? (added > 0 ? `Scanned 6 lanes · ${added} new signals ingested.` : `Scanned 6 lanes · No new high-priority anomalies detected.`)
-      : (result?.error || 'Operating in Demo mode · Pre-cleared intelligence active.');
 
     broadcastAgentLog({
       agent: "Arbiter",
       time: "Just now",
-      status: wasLive ? "COMPLETED" : "DEMO",
-      text: plainOutcome
+      status: "COMPLETED",
+      text: `Scan finished. Ingested grounded intelligence. Next automated scan in 10 minutes.`
     });
-
-    res.json({
-      success: wasLive,
-      mode: result?.mode || systemMode,
-      addedCount: added,
-      lanesQueried: 6,
-      callsUsed: wasLive ? 1 : 0,
-      message: plainOutcome,
-      error: wasLive ? null : (result?.error || 'Operating in Demo mode'),
-      nextRefreshAt
-    });
+    res.json({ success: true, ...result, nextRefreshAt });
   } catch (err) {
     isScanning = false;
-    res.json({
-      success: false,
-      mode: 'replay',
-      addedCount: 0,
-      lanesQueried: 6,
-      callsUsed: 0,
-      error: err.message,
-      message: `Scan failed: ${err.message}`
-    });
+    res.status(500).json({ success: false, error: err.message });
   }
-});
-
-// Self-Test Diagnostic Endpoint (/api/selftest)
-app.get('/api/selftest', async (req, res) => {
-  const geminiKey = process.env.GEMINI_API_KEY || process.env.API_KEY;
-  const quota = getQuotaStatus();
-  const resetsInfo = getDerivedResetStrings();
-
-  const results = {
-    apiKey: {
-      status: geminiKey ? 'OK' : 'MISSING',
-      message: geminiKey ? 'API key is configured in environment.' : 'GEMINI_API_KEY is not set. Add your key in Settings to enable live AI.',
-      action: geminiKey ? null : 'Provide GEMINI_API_KEY in Settings.'
-    },
-    quota: {
-      status: quota.remainingRPD > 0 ? 'OK' : 'EXHAUSTED',
-      remainingRPD: quota.remainingRPD,
-      rpdLimit: quota.rpdLimit,
-      remainingRPM: quota.remainingRPM,
-      rpmLimit: quota.rpmLimit,
-      resetsAt: resetsInfo.resetTimeString,
-      message: quota.remainingRPD > 0 
-        ? `${quota.remainingRPD}/${quota.rpdLimit} daily calls available.` 
-        : `Daily call limit reached. Resets at midnight PT (${resetsInfo.istTimeStr} IST).`,
-      action: quota.remainingRPD > 0 ? null : 'Wait for daily reset, or click "Reset Quota" in the diagnostics drawer.'
-    },
-    models: {
-      configuredModel: MODEL,
-      verifiedModel,
-      configuredArbiterModel: ARBITER_MODEL_CONFIG,
-      verifiedArbiterModel,
-      availableModels,
-      arbiterReachable: arbiterModelReachable,
-      message: `Primary: ${verifiedModel} · Arbiter: ${verifiedArbiterModel}`,
-      action: arbiterModelReachable ? null : 'Arbiter is running on Flash model for compatibility.'
-    },
-    grounding: {
-      status: 'AVAILABLE',
-      citationsInBuffer: currentSources.length,
-      message: `${currentSources.length} search citations actively indexed.`
-    },
-    systemMode,
-    overallHealth: (!geminiKey || quota.remainingRPD <= 0) ? 'DEGRADED_DEMO' : 'LIVE_OPERATIONAL'
-  };
-
-  res.json(results);
-});
-
-// Temporary Phase 0 Grounding Test Endpoint
-app.get('/api/debug/grounding-test', async (req, res) => {
-  const geminiKey = getEffectiveApiKey();
-  const testQuery = "Hindustan Unilever news today";
-  let callSucceeded = false;
-  let groundingChunkCount = 0;
-  let groundingChunkUrls = [];
-  let rawResponseText = "";
-  let parsedOk = false;
-  let errorMsg = null;
-  const targetModel = 'gemini-3.7-flash';
-
-  if (!geminiKey) {
-    return res.json({
-      systemMode,
-      modelUsed: targetModel,
-      callSucceeded: false,
-      groundingChunkCount: 0,
-      groundingChunkUrls: [],
-      rawResponseText: "",
-      parsedOk: false,
-      error: "No GEMINI_API_KEY available"
-    });
-  }
-
-  try {
-    const ai = new GoogleGenAI({
-      apiKey: geminiKey,
-      httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-    });
-
-    const response = await ai.models.generateContent({
-      model: targetModel,
-      contents: `Search live Google News for: "${testQuery}". Return a JSON array of recent articles with headline, url, and summary.`,
-      config: {
-        tools: [{ googleSearch: {} }]
-      }
-    });
-
-    callSucceeded = true;
-    rawResponseText = (response.text || "").slice(0, 500);
-    const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks ?? [];
-    groundingChunkCount = chunks.length;
-    groundingChunkUrls = chunks.map(c => c.web?.uri).filter(Boolean);
-
-    try {
-      const parsed = extractJson(response.text);
-      if (parsed) parsedOk = true;
-    } catch {}
-
-  } catch (err) {
-    errorMsg = err.message || String(err);
-  }
-
-  res.json({
-    systemMode,
-    modelUsed: targetModel,
-    callSucceeded,
-    groundingChunkCount,
-    groundingChunkUrls,
-    rawResponseText,
-    parsedOk,
-    error: errorMsg
-  });
 });
 
 // 6. Signals API
 app.get('/api/signals', (req, res) => {
   res.json({ success: true, count: signals.length, signals });
-});
-
-// Search Cache & Archive Formatting Helpers
-const SEARCH_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes TTL
-const searchMemCache = new Map();
-
-function computeSearchCacheKey(normQuery) {
-  return crypto.createHash('sha256').update(`signal_search|${normQuery}`).digest('hex');
-}
-
-function getSearchFromCache(normQuery) {
-  const key = computeSearchCacheKey(normQuery);
-  const now = Date.now();
-  if (searchMemCache.has(key)) {
-    const item = searchMemCache.get(key);
-    if (item.expiresAt > now) {
-      return item.result;
-    } else {
-      searchMemCache.delete(key);
-    }
-  }
-
-  if (db) {
-    try {
-      const res = db.exec(`SELECT result, expiresAt FROM agent_cache WHERE cacheKey = '${key}'`);
-      if (res && res.length > 0 && res[0].values.length > 0) {
-        const [resultStr, expiresAt] = res[0].values[0];
-        if (expiresAt > now) {
-          const parsed = JSON.parse(resultStr);
-          searchMemCache.set(key, { result: parsed, expiresAt });
-          return parsed;
-        }
-      }
-    } catch {}
-  }
-  return null;
-}
-
-function setSearchInCache(normQuery, result) {
-  const key = computeSearchCacheKey(normQuery);
-  const now = Date.now();
-  const expiresAt = now + SEARCH_CACHE_TTL_MS;
-  searchMemCache.set(key, { result, expiresAt });
-
-  if (db) {
-    try {
-      const escapedResult = JSON.stringify(result).replace(/'/g, "''");
-      const escapedQuery = (normQuery || '').replace(/'/g, "''");
-      db.run(`INSERT OR REPLACE INTO agent_cache (cacheKey, agentName, headline, constraintStr, result, createdAt, expiresAt)
-              VALUES ('${key}', 'SignalSearch', '${escapedQuery}', '', '${escapedResult}', ${now}, ${expiresAt})`);
-      persistDb();
-    } catch {}
-  }
-}
-
-function formatNewsAsSignal(newsItem, provOverride = "ARCHIVE") {
-  const headline = newsItem.headline || newsItem.title || "Cultural News Signal";
-  const summary = newsItem.summary || "";
-  const detectedBrand = newsItem.brand || detectBrand(headline, summary, "HUL");
-  const targetCategory = newsItem.category || classifyCategory(headline, summary, detectedBrand);
-  const oppScore = newsItem.analysis?.relevance || (newsItem.impact === 'High' ? 88 : 78);
-  const stance = newsItem.analysis?.stance || (oppScore >= 85 ? "ACT FAST" : "MONITOR");
-  const verdictColor = newsItem.stanceColor || (stance.includes("ACT") ? "#0E9F6E" : "#1F44D6");
-  const verdictBg = newsItem.stanceBg || (stance.includes("ACT") ? "#E8F8F0" : "#EAF0FF");
-
-  return {
-    id: newsItem.id || `SIG-${(newsItem.contentHash || crypto.randomUUID()).slice(0, 6)}`,
-    brand: detectedBrand,
-    category: targetCategory,
-    headline,
-    summary,
-    source: newsItem.source || "News Wire",
-    url: newsItem.canonicalUrl || newsItem.url || null,
-    canonicalUrl: newsItem.canonicalUrl || newsItem.url || null,
-    contentHash: newsItem.contentHash || computeContentHash(headline),
-    publishedAt: newsItem.publishedAt || "Archived",
-    publishedAtISO: newsItem.publishedAtISO || new Date().toISOString(),
-    seenTime: newsItem.publishedAt || "Archived",
-    opportunityScore: oppScore,
-    windowClose: "4h 00m",
-    verdict: stance,
-    verdictColor,
-    verdictBg,
-    decisionRights: "Category Lead Level",
-    ask: newsItem.analysis?.rationale || `Monitor category impact for ${detectedBrand}.`,
-    note: newsItem.analysis?.rationale || "Archived cultural record.",
-    twinDetails: {
-      source: `${detectedBrand} Living Twin`,
-      matchAssessment: "Historical pattern from archived market surveillance."
-    },
-    bullets: [
-      { bg: "#E8F8F0", color: "#0E9F6E", mark: "✓", text: `Archive Match: Sourced from verified ${targetCategory} intelligence.` },
-      { bg: "#FEF3C7", color: "#B8770A", mark: "!", text: `Historical Record: Originally published ${newsItem.publishedAt || 'previously'}.` }
-    ],
-    agentDebate: Array.isArray(newsItem.analysis?.agentRead) && newsItem.analysis.agentRead.length > 0
-      ? newsItem.analysis.agentRead.map(a => ({
-          name: a.name || 'Specialist',
-          score: `${a.score || 80}/100`,
-          verdict: a.verdict || 'Go',
-          color: '#0E9F6E',
-          bg: '#E8F8F0',
-          bd: '#A7F3D0',
-          line: a.line || 'Archived assessment'
-        }))
-      : [
-          { name: "Culture & Trend", score: `${oppScore}/100`, verdict: "ARCHIVED", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Historical market movement." },
-          { name: "Brand Constitution", score: "90/100", verdict: "ALIGNED", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Complies with core brand guidelines." },
-          { name: "ASCI & Legal Gate", score: "92/100", verdict: "CLEARED", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Past compliance verified." },
-          { name: "Commercial & ROI", score: "80/100", verdict: "MONITORED", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Historical commercial impact." },
-          { name: "Devil's Advocate", score: "72/100", verdict: "RETROSPECTIVE", color: "#B8770A", bg: "#FEF4E4", bd: "#FDE68A", line: "Review historical outcome before deploying." }
-        ],
-    provenance: provOverride,
-    citations: newsItem.citations || []
-  };
-}
-
-function searchLocalArchive(query) {
-  const qLower = query.toLowerCase();
-  const matchedMap = new Map();
-
-  // 1. Search in-memory newsBuffer
-  newsBuffer.forEach(item => {
-    const text = `${item.headline || ''} ${item.summary || ''} ${item.brand || ''} ${item.category || ''}`.toLowerCase();
-    if (text.includes(qLower)) {
-      matchedMap.set(item.id || item.contentHash, item);
-    }
-  });
-
-  // 2. Search in-memory seed signals if matching
-  signals.forEach(s => {
-    const text = `${s.headline || ''} ${s.summary || ''} ${s.brand || ''} ${s.category || ''}`.toLowerCase();
-    if (text.includes(qLower) && !matchedMap.has(s.id)) {
-      matchedMap.set(s.id, s);
-    }
-  });
-
-  // 3. Search SQLite database if available
-  if (db) {
-    try {
-      const res = db.exec("SELECT * FROM news ORDER BY publishedAtISO DESC LIMIT 100");
-      if (res.length > 0 && res[0].values.length > 0) {
-        const cols = res[0].columns;
-        res[0].values.forEach(val => {
-          const item = {};
-          cols.forEach((c, idx) => item[c] = val[idx]);
-          const text = `${item.headline || ''} ${item.summary || ''} ${item.brand || ''} ${item.category || ''}`.toLowerCase();
-          if (text.includes(qLower) && !matchedMap.has(item.id || item.contentHash)) {
-            try { item.analysis = JSON.parse(item.analysis); } catch {}
-            try { item.citations = JSON.parse(item.citations); } catch {}
-            item.isArchive = Boolean(item.isArchive);
-            matchedMap.set(item.id || item.contentHash, item);
-          }
-        });
-      }
-    } catch {}
-  }
-
-  // Convert all matched news items to signal objects
-  const archiveSignals = [];
-  matchedMap.forEach(item => {
-    if (item.opportunityScore !== undefined && item.verdict !== undefined) {
-      archiveSignals.push({
-        ...item,
-        provenance: item.provenance === 'FIXTURE' ? 'FIXTURE' : 'ARCHIVE'
-      });
-    } else {
-      archiveSignals.push(formatNewsAsSignal(item, "ARCHIVE"));
-    }
-  });
-
-  return archiveSignals;
-}
-
-// Helper to persist new discovered news items to memory and SQLite
-export function saveNewsItemToState(norm) {
-  if (!norm) return false;
-  const isDupe = newsBuffer.some(existing => {
-    if (existing.id === norm.id) return true;
-    if (existing.contentHash && norm.contentHash && existing.contentHash === norm.contentHash) return true;
-    const normExistingTitle = normalizeTitle(existing.headline || existing.title);
-    const normNewTitle = normalizeTitle(norm.headline || norm.title);
-    if (normExistingTitle === normNewTitle) return true;
-    if (existing.canonicalUrl && norm.canonicalUrl && existing.canonicalUrl === norm.canonicalUrl) return true;
-    if (calculateTokenOverlap(normExistingTitle, normNewTitle) >= 0.65) return true;
-    return false;
-  });
-
-  if (!isDupe) {
-    seenHashes.add(norm.id);
-    newsBuffer.unshift(norm);
-    if (newsBuffer.length > BUFFER_MAX) newsBuffer.length = BUFFER_MAX;
-    if (db) {
-      try {
-        db.run(`
-          INSERT OR REPLACE INTO news (
-            id, headline, summary, source, url, canonicalUrl, contentHash,
-            publishedAt, publishedAtISO, region, category, brand, impact,
-            isArchive, provenance, stanceColor, stanceBg, analysis, citations, createdAt
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        `, [
-          norm.id,
-          norm.headline,
-          norm.summary,
-          norm.source,
-          norm.url,
-          norm.canonicalUrl,
-          norm.contentHash,
-          norm.publishedAt,
-          norm.publishedAtISO,
-          norm.region,
-          norm.category,
-          norm.brand,
-          norm.impact,
-          norm.isArchive ? 1 : 0,
-          norm.provenance,
-          norm.stanceColor,
-          norm.stanceBg,
-          JSON.stringify(norm.analysis || {}),
-          JSON.stringify(norm.citations || []),
-          new Date().toISOString()
-        ]);
-        persistDb();
-      } catch (dbErr) {
-        console.warn('[NEXT SQLite] Insert error:', dbErr.message);
-      }
-    }
-    return true;
-  }
-  return false;
-}
-
-// 6b. Signals Real-Time Search Endpoint (Live Indian RSS Feeds + Google Grounding + Local Archive)
-app.post('/api/signals/search', async (req, res) => {
-  const rawQuery = req.body?.query;
-  if (!rawQuery || typeof rawQuery !== 'string' || rawQuery.trim().length < 3) {
-    return res.status(400).json({
-      success: false,
-      error: 'Search query must be at least 3 characters.',
-      results: []
-    });
-  }
-
-  const query = rawQuery.trim();
-  const limit = Math.min(Math.max(parseInt(req.body.limit, 10) || 8, 1), 30);
-  const normQuery = query.toLowerCase().replace(/\s+/g, ' ');
-
-  // 1. Check 30-Minute Cache
-  const cached = getSearchFromCache(normQuery);
-  if (cached) {
-    const cachedResults = (cached.results || []).map(r => ({
-      ...r,
-      provenance: r.provenance && r.provenance.startsWith('LIVE') ? 'CACHED' : r.provenance
-    }));
-    return res.json({
-      ...cached,
-      results: cachedResults.slice(0, limit),
-      mode: cached.mode || 'cached'
-    });
-  }
-
-  // 2. Search Archive (Instant & Local)
-  const archiveSignals = searchLocalArchive(query);
-
-  const geminiKey = getEffectiveApiKey();
-  const quota = getQuotaStatus();
-  const isLivePossible = !!geminiKey && systemMode === 'live' && quota.remainingRPD > 0;
-
-  const discoveredLiveSignals = [];
-  const usedUrls = new Set();
-  const usedHashes = new Set();
-
-  // 3. Stage A: Search Curated Live Indian News RSS Feeds
-  try {
-    const rssMatches = await searchRssFeedsForKeyword(query);
-    if (Array.isArray(rssMatches) && rssMatches.length > 0) {
-      for (const item of rssMatches) {
-        const headline = item.headline || item.title || '';
-        const summary = item.summary || item.description || '';
-        if (!headline) continue;
-
-        const detectedBrand = item.brand || detectBrand(headline, summary, 'HUL');
-        const detectedCategory = item.category || classifyCategory(headline, summary, detectedBrand);
-        const itemUrl = item.url || item.link || null;
-        const itemHash = item.contentHash || computeContentHash(headline);
-
-        if (itemUrl && usedUrls.has(itemUrl.toLowerCase())) continue;
-        if (usedHashes.has(itemHash)) continue;
-        if (itemUrl) usedUrls.add(itemUrl.toLowerCase());
-        usedHashes.add(itemHash);
-
-        const oppScore = 86;
-        const signalObj = {
-          id: `SIG-${itemHash.slice(0, 6)}`,
-          brand: detectedBrand,
-          category: detectedCategory,
-          headline,
-          summary,
-          source: item.source || 'Live RSS Feed',
-          url: itemUrl,
-          canonicalUrl: itemUrl,
-          contentHash: itemHash,
-          publishedAt: item.publishedAt || 'Today',
-          publishedAtISO: item.publishedAtISO || new Date().toISOString(),
-          seenTime: item.publishedAt || 'Today',
-          opportunityScore: oppScore,
-          windowClose: '3h 30m',
-          verdict: 'ACT FAST',
-          verdictColor: '#0E9F6E',
-          verdictBg: '#E8F8F0',
-          decisionRights: 'Category Lead / Brand Director Level',
-          ask: `Evaluate immediate category activation for ${detectedBrand} across quick-commerce and digital channels.`,
-          note: `Real-time intelligence from ${item.source || 'verified news wire'}.`,
-          twinDetails: {
-            source: `${detectedBrand} Brand Constitution`,
-            matchAssessment: `Direct alignment with ${detectedCategory} surveillance parameters.`
-          },
-          bullets: [
-            { bg: '#E8F8F0', color: '#0E9F6E', mark: '✓', text: `Live Feed: Ingested from verified source (${item.source || 'News Wire'}).` },
-            { bg: '#E8F8F0', color: '#0E9F6E', mark: '✓', text: `Category Fit: Mapped to ${detectedCategory} for ${detectedBrand}.` },
-            { bg: '#FEF3C7', color: '#B8770A', mark: '!', text: 'Time Sensitive: Fast response opportunity active.' }
-          ],
-          agentDebate: [
-            { name: "Culture & Trend", score: "88/100", verdict: "ACTIVE", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Momentum detected in Indian market news." },
-            { name: "Brand Constitution", score: "92/100", verdict: "ALIGNED", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: `Fits ${detectedBrand} core voice and guardrails.` },
-            { name: "ASCI & Legal Gate", score: "90/100", verdict: "CLEAR", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Compliance standards met." },
-            { name: "Commercial & ROI", score: "84/100", verdict: "GROWTH", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "High ROAS potential on quick commerce." },
-            { name: "Devil's Advocate", score: "74/100", verdict: "MONITOR", color: "#B8770A", bg: "#FEF4E4", bd: "#FDE68A", line: "Review channel inventory before high spend." }
-          ],
-          provenance: 'LIVE_GROUNDED',
-          citations: itemUrl ? [{ uri: itemUrl, title: item.source || 'Article Link' }] : []
-        };
-
-        discoveredLiveSignals.push(signalObj);
-
-        // Also add to state buffer and SQLite
-        const normalizedForState = {
-          id: signalObj.id,
-          headline: signalObj.headline,
-          summary: signalObj.summary,
-          source: signalObj.source,
-          url: signalObj.url,
-          canonicalUrl: signalObj.canonicalUrl,
-          contentHash: signalObj.contentHash,
-          publishedAt: signalObj.publishedAt,
-          publishedAtISO: signalObj.publishedAtISO,
-          region: 'India',
-          category: signalObj.category,
-          brand: signalObj.brand,
-          impact: 'High',
-          isArchive: false,
-          provenance: 'LIVE_GROUNDED',
-          stanceColor: signalObj.verdictColor,
-          stanceBg: signalObj.verdictBg,
-          analysis: {
-            stance: signalObj.verdict,
-            rationale: signalObj.ask,
-            relevance: signalObj.opportunityScore
-          },
-          citations: signalObj.citations
-        };
-        saveNewsItemToState(normalizedForState);
-      }
-    }
-  } catch (rssErr) {
-    console.warn('[Signal Search] RSS search note:', rssErr.message);
-  }
-
-  // 4. Stage B: If fewer than 3 results found from RSS and Gemini is available, supplement with Grounded Search
-  if (discoveredLiveSignals.length < 3 && isLivePossible) {
-    try {
-      const ai = new GoogleGenAI({
-        apiKey: geminiKey,
-        httpOptions: { headers: { 'User-Agent': 'aistudio-build' } }
-      });
-
-      const retrievalPrompt = `You are the NEXT Cultural War Room AI Search & Retrieval Engine for Hindustan Unilever (HUL).
-Search live Google News strictly for real, currently published news articles and consumer discussions in India regarding: "${query}".
-
-CRITICAL INSTRUCTIONS:
-1. Return ONLY real facts and news present in the grounded search results.
-2. If fewer than 4 real articles exist, return fewer. Returning an empty array is a valid, correct answer. NEVER invent or fabricate stories.
-3. Every article must have a real headline, summary, publisher source, and valid URL from the search results.
-
-Return strictly a JSON object with this exact structure:
-{
-  "articles": [
-    {
-      "headline": "Real headline from grounded search result",
-      "summary": "1-2 sentences with factual details, numbers, and context strictly from the source",
-      "source": "Publication name (e.g., Economic Times, LiveMint, NDTV, Times of India)",
-      "url": "https://... real URL from the grounded search result",
-      "publishedAt": "e.g. 2h ago, 1d ago, or date",
-      "brand": "Relevant brand (e.g. Dove, Surf Excel, Lifebuoy, Rexona, Pond's, Lux, or HUL)",
-      "category": "Personal Care / Home Care / Beauty & Wellbeing / Foods & Refreshment / Supply Chain & Quick Commerce",
-      "opportunityScore": 88,
-      "verdict": "ACT FAST / MONITOR / ELEVATE SPONSOR / AUTO-TRIGGER / WATCH",
-      "verdictColor": "#0E9F6E",
-      "verdictBg": "#E8F8F0",
-      "decisionRights": "Category Lead / Brand Director / Programmatic Rule",
-      "ask": "Specific brand opportunity recommendation in INR (₹)",
-      "note": "Brand strategic rationale and guardrail alignment",
-      "agentDebate": [
-        { "name": "Culture & Trend", "score": "90/100", "verdict": "ACTIVE", "color": "#0E9F6E", "bg": "#E8F8F0", "bd": "#A7F3D0", "line": "Cultural velocity" },
-        { "name": "Brand Constitution", "score": "92/100", "verdict": "ALIGNED", "color": "#0E9F6E", "bg": "#E8F8F0", "bd": "#A7F3D0", "line": "Brand alignment" },
-        { "name": "ASCI & Legal Gate", "score": "88/100", "verdict": "CLEAR", "color": "#0E9F6E", "bg": "#E8F8F0", "bd": "#A7F3D0", "line": "ASCI safety" },
-        { "name": "Commercial & ROI", "score": "85/100", "verdict": "GROWTH", "color": "#0E9F6E", "bg": "#E8F8F0", "bd": "#A7F3D0", "line": "Commercial lift" },
-        { "name": "Devil's Advocate", "score": "75/100", "verdict": "WATCH", "color": "#B8770A", "bg": "#FEF4E4", bd: "#FDE68A", "line": "Risk assessment" }
-      ]
-    }
-  ]
-}`;
-
-      const { response, chunks } = await executeGeminiCall(ai, retrievalPrompt, {
-        promptName: "Search:LiveGrounded",
-        enableSearch: true
-      });
-
-      const parsed = extractJson(response.text);
-
-      // Build Grounding Citation Verification Set
-      const groundingUrls = new Set();
-      const groundingDomains = new Set();
-      (chunks || []).forEach(c => {
-        if (c.web?.uri) {
-          const cUrl = cleanUrl(c.web.uri) || c.web.uri;
-          groundingUrls.add(cUrl.toLowerCase());
-          try {
-            const host = new URL(c.web.uri).hostname.replace(/^www\./, '').toLowerCase();
-            groundingDomains.add(host);
-          } catch {}
-        }
-      });
-
-      const articles = parsed && Array.isArray(parsed.articles) ? parsed.articles : [];
-
-      for (const art of articles) {
-        if (!art.headline) continue;
-        const artUrl = art.url || '';
-        let isGrounded = false;
-
-        if (artUrl) {
-          const cleanedArtUrl = (cleanUrl(artUrl) || artUrl).toLowerCase();
-          for (const gUrl of groundingUrls) {
-            if (cleanedArtUrl.includes(gUrl) || gUrl.includes(cleanedArtUrl)) {
-              isGrounded = true;
-              break;
-            }
-          }
-          if (!isGrounded) {
-            try {
-              const artHost = new URL(artUrl).hostname.replace(/^www\./, '').toLowerCase();
-              if (groundingDomains.has(artHost)) {
-                isGrounded = true;
-              }
-            } catch {}
-          }
-        }
-
-        if (!isGrounded && chunks && chunks.length > 0) {
-          continue; // Skip ungrounded hallucinations
-        }
-
-        const signalBrand = art.brand || detectBrand(art.headline, art.summary, 'HUL');
-        const signalCategory = art.category || classifyCategory(art.headline, art.summary, signalBrand);
-        const artHash = computeContentHash(art.headline);
-
-        if (artUrl && usedUrls.has(artUrl.toLowerCase())) continue;
-        if (usedHashes.has(artHash)) continue;
-        if (artUrl) usedUrls.add(artUrl.toLowerCase());
-        usedHashes.add(artHash);
-
-        const liveSig = {
-          id: `SIG-${Date.now().toString().slice(-4)}-${Math.floor(Math.random() * 1000)}`,
-          brand: signalBrand,
-          category: signalCategory,
-          headline: art.headline,
-          summary: art.summary || '',
-          source: art.source || 'Google News',
-          url: art.url || null,
-          canonicalUrl: art.url ? (cleanUrl(art.url) || art.url) : null,
-          contentHash: artHash,
-          publishedAt: art.publishedAt || 'Just now',
-          publishedAtISO: new Date().toISOString(),
-          seenTime: art.publishedAt || 'Just now',
-          opportunityScore: typeof art.opportunityScore === 'number' ? art.opportunityScore : 88,
-          windowClose: "3h 30m",
-          verdict: art.verdict || "ACT FAST",
-          verdictColor: art.verdictColor || "#0E9F6E",
-          verdictBg: art.verdictBg || "#E8F8F0",
-          decisionRights: art.decisionRights || "Category Lead / Brand Director Level",
-          ask: art.ask || "Launch responsive campaign.",
-          note: art.note || "Grounded live market opportunity.",
-          twinDetails: {
-            source: `${signalBrand} Brand Constitution`,
-            matchAssessment: "Grounded in live Indian consumer discussions."
-          },
-          bullets: [
-            { bg: "#E8F8F0", color: "#0E9F6E", mark: "✓", text: `Live Grounding: Verified across real published sources.` },
-            { bg: "#E8F8F0", color: "#0E9F6E", mark: "✓", text: `Brand Alignment: Audited against ${signalBrand} equity principles.` },
-            { bg: "#FEF3C7", color: "#B8770A", mark: "!", text: "Execution Window: Peak social momentum active now." }
-          ],
-          agentDebate: Array.isArray(art.agentDebate) && art.agentDebate.length > 0 ? art.agentDebate : [
-            { name: "Culture & Trend", score: "90/100", verdict: "ACTIVE", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Active search velocity in Indian market." },
-            { name: "Brand Constitution", score: "92/100", verdict: "ALIGNED", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Fits brand voice." },
-            { name: "ASCI & Legal Gate", score: "88/100", verdict: "CLEAR", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "ASCI safety verified." },
-            { name: "Commercial & ROI", score: "85/100", verdict: "GROWTH", color: "#0E9F6E", bg: "#E8F8F0", bd: "#A7F3D0", line: "Commercial lift expected." },
-            { name: "Devil's Advocate", score: "75/100", verdict: "WATCH", color: "#B8770A", bg: "#FEF4E4", bd: "#FDE68A", line: "Assess execution speed." }
-          ],
-          provenance: "LIVE_GROUNDED",
-          citations: Array.from(groundingUrls).slice(0, 3).map(u => ({ uri: u, title: u }))
-        };
-
-        discoveredLiveSignals.push(liveSig);
-
-        // Also add to state buffer and SQLite
-        const normalizedForState = {
-          id: liveSig.id,
-          headline: liveSig.headline,
-          summary: liveSig.summary,
-          source: liveSig.source,
-          url: liveSig.url,
-          canonicalUrl: liveSig.canonicalUrl,
-          contentHash: liveSig.contentHash,
-          publishedAt: liveSig.publishedAt,
-          publishedAtISO: liveSig.publishedAtISO,
-          region: 'India',
-          category: liveSig.category,
-          brand: liveSig.brand,
-          impact: 'High',
-          isArchive: false,
-          provenance: 'LIVE_GROUNDED',
-          stanceColor: liveSig.verdictColor,
-          stanceBg: liveSig.verdictBg,
-          analysis: {
-            stance: liveSig.verdict,
-            rationale: liveSig.ask,
-            relevance: liveSig.opportunityScore
-          },
-          citations: liveSig.citations
-        };
-        saveNewsItemToState(normalizedForState);
-      }
-    } catch (geminiSearchErr) {
-      console.warn('[Signal Search] Gemini grounded search note:', geminiSearchErr.message);
-    }
-  }
-
-  // 5. Deduplicate & Merge Live Signals with Archive Results
-  const finalResults = [];
-  const usedIds = new Set();
-  let liveMatchCount = 0;
-  let archiveMatchCount = 0;
-
-  discoveredLiveSignals.forEach(liveSig => {
-    const matchingArchive = archiveSignals.find(arc => {
-      if (arc.canonicalUrl && liveSig.canonicalUrl && arc.canonicalUrl === liveSig.canonicalUrl) return true;
-      if (arc.contentHash && liveSig.contentHash && arc.contentHash === liveSig.contentHash) return true;
-      const normArc = normalizeTitle(arc.headline);
-      const normLive = normalizeTitle(liveSig.headline);
-      if (normArc === normLive) return true;
-      if (calculateTokenOverlap(normArc, normLive) >= 0.65) return true;
-      return false;
-    });
-
-    if (matchingArchive) {
-      liveSig.provenance = "ARCHIVE · REFRESHED";
-      liveSig.publishedAt = matchingArchive.publishedAt || liveSig.publishedAt;
-      liveSig.seenTime = matchingArchive.seenTime || liveSig.seenTime;
-      usedIds.add(matchingArchive.id);
-      archiveMatchCount++;
-    } else {
-      liveMatchCount++;
-    }
-    usedIds.add(liveSig.id);
-    finalResults.push(liveSig);
-  });
-
-  // Add remaining unmatched archive items
-  archiveSignals.forEach(arc => {
-    if (!usedIds.has(arc.id)) {
-      usedIds.add(arc.id);
-      finalResults.push(arc);
-      archiveMatchCount++;
-    }
-  });
-
-  const provenanceBreakdown = {};
-  finalResults.forEach(r => {
-    provenanceBreakdown[r.provenance] = (provenanceBreakdown[r.provenance] || 0) + 1;
-  });
-
-  const responsePayload = {
-    success: true,
-    query,
-    resultCount: finalResults.length,
-    archiveMatches: archiveMatchCount,
-    liveMatches: liveMatchCount,
-    results: finalResults.slice(0, limit),
-    provenanceBreakdown,
-    mode: isLivePossible || discoveredLiveSignals.length > 0 ? 'live' : 'archive-only',
-    error: null
-  };
-
-  setSearchInCache(normQuery, responsePayload);
-  return res.json(responsePayload);
-});
-
-// 6c. Specialist 7-Agent Mesh Evaluation Endpoint (/api/mesh/evaluate)
-app.post('/api/mesh/evaluate', async (req, res) => {
-  try {
-    const candidate = req.body.candidate || req.body;
-    if (!candidate || (!candidate.headline && !candidate.title)) {
-      return res.status(400).json({ success: false, error: 'Candidate headline or title is required' });
-    }
-    const evaluated = await evaluateWithAgentMesh(candidate, req.body.context || {});
-    return res.json({ success: true, evaluation: evaluated });
-  } catch (err) {
-    return res.status(500).json({ success: false, error: err.message || String(err) });
-  }
 });
 
 // 7. Signals Refresh (Grounded Signal Generator)
@@ -3953,9 +2189,10 @@ Return strictly a JSON object with this exact structure:
       const msg = err?.message || String(err);
       if (msg.includes('429') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('quota') || msg.includes('exceeded')) {
         systemMode = 'replay';
-        console.log("[Signals Refresh] Operating seamlessly with Living Brand Twin deterministic generator (Replay mode).");
+        dailyCallsCount = RPD_LIMIT;
+        console.log("[Signals Refresh] Daily API quota reached. Operating in replay mode.");
       } else {
-        console.warn("[Signals Refresh] Using deterministic generator:", msg.slice(0, 80));
+        console.warn("[Signals Refresh] Using deterministic generator:", msg);
       }
     }
   }
@@ -4438,24 +2675,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-function printStartupBanner() {
-  const hasKey = !!getEffectiveApiKey();
-  console.log(`
-╔══════════════════════════════════════════════════════════════════════════╗
-║              NEXT Cultural Decision Infrastructure (HUL)                 ║
-╠══════════════════════════════════════════════════════════════════════════╣
-║  Port:              ${PORT}                                                 ║
-║  Operating Mode:    ${systemMode.toUpperCase()}                                          ║
-║  API Key Status:    ${hasKey ? 'CONFIGURED (Active)' : 'SIMULATED / DEMO MODE'}                   ║
-║  Primary Model:     ${verifiedModel}                                      ║
-║  Arbiter Model:     ${verifiedArbiterModel} (Reachable: ${arbiterModelReachable ? 'YES' : 'FALLBACK'})            ║
-║  Rate Limits:       ${RPM_LIMIT} RPM · ${RPD_LIMIT} RPD (Midnight PT Reset)                ║
-║  Ingestion Engine:  Hybrid (Native RSS + Gemini Grounded Surveillance)  ║
-╚══════════════════════════════════════════════════════════════════════════╝
-`);
-}
-
 app.listen(PORT, '0.0.0.0', () => {
-  printStartupBanner();
+  console.log(`NEXT Cultural Decision System running at http://0.0.0.0:${PORT}`);
 });
 

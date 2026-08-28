@@ -65,28 +65,9 @@ NEXT is an operational decision infrastructure for Hindustan Unilever (HUL). Whe
 
 ```bash
 npm install
-npm run dev
-# Or with explicit environment file:
-node --env-file=.env server.js
+node server.ts
 # Server runs on port 3000 (http://localhost:3000)
 ```
-
-### Environment Configuration (.env)
-
-Create a `.env` file from `.env.example`:
-
-```bash
-cp .env.example .env
-```
-
-Key configuration options:
-- `GEMINI_API_KEY`: Google Gemini API key for live multi-agent intelligence
-- `GEMINI_MODEL`: Primary Gemini model (default: `gemini-3.7-flash`)
-- `GEMINI_ARBITER_MODEL`: Dedicated Arbiter model (default: `gemini-3.7-flash`)
-- `GEMINI_RPM_LIMIT`: Rate limit calls per minute (default: `10`)
-- `GEMINI_RPD_LIMIT`: Daily budget limit (default: `250`)
-- `NEWS_REFRESH_MS`: Ingestion cycle interval (default: `600000` / 10m)
-- `DEMO_MODE`: Enable tamper demo simulator (default: `true`)
 
 ## API Endpoints
 
